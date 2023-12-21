@@ -1,0 +1,372 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #ccc #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 13px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 15px;
+  border: 2px solid #ffffff;
+}
+
+.menu .app-brand.demo {
+  height: 64px;
+  margin-top: 12px;
+}
+
+.app-brand-logo.demo svg {
+  width: 22px;
+  height: 38px;
+}
+
+.app-brand-text.demo {
+  font-size: 1.75rem;
+  letter-spacing: -0.5px;
+  text-transform: lowercase;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
+/* Detached navbar */
+.layout-navbar-fixed .layout-wrapper:not(.layout-horizontal):not(.layout-without-menu) .layout-page {
+  padding-top: 76px !important;
+}
+
+/* Default navbar */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+  padding-top: 64px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+  z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks>* {
+  display: block !important;
+}
+
+.demo-inline-spacing>* {
+  margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing>* {
+  margin-top: 1rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg>* {
+  margin-top: 1.875rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-lg.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl>* {
+  margin-top: 5rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-xl.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.rtl-only {
+  display: none !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+[dir='rtl'] .rtl-only {
+  display: block !important;
+}
+
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.layout-demo-placeholder img {
+  width: 900px;
+}
+
+.layout-demo-info {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.loading-bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff
+}
+
+.vscomp-ele {
+  max-width: 100% !important;
+}
+
+.vscomp-arrow::after {
+  border-bottom-color: #697a8d !important;
+  border-right-color: #697a8d !important;
+}
+
+.vscomp-toggle-button {
+  border: 1px solid #d9dee3 !important;
+  border-radius: 0.375rem;
+  padding: 0.4375rem 1.875rem 0.4375rem 0.875rem !important;
+  color: #697a8d !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.53 !important;
+  font-weight: 400 !important;
+}
+
+.vscomp-wrapper.focused .vscomp-toggle-button,
+.vscomp-wrapper:focus .vscomp-toggle-button {
+  box-shadow: none !important;
+}
+
+.upload__box {
+  padding: 15px;
+  border: 1px dashed;
+  border-radius: 8px;
+  text-align: center;
+
+}
+
+.upload__inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.upload__btn {
+  display: inline-block;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  min-width: 116px;
+  padding: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid;
+  background-color: #4045ba;
+  border-color: #4045ba;
+  border-radius: 10px;
+  line-height: 26px;
+  font-size: 14px;
+
+}
+
+.upload__btn:hover {
+  background-color: unset;
+  color: #4045ba;
+  transition: all 0.3s ease;
+}
+
+.upload__btn-box {
+  margin-bottom: 10px;
+}
+
+.upload__img-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 -10px;
+}
+
+.upload__img-box {
+  width: 200px;
+  padding: 0 10px;
+  margin-bottom: 12px;
+}
+
+.upload__img-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  text-align: center;
+  line-height: 24px;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.upload__img-close:after {
+  content: '\2716';
+  font-size: 14px;
+  color: white;
+}
+
+.img-bg {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  padding-bottom: 100%;
+}
+
+.upload-label {
+  cursor: pointer;
+  padding: 10px 15px;
+  border: 1px dashed;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.five-line {
+  -webkit-line-clamp: 5;
+  /* number of lines to show */
+  line-clamp: 5;
+}
+
+.four-line {
+  -webkit-line-clamp: 4;
+  /* number of lines to show */
+  line-clamp: 4;
+}
+
+.three-line {
+  -webkit-line-clamp: 3;
+  /* number of lines to show */
+  line-clamp: 3;
+}
+
+.two-line {
+  -webkit-line-clamp: 2;
+  /* number of lines to show */
+  line-clamp: 2;
+}
+
+.one-line {
+  -webkit-line-clamp: 1;
+  /* number of lines to show */
+  line-clamp: 1;
+}
+
+.preview-img {
+  object-fit: contain;
+  height: 10rem;
+  width: 10rem;
+  border-radius: 5px;
+  border: 1px dashed;
+}
+
+.wtree li {
+  list-style-type: none;
+  margin: 10px 0 10px 10px;
+  position: relative;
+}
+
+.wtree li:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -20px;
+  border-left: 1px dashed #ddd;
+  border-bottom: 1px dashed #ddd;
+  width: 20px;
+  height: 15px;
+}
+
+.wtree li:after {
+  position: absolute;
+  content: "";
+  top: 5px;
+  left: -20px;
+  border-left: 1px dashed #ddd;
+  border-top: 1px dashed #ddd;
+  width: 20px;
+  height: 100%;
+}
+
+.wtree li:last-child:after {
+  display: none;
+}
+
+.wtree li a {
+  display: block;
+  border: 1px dashed #ddd;
+  padding: 10px;
+  color: #888;
+  text-decoration: none;
+}
+
+.wtree li a:hover,
+.wtree li a:focus {
+  background: #696cff;
+  color: #fff;
+  font-weight: 500;
+  border: 1px dashed #696cff;
+}
+
+.wtree li a:hover+ul li a,
+.wtree li a:focus+ul li a {
+  background: #f1f3f5;
+  color: #000;
+  border: 1px dashed #f1f3f5;
+}
+
+.wtree li a:hover+ul li:after,
+.wtree li a:focus+ul li:after,
+.wtree li a:hover+ul li:before,
+.wtree li a:focus+ul li:before {
+  border-color: #aaa;
+}
