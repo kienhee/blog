@@ -10,14 +10,14 @@
     <meta property="og:url" content="{{ getEnv('APP_URL') }}" />
     <meta property="og:title" content="{{ $work->title }}" />
     <meta property="og:description" content="{{ $work->description }}" />
-    <meta property="og:image" content="{{ $work->cover }}" />
+    <meta property="og:image" content="{{ getEnv('APP_URL') }}{{ $work->cover }}" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="{{ getEnv('APP_URL') }}" />
     <meta property="twitter:title" content="{{ $work->title }}" />
     <meta property="twitter:description" content="{{ $work->description }}" />
-    <meta property="twitter:image" content="{{ $work->cover }}" />
+    <meta property="twitter:image" content="{{ getEnv('APP_URL') }}{{ $work->cover }}" />
 
     <!-- Meta Tags Generated with https://metatags.io -->
 @endsection
@@ -34,7 +34,8 @@
 
             </div>
             <div class="col-md-6">
-                <a href="{{ $work->cover }}" data-lightbox="{{ $work->cover }}" data-title="{{ $work->title }}" title="Phóng to ảnh">
+                <a href="{{ $work->cover }}" data-lightbox="{{ $work->cover }}" data-title="{{ $work->title }}"
+                    title="Phóng to ảnh">
 
                     <img src="{{ $work->cover }}" class="img-fluid rounded-2" alt="">
                 </a>

@@ -10,14 +10,14 @@
     <meta property="og:url" content="{{ getEnv('APP_URL') }}" />
     <meta property="og:title" content="{{ $post->title_meta }}" />
     <meta property="og:description" content="{{ $post->description_meta }}" />
-    <meta property="og:image" content="{{ getEnv('APP_URL') }}/client/assets/images/about_img.jpg" />
+    <meta property="og:image" content="{{ getEnv('APP_URL') }}{{ $post->cover }}" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="{{ getEnv('APP_URL') }}" />
     <meta property="twitter:title" content="{{ $post->title_meta }}" />
     <meta property="twitter:description" content="{{ $post->description_meta }}" />
-    <meta property="twitter:image" content="{{ getEnv('APP_URL') }}/client/assets/images/about_img.jpg" />
+    <meta property="twitter:image" content="{{ getEnv('APP_URL') }}{{ $post->cover }}" />
     <!-- Meta Tags Generated with https://metatags.io -->
 @endsection
 @section('content')
