@@ -32,7 +32,7 @@ Route::prefix('/')->name('client.')->group(function () {
     Route::post("bai-viet/{id}", [ClientController::class, 'commentPost'])->name('commentPost');
     Route::get("du-an/{slug}", [ClientController::class, 'work'])->name('work');
 });
-Route::prefix('/dashboard')->name('dashboard.')->middleware('auth')->group(function () {
+Route::prefix('/vung-oi-mo-cua-ra')->name('dashboard.')->middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, "dashboard"])->name('index');
     Route::prefix('categories')->name('category.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
