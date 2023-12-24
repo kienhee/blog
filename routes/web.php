@@ -29,6 +29,7 @@ Route::prefix('/')->name('client.')->group(function () {
     Route::get("/", [ClientController::class, 'home'])->name('index');
     Route::get("tac-gia", [ClientController::class, 'author'])->name('author');
     Route::get("bai-viet/{slug}", [ClientController::class, 'blog'])->name('blog');
+    Route::post("bai-viet/{id}", [ClientController::class, 'commentPost'])->name('commentPost');
     Route::get("du-an/{slug}", [ClientController::class, 'work'])->name('work');
 });
 Route::prefix('/dashboard')->name('dashboard.')->middleware('auth')->group(function () {

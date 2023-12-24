@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Feedback;
 use App\Models\Post;
 use App\Models\Project;
@@ -52,6 +53,7 @@ class ClientController extends Controller
         $post = Post::where('slug', $slug)->first();
 
         if ($post) {
+            $comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'desc')->get();
             // Check if the post has been viewed in the current session
             if (!Session::has('viewed_post_' . $post->id)) {
                 // If not, increment the view count and mark the post as viewed in the session
@@ -59,10 +61,26 @@ class ClientController extends Controller
                 Session::put('viewed_post_' . $post->id, true);
             }
 
-            return view('client.blog', compact('post'));
+            return view('client.blog', compact('post', 'comments'));
         } else {
             abort(404);
         }
+    }
+    public function commentPost(Request $request, $id)
+    {
+        // Validate form data
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'content' => 'required|string',
+        ]);
+        $data['comment_id'] = 0;
+        $data['post_id'] = $id;
+        $check = Comment::insert($data);
+        if ($check) {
+            return back()->with('msgSuccess', 'Bình luận đã được thêm thành công!');
+        }
+        return back()->with('msgError', 'Bình luận không công, vui lòng thử lại!');
     }
     public function work($slug)
     {

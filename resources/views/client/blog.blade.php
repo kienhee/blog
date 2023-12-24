@@ -18,7 +18,6 @@
     <meta property="twitter:title" content="{{ $post->title_meta }}" />
     <meta property="twitter:description" content="{{ $post->description_meta }}" />
     <meta property="twitter:image" content="{{ getEnv('APP_URL') }}/client/assets/images/about_img.jpg" />
-
     <!-- Meta Tags Generated with https://metatags.io -->
 @endsection
 @section('content')
@@ -46,6 +45,17 @@
                     <input type="text" class="form-control rounded-pill text-muted bg-light px-3 mb-4"
                         placeholder="Tìm kiếm bài viết..." name="search">
                 </form>
+                @if (session('msgSuccess'))
+                    <div class="alert alert-success"
+                        style="background-color: #e8fadf;border-color: #d4f5c3;color: #71dd37;">
+                        {{ session('msgSuccess') }}
+                    </div>
+                @endif
+                @if (session('msgError'))
+                    <div class="alert alert-danger" style="background-color: #ffe0db;border-color: #ffc5bb;color: #ff3e1d;">
+                        {{ session('msgError') }}
+                    </div>
+                @endif
                 <div
                     class="sort py-2 d-flex gap-2 justify-content-between justify-content-lg-start align-items-center mb-3">
                     <a href="javascript:void(0)" onclick="window.history.back()" class="fw-medium text-secondary ">🔙
@@ -80,7 +90,7 @@
                 </div>
 
                 <div class="d-flex flex-column gap-3 mt-3">
-                    <article class="article w-100 rounded-3 shadow-sm overflow-hidden">
+                    <article class="article w-100 rounded-3  overflow-hidden">
 
                         @if ($post->cover)
                             <img class="img-fluid" src="{{ $post->cover }}" alt="{{ $post->title }}">
@@ -91,84 +101,118 @@
                             <small class="text-muted d-block mb-2">By <a
                                     href="{{ route('client.author') }}"><strong>{{ $post->user->full_name }}</strong></a>
                                 -
-                                <a href="/?category={{ $post->category->slug }}">{{ $post->category->name }}</a></small>
-                            <small class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m:s') }} - <i
-                                    class="fa-regular fa-eye"></i>
-                                {{ $post->views }} - {{ estimateReadingTime($post->content) }} phút đọc</small>
+                                <a
+                                    href="/?category={{ $post->category->slug ?? '' }}">{{ $post->category->name ?? 'Danh mục ẩn' }}</a></small>
+                            <small class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m') }} -
+                                {{ estimateReadingTime($post->content) }} phút đọc - <i class="fa-regular fa-eye"></i>
+                                {{ $post->views }} views</small>
                             <hr>
                             <div>
                                 {!! $post->content !!}
                             </div>
-                            <div class="d-flex gap-2 flex-wrap mt-3">
+                            <div class="d-flex gap-2 flex-wrap mt-3 mb-4">
                                 <span>🏷️ Tag:</span>
                                 @foreach (explode(',', $post->tags) as $tag)
                                     <a href="/?tag={{ $tag }}" class="tag">{{ $tag }}</a>
                                 @endforeach
                             </div>
                             <hr>
-                            <section class="p-1">
-                                <div class="d-flex flex-start mb-4">
-                                    <img class="rounded-circle shadow-1-strong me-3 d-none d-md-block"
-                                        src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(32).webp" alt="avatar"
-                                        width="65" height="65" />
-                                    <div class="card w-100">
-                                        <div class="card-body p-4">
-                                            <div class="">
-                                                <img class="rounded-circle shadow-1-strong mb-2 d-md-none"
-                                                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(32).webp"
-                                                    alt="avatar" width="65" height="65" />
-                                                <h5>Johny Cash</h5>
-                                                <p class="small">3 hours ago</p>
-                                                <p>
-                                                    Cras sit amet nibh libero, in gravida nulla. Nulla
-                                                    vel metus scelerisque
-                                                    ante sollicitudin. Cras purus odio, vestibulum in
-                                                    vulputate at, tempus
-                                                    viverra turpis.
-                                                </p>
+                            <div class="social-button d-flex gap-3 align-items-center">
+                                Chia sẻ:
+                                <div class="social-icons d-flex gap-3 align-items-center fs-5">
+                                    <a href="http://www.facebook.com/sharer.php?u={{ url()->current() }}"
+                                        target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                                    <a href="http://twitter.com/share?text=Xem tôi tì được gì này." target="_blank"><i
+                                            class="fa-brands fa-twitter"></i></a>
+                                    <a href="http://www.linkedin.com/shareArticle?mini=true&url={{ url()->current() }}"
+                                        target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                                    <a href="mailto:?Subject=Xem tôi tì được gì này. {{ url()->current() }}"
+                                        target="_blank"><i class="fa-regular fa-envelope"></i></a>
+                                </div>
+                            </div>
 
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="#!" class="link-muted me-2"><i
-                                                                class="fas fa-thumbs-up me-1"></i>132</a>
+                            @if ($post->isComment)
+                                <hr>
+                                <section class="p-1">
+
+
+                                    @foreach ($comments as $comment)
+                                        <div class="d-flex flex-start mb-4">
+                                            <img class="rounded-circle shadow-1-strong me-3 d-none d-md-block"
+                                                src="{{ asset('client/assets/images/facebook-avatar.png') }}"
+                                                alt="avatar" width="65" height="65"
+                                                style="object-fit: contain" />
+                                            <div class="card w-100">
+                                                <div class="card-body p-4">
+                                                    <div class="">
+                                                        <img class="rounded-circle shadow-1-strong mb-2 d-md-none"
+                                                            src="{{ asset('client/assets/images/facebook-avatar.png') }}"
+                                                            style="object-fit: contain" alt="avatar" width="65"
+                                                            height="65" />
+                                                        <h5>{{ $comment->name }}</h5>
+                                                        <p class="small">
+                                                            {{ $comment->created_at->format('d/m/Y - H:m') }}
+                                                        </p>
+                                                        <p>
+                                                            {{ $comment->content }}
+                                                        </p>
+
+                                                        {{-- <div class="d-flex justify-content-end align-items-center">
+
                                                         <a href="#!" class="link-muted"><i
-                                                                class="fas fa-thumbs-down me-1"></i>15</a>
+                                                                class="fas fa-reply me-1"></i>
+                                                            Reply</a>
+                                                    </div> --}}
                                                     </div>
-                                                    <a href="#!" class="link-muted"><i
-                                                            class="fas fa-reply me-1"></i>
-                                                        Reply</a>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <hr class="mt-5">
-                                <h5 class="title mb-4 mt-4 text-center">🗨️ Để lại lời nhắn</h5>
-                                <div class="row mb-3">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="fullName" class="form-label">Họ và tên
-                                        </label>
-                                        <input type="text" class="form-control" id="fullName" required>
-                                    </div>
-                                    <div class="col-md-6  mb-3">
-                                        <label for="email" class="form-label">Email
-                                        </label>
-                                        <input type="email" class="form-control" id="email" required>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <label for="content" class="form-label">Nội dung</label>
-                                        <textarea class="form-control" id="content" rows="3"></textarea>
-                                    </div>
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100">Bình luận</button>
-                                    </div>
-                                </div>
-                                <small class="d-block text-center text-muted d-lg-none">© kienhee.com 2022 -
-                                    <script>
-                                        document.write(new Date().getFullYear())
-                                    </script>
-                                </small>
-                            </section>
+                                    @endforeach
+
+                                    <hr class="mt-5">
+
+
+                                    <h5 class="title mb-4 mt-4 text-center">Để lại lời nhắn</h5>
+                                    <form action="{{ route('client.commentPost', $post->id) }}" method="POST"
+                                        class="row mb-3">
+                                        @csrf
+                                        <div class="col-md-6 mb-3">
+                                            <label for="fullName" class="form-label">Họ và tên
+                                            </label>
+                                            <input type="text" class="form-control" id="fullName" name="name"
+                                                value="{{ old('name') }}" required>
+                                            @error('name')
+                                                <p class="text-danger my-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6  mb-3">
+                                            <label for="email" class="form-label">Email
+                                            </label>
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                value="{{ old('email') }}" required>
+                                            @error('email')
+                                                <p class="text-danger my-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label for="comment" class="form-label">Nội dung</label>
+                                            <textarea class="form-control" id="comment" name="content" rows="3" required>{{ old('content') }}</textarea>
+                                            @error('content')
+                                                <p class="text-danger my-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div class="col-12">
+                                            <button class="btn btn-primary w-100">Bình luận</button>
+                                        </div>
+                                    </form>
+                                    <small class="d-block text-center text-muted d-lg-none">© kienhee.com 2022 -
+                                        <script>
+                                            document.write(new Date().getFullYear())
+                                        </script>
+                                    </small>
+                                </section>
+                            @endif
+
                         </div>
                     </article>
 
@@ -182,7 +226,15 @@
                         <img src="{{ asset('client') }}/assets/images/avatar.png" class="profile-image"
                             alt="Trần Trung Kiên">
                         <h5 class="mb-0"><i>Trần Trung Kiên</i></h5>
-                        <small class="text-muted" id="job-current">Software Engineer</small>
+                        <small class="text-muted" id="job-current">{{ author()->career }}</small>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h5 class="title mb-3">🏷️ Khám phá</h5>
+                    <div class="bg-white rounded-1 shadow-sm p-3 d-flex gap-2 flex-wrap mt-3">
+                        @foreach (getAllTags() as $tag)
+                            <a href="/?tag={{ $tag->name }}" class="tag">{{ $tag->name }}</a>
+                        @endforeach
                     </div>
                 </div>
                 <div class="mb-4">

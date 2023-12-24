@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug');
             $table->integer('category_project_id');
             $table->text('description');
-            $table->text('content');
+            $table->longText('content');
             $table->string('website')->nullable();
             $table->softDeletes();
             $table->timestamp('created_at')->useCurrent();

@@ -15,10 +15,12 @@
     <link rel="stylesheet" href="{{ asset('client') }}/assets/lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('client') }}/assets/lib/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('client') }}/assets/lib/owlcarousel/assets/owl.carousel.min.css">
-    <link rel="stylesheet" href="{{ asset('client') }}/assets/css/style.css">
     <script src="https://cdn.tiny.cloud/1/el9eht3oqsjlpvjkdu2mx5gh01fq5xie6zt09pq791iqfhej/tinymce/6/tinymce.min.js"
-        referrerpolicy="origin"></script>
+    referrerpolicy="origin"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="{{ asset('client') }}/assets/lib/prismjs/prism.css">
+    <link rel="stylesheet" href="{{asset('client/assets/lib/lightbox/dist/css/lightbox.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('client') }}/assets/css/style.css">
     @yield('seo')
 
 
@@ -44,13 +46,17 @@
     </main>
 
     <script src="{{ asset('client') }}/assets/lib/jquery.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
     <script src="{{ asset('client') }}/assets/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{{ asset('client') }}/assets/lib/isotope/isotope-min.js"></script>
     <script src="{{ asset('client') }}/assets/lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="{{ asset('client') }}/assets/lib/prismjs/prism.js"></script>
     <script src="{{ asset('admin/assets') }}/js/initTinymce.js"></script>
-
+<script src="{{asset('client/assets/lib/lightbox/dist/js/lightbox.min.js')}}"></script>
     <script src="{{ asset('client') }}/assets/js/main.js"></script>
 </body>
 

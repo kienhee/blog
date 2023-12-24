@@ -25,7 +25,7 @@
     <!-- Meta Tags Generated with https://metatags.io -->
 @endsection
 @section('content')
-    <section class="wrapper">
+    <section class="wrapper overflow-hidden">
         <section class="row ">
             <div class="col-md-6 ">
                 <article>
@@ -81,7 +81,7 @@
                     <div class="timeline-middle ">
                         <div class="timeline-circle "></div>
                     </div>
-                    <div class="timeline-component timeline-content rounded-2 shadow-sm bg-white">
+                    <div class="timeline-component timeline-content rounded-2 shadow-sm bg-white" data-aos="fade-left" data-aos-duration="1000">
                         <h3>2020 - 2021 🔥</h3>
                         <p>
                             - Theo học tại <strong>Trường Cao đẳng FPT Polytechnic</strong> Và <strong>Học viện công
@@ -91,7 +91,7 @@
                         <p>- Làm freelancer triển khai hơn <strong>30+</strong> các bài tập lớn, đồ án về lập trình.
                         </p>
                     </div>
-                    <div class="timeline-component timeline-content rounded-2 shadow-sm bg-white">
+                    <div class="timeline-component timeline-content rounded-2 shadow-sm bg-white" data-aos="fade-right" data-aos-duration="2000">
                         <h3>2022 🔥</h3>
                         <p>
                             - Giảng dạy và phát triển phần mềm tại <a href="https://rikkei.edu.vn/"
@@ -119,7 +119,7 @@
                     <div class="timeline-middle ">
                         <div class="timeline-circle "></div>
                     </div>
-                    <div class=" timeline-component timeline-content rounded-2 shadow-sm bg-white">
+                    <div class=" timeline-component timeline-content rounded-2 shadow-sm bg-white" data-aos="fade-left" data-aos-duration="3000">
                         <h3>2023 🔥</h3>
                         <p>
                             - Trở thành freelancer 🧑‍💻.
@@ -144,7 +144,7 @@
                 <h3 class="mt-2">Những dịch vụ nào đang được mình triển khai?</h3>
             </div>
             <div class="row g-4">
-                <div class="col-lg-4 col-md-6 ">
+                <div class="col-lg-4 col-md-6 " data-aos="fade-up" data-aos-duration="1000">
                     <div class="service-item d-flex flex-column justify-content-center text-center rounded">
                         <div class="service-icon flex-shrink-0">
                             <img src="{{ asset('client') }}/assets/images/icons/customSoftware.png" alt="">
@@ -159,7 +159,7 @@
                         <a class=" mt-auto mx-auto" href=""></a>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 ">
+                <div class="col-lg-4 col-md-6 "data-aos="fade-up" data-aos-duration="5000">
                     <div class="service-item d-flex flex-column justify-content-center text-center rounded">
                         <div class="service-icon flex-shrink-0">
                             <img src="{{ asset('client') }}/assets/images/icons/mobile-development.png" alt="">
@@ -171,7 +171,7 @@
                 </div>
 
 
-                <div class="col-lg-4 col-md-6 ">
+                <div class="col-lg-4 col-md-6 " data-aos="fade-up" data-aos-duration="1000">
                     <div class="service-item d-flex flex-column justify-content-center text-center rounded">
                         <div class="service-icon flex-shrink-0">
                             <img src="{{ asset('client') }}/assets/images/icons/ux-design.png" alt="">
@@ -252,14 +252,14 @@
                 <ul>
                     <li class="active" data-filter="*">all</li>
                     @foreach ($categories as $category)
-                        <li data-filter=".{{ $category->name }}">{{ $category->name }}</li>
+                        <li data-filter=".{{ createSlug($category->name) }}">{{ $category->name }}</li>
                     @endforeach
                 </ul>
             </div>
             <div class="filters-content">
                 <div class="row portfolio-grid justify-content-center">
                     @foreach ($projects as $project)
-                        <div class="col-lg-4 col-md-6 all {{ $project->category->name }}">
+                        <div class="col-lg-4 col-md-6 all {{ createSlug($project->category->name) }}">
                             <div class="portfolio_box">
                                 <div class="single_portfolio">
                                     <img class="img-fluid w-100" src="{{ $project->cover }}" alt="">

@@ -76,3 +76,21 @@ function author()
 {
     return User::where('id', 1)->first();
 }
+function createSlug($string) {
+    // Convert the string to lowercase
+    $string = strtolower($string);
+
+    // Remove special characters
+    $string = preg_replace('/[^a-z0-9\-]/', '', $string);
+
+    // Replace spaces with hyphens
+    $string = str_replace(' ', '-', $string);
+
+    // Remove consecutive hyphens
+    $string = preg_replace('/-+/', '-', $string);
+
+    // Trim any leading or trailing hyphens
+    $string = trim($string, '-');
+
+    return $string;
+}

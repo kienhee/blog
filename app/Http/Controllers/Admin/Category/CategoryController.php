@@ -104,12 +104,12 @@ class CategoryController extends Controller
         if ($category && $category->type == 1) {
             $checkPostExist = Post::where("category_id", $id)->get();
             if ($checkPostExist->count() > 0) {
-                return back()->with('msgError', 'There are ' . $checkPostExist->count() . ' products in the post, cannot delete');
+                return back()->with('msgError', 'There are ' . $checkPostExist->count() . ' posts in the category, cannot delete');
             }
         } elseif ($category && $category->type == 2) {
             $checkProjectExist = Project::where("category_project_id", $id)->get();
             if ($checkProjectExist->count() > 0) {
-                return back()->with('msgError', 'There are ' . $checkProjectExist->count() . ' products in the project, cannot delete');
+                return back()->with('msgError', 'There are ' . $checkProjectExist->count() . ' project in the category, cannot delete');
             }
         }
         $check = Category::onlyTrashed()->where('id', $id)->forceDelete();

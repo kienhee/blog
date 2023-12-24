@@ -34,7 +34,10 @@
 
             </div>
             <div class="col-md-6">
-                <img src="{{ $work->cover }}" class="img-fluid rounded-2" alt="">
+                <a href="{{ $work->cover }}" data-lightbox="{{ $work->cover }}" data-title="{{ $work->title }}" title="Phóng to ảnh">
+
+                    <img src="{{ $work->cover }}" class="img-fluid rounded-2" alt="">
+                </a>
             </div>
         </div>
         <div class="section-title position-relative text-center  mb-5 pb-2  ">
@@ -42,7 +45,7 @@
             <h3 class="mt-2">Một vài thông tin dự án.
             </h3>
         </div>
-        <div>
+        <div class="mb-5">
             {!! $work->content !!}
         </div>
     </section>

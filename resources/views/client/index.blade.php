@@ -100,11 +100,11 @@
                                     <a href="{{ route('client.blog', $post->slug) }}"
                                         class="fs-4 fw-medium d-block mb-2">{{ $post->title }}</a>
                                     <small
-                                        class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m:s') }}</small>
+                                        class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m') }}</small>
                                     <small class="text-muted d-block mb-2">By <a
                                             href="{{ route('client.author') }}"><strong>{{ $post->user->full_name }}</strong></a>
                                         - <a
-                                            href="/?category={{ $post->category->slug }}">{{ $post->category->name }}</a></small>
+                                            href="/?category={{ $post->category->slug ?? '' }}">{{ $post->category->name ?? 'Danh mục ẩn' }}</a></small>
                                     <p class="text-muted"> {{ $post->description }}</p>
                                     <div class="d-flex gap-2 flex-wrap mt-3">
                                         @foreach (explode(',', $post->tags) as $tag)
@@ -114,7 +114,8 @@
                                 </div>
                             </article>
                         @endforeach
-
+                    @else
+                        <h6 class="text-center">Không có bài viết nào</h6>
                     @endif
 
 
@@ -131,7 +132,15 @@
                         <img src="{{ asset('client') }}/assets/images/avatar.png" class="profile-image"
                             alt="Trần Trung Kiên">
                         <h5 class="mb-0"><i>Trần Trung Kiên</i></h5>
-                        <small class="text-muted" id="job-current">Software Engineer</small>
+                        <small class="text-muted" id="job-current">{{ author()->career }}</small>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h5 class="title mb-3">🏷️ Khám phá</h5>
+                    <div class="bg-white rounded-1 shadow-sm p-3 d-flex gap-2 flex-wrap mt-3">
+                        @foreach (getAllTags() as $tag)
+                            <a href="/?tag={{ $tag->name }}" class="tag">{{ $tag->name }}</a>
+                        @endforeach
                     </div>
                 </div>
                 <div class="mb-4">
