@@ -100,7 +100,7 @@
                                     <a href="{{ route('client.blog', $post->slug) }}"
                                         class="fs-4 fw-medium d-block mb-2">{{ $post->title }}</a>
                                     <small
-                                        class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m') }}</small>
+                                        class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y') }}</small>
                                     <small class="text-muted d-block mb-2">By <a
                                             href="{{ route('client.author') }}"><strong>{{ $post->user->full_name }}</strong></a>
                                         - <a

@@ -19,9 +19,7 @@ a {
     text-decoration: none;
 }
 
-li {
-    list-style: none;
-}
+
 
 tbody,
 td,
@@ -133,7 +131,9 @@ tr {
     font-weight: 500;
     font-size: 18px;
 }
-
+.category li{
+    list-style: none;
+}
 .category .active {
     background: hsl(0, 0%, 93.0%);
     font-weight: 500;

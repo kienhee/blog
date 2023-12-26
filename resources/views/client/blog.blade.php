@@ -103,7 +103,7 @@
                                 -
                                 <a
                                     href="/?category={{ $post->category->slug ?? '' }}">{{ $post->category->name ?? 'Danh mục ẩn' }}</a></small>
-                            <small class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y - H:m') }} -
+                            <small class="text-muted d-block mb-2">{{ $post->created_at->format('d/m/Y') }} -
                                 {{ estimateReadingTime($post->content) }} phút đọc - <i class="fa-regular fa-eye"></i>
                                 {{ $post->views }} views</small>
                             <hr>
