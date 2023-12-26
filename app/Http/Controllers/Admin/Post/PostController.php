@@ -55,8 +55,8 @@ class PostController extends Controller
       'tags' => 'required',
       'content' => 'required',
       'cover' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-      'title_meta' => 'required|max:38',
-      'description_meta' => 'required|max:139',
+      'title_meta' => 'required|max:56',
+      'description_meta' => 'required|max:156',
     ]);
     if ($request->hasFile('cover')) {
       $file = $request->file('cover');
@@ -95,8 +95,8 @@ class PostController extends Controller
       'cover' => 'nullable',
       'views' => 'nullable',
       'created_at' => 'nullable',
-      'title_meta' => 'required|max:38',
-      'description_meta' => 'required|max:139',
+      'title_meta' => 'required|max:56',
+      'description_meta' => 'required|max:156',
     ]);
     if ($request->hasFile('cover')) {
       $file = $request->file('cover');

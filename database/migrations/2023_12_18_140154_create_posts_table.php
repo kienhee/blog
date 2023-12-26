@@ -17,8 +17,8 @@ return new class extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('slug');
-            $table->string('title_meta', 38);
-            $table->string('description_meta', 139);
+            $table->string('title_meta', 56);
+            $table->string('description_meta', 156);
             $table->string('cover')->nullable();
             $table->string('description');
             $table->longText('content');
