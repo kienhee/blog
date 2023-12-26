@@ -137,7 +137,7 @@
                 </div>
                 <div class="mb-4">
                     <h5 class="title mb-3">🏷️ Khám phá</h5>
-                    <div class="bg-white rounded-1 shadow-sm p-3 d-flex gap-2 flex-wrap mt-3">
+                    <div class="bg-white rounded-1 shadow-sm p-3 d-flex gap-2 flex-wrap mt-3 justify-content-center">
                         @foreach (getAllTags() as $tag)
                             <a href="/?tag={{ $tag->name }}" class="tag">{{ $tag->name }}</a>
                         @endforeach
