@@ -1,5 +1,5 @@
 @extends('layouts.client.index')
-@section('title', '404')
+@section('title', '500')
 @section('content')
     <div id="notfound">
         <div class="notfound">
