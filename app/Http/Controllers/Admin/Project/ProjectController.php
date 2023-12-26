@@ -34,7 +34,7 @@ class ProjectController extends Controller
             $result->withTrashed();
         }
 
-        $projects = $result->paginate(10);
+        $projectss = $result->paginate(10);
         return view('admin.project.index', compact('projects'));
     }
 
