@@ -381,6 +381,7 @@ tr {
     width: 100px !important;
     height: 100px !important;
     border-radius: 100px;
+    object-fit: cover;
 }
 
 .owl-item .testimonial-item,
