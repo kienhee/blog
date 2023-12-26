@@ -23,6 +23,17 @@ li {
     list-style: none;
 }
 
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+    border-color: inherit;
+    border-style: solid;
+    border-width: 1px;
+}
+
 #preloader {
     position: fixed;
     top: 0;
@@ -632,7 +643,7 @@ li {
 .page-item:first-child .page-link {
     border-top-left-radius: 50%;
     border-bottom-left-radius: 50%;
-   
+
 }
 
 .page-item:last-child .page-link {
