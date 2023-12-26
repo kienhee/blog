@@ -34,13 +34,13 @@ class ProjectController extends Controller
             $result->withTrashed();
         }
 
-        $projects = $result->paginate(10);
-        return view('admin.Project.index', compact('projects'));
+        $projectss = $result->paginate(10);
+        return view('admin.project.index', compact('projects'));
     }
 
     public function add()
     {
-        return view('admin.Project.add');
+        return view('admin.project.add');
     }
 
     public function store(Request $request)
@@ -72,7 +72,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        return view('admin.Project.edit', compact('project'));
+        return view('admin.project.edit', compact('project'));
     }
 
     public function update(Request $request, $id)
