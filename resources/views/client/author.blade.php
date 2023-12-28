@@ -66,7 +66,7 @@
             </div>
         </section>
         </div>
-        <section class="py-5">
+        {{-- <section class="py-5">
             <div class="section-title position-relative text-center mb-5 pb-2  ">
                 <h6 class="position-relative d-inline text-primary ps-4">Sự nghiệp</h6>
                 <h3 class="mt-2">Theo dòng sự kiện</h3>
@@ -135,7 +135,7 @@
 
                 </div>
             </section>
-        </section>
+        </section> --}}
 
 
         <section class="py-5">
