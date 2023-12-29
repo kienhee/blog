@@ -97,10 +97,10 @@
                         @enderror
                     </div>
                     <div class="mb-3 col-md-6">
-                        <label class="form-label" for="views">Lượt Xem:</label>
+                        <label class="form-label" for="views">Lượt Xem: ({{ $post->views }})</label>
                         <div class="d-flex gap-2">
                             <input type="text" class="form-control" id="views" name="views"
-                                value="{{ old('views') ?? $post->views }}" />
+                                value="{{ old('views') }}" />
                         </div>
 
                     </div>
