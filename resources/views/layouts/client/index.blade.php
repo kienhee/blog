@@ -27,9 +27,9 @@
 </head>
 
 <body>
-    <div id="preloader">
+    {{-- <div id="preloader">
         <div id="loader"></div>
-    </div>
+    </div> --}}
     <header class="header py-2 shadow-sm mb-5">
         <div class="wrapper">
             <nav class="d-flex justify-content-between align-items-center">
