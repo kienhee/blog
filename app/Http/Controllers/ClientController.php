@@ -53,7 +53,7 @@ class ClientController extends Controller
         $post = Post::where('slug', $slug)->first();
 
         if ($post) {
-            $comments = Comment::where('post_id', $post->id)->orderBy('created_at', 'desc')->get();
+            $comments = Comment::where('post_id', $post->id)->get();
             // Check if the post has been viewed in the current session
             if (!Session::has('viewed_post_' . $post->id)) {
                 // If not, increment the view count and mark the post as viewed in the session

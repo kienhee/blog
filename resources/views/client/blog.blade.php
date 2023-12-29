@@ -151,7 +151,7 @@
                                                             height="65" />
                                                         <h5>{{ $comment->name }}</h5>
                                                         <p class="small">
-                                                            {{ $comment->created_at->format('d/m/Y - H:m') }}
+                                                            {{ $comment->created_at->format('d/m/Y') }}
                                                         </p>
                                                         <p>
                                                             {{ $comment->content }}
