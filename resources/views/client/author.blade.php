@@ -35,9 +35,8 @@
                         Sống đầy ý nghĩa, bước đi trên hành trình vô tận.<span class="fs-2 text-muted">"</span></h4>
                     <p>
                         Chào bạn 👋! Mình là <a href="https://www.facebook.com/kien.itt/" target="_blank"
-                            class="text-primary">Trần Trung Kiên</a>, một <a
-                            href="https://www.computerscience.org/careers/software-engineer/" target="_blank"
-                            class="text-primary">Software Engineer</a>🧑‍💻 và cũng là một người đam mê
+                            class="text-primary">Trần Trung Kiên</a>, một Software Developer 🧑‍💻 và cũng là một người đam
+                        mê
                         công nghệ. Với 2 năm kinh nghiệm trong ngành lập trình,
                         mình đang hướng tới sự sáng tạo và khám phá trong thế giới số. Ngoài ra, mình còn yêu thích
                         công việc viết blog, nhằm mục đích chia sẻ những kiến thức mà mình đã tích luỹ được trong
@@ -198,8 +197,7 @@
             <div class="row technology gap-4 justify-content-center">
                 <div
                     class="  col-md-3 col-lg-2 technology__item shadow-sm p-5 d-flex justify-content-center align-items-center  rounded-4">
-                    <img src="{{ asset('client') }}/assets/images/logo/nodejs.png" class="technology__img"
-                        alt="">
+                    <img src="{{ asset('client') }}/assets/images/logo/nodejs.png" class="technology__img" alt="">
                 </div>
                 <div
                     class="  col-md-3 col-lg-2 technology__item shadow-sm p-5 d-flex justify-content-center align-items-center  rounded-4">
