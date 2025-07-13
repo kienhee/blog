@@ -1,0 +1,11 @@
+.auth_form input[class*="form-control"] {
+    order: 1;
+}
+
+.auth_form .input-group-text {
+    order: 2;
+}
+
+.auth_form .invalid-feedback {
+    order: 3;
+}

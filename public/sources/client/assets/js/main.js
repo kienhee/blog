@@ -54,6 +54,32 @@
       }
     });
   }
+    // lang switch
+    document.addEventListener('DOMContentLoaded', function () {
+        const langBtn = document.getElementById('langDropdownBtn');
+        const langList = document.getElementById('langDropdownList');
+        const langOptions = document.querySelectorAll('.lang-option');
+        const langForm = document.getElementById('langForm');
+        const langInput = document.getElementById('langInput');
+
+        if (langBtn && langList) {
+            langBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                langList.classList.toggle('show');
+            });
+            document.addEventListener('click', function () {
+                langList.classList.remove('show');
+            });
+        }
+        langOptions.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                langInput.value = btn.getAttribute('data-lang');
+                langForm.submit();
+            });
+        });
+    });
+
 
   /**
    * Apply .scrolled class to the body as the page is scrolled down
