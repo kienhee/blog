@@ -14,4 +14,9 @@ class Contact extends Model
         'subject',
         'message',
     ];
+
+    // public function getDataContact()
+    // {
+    //     return $self::query();
+    // }
 }

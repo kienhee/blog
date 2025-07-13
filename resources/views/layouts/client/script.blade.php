@@ -1,4 +1,4 @@
-<script src="{{asset("sources/client/assets/vendor/jquery-3.7.1.min.js")}}"></script>
+<script src="{{asset("sources/common/libs/jquery-3.7.1.min.js")}}"></script>
 <!-- Vendor JS Files -->
 <script src="{{asset("sources/client/assets/vendor/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
 {{--<script src="{{asset("sources/client/assets/vendor/php-email-form/validate.js")}}"></script>--}}

@@ -4,9 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use Illuminate\Http\Request;
-
+use Yajra\DataTables\DataTables;
 class ContactController extends Controller
 {
+    public function index()
+    {
+        return view('pages.admin.contact.index');
+    }
+
+    public function ajaxGetDataContact() {
+        $contacts = Contact::get();
+        return DataTables::of($contacts)->make(true);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -17,13 +26,6 @@ class ContactController extends Controller
         ]);
 
         $contact = Contact::create($validated);
-
-        // Gửi email thông báo
-//        \Mail::send('emails.contact_notify', ['contact' => $contact], function ($m) use ($contact) {
-//            $m->to(config('mail.from.address'))
-//              ->subject('New Contact: ' . $contact->subject);
-//        });
-
         return back()->with('success', 'Chúng tôi đã nhận được thông tin, Cảm ơn bạn đã liên hệ!');
     }
 }
