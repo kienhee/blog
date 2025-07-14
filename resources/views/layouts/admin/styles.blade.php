@@ -26,3 +26,4 @@
 />
 <link rel="stylesheet" href="{{asset("sources/admin/assets/css/adminlte.css")}}" />
 <link rel="stylesheet" href="{{asset("sources/admin/assets/css/style.css")}}" />
+@yield("styles")
