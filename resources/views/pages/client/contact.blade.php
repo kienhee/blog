@@ -95,7 +95,7 @@
 
 @endsection
 
-@section('script')
+@section('scripts')
 <script src="{{ asset('sources/client/assets/vendor/jquery-validation-1.19.5/dist/jquery.validate.min.js') }}"></script>
 <script src="{{asset("sources/client/assets/js/contact.js")}}"></script>
 @endsection

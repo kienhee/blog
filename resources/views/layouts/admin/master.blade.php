@@ -3,8 +3,9 @@
 <!--begin::Head-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AdminLTE v4 | Dashboard</title>
-    @include("layouts.admin.style")
+    @include("layouts.admin.styles")
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -55,7 +56,7 @@
 </div>
 <!--end::App Wrapper-->
 <!--begin::Script-->
-@include("layouts.admin.script")
+@include("layouts.admin.scripts")
 <!--end::Script-->
 </body>
 <!--end::Body-->

@@ -8,4 +8,4 @@
 <!-- Main JS File -->
 <script src="{{asset("sources/client/assets/js/main.js")}}"></script>
 
-@yield('script')
+@yield('scripts')

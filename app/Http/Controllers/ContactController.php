@@ -28,4 +28,12 @@ class ContactController extends Controller
         $contact = Contact::create($validated);
         return back()->with('success', 'Chúng tôi đã nhận được thông tin, Cảm ơn bạn đã liên hệ!');
     }
+    public function confirm($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $contact->is_confirmed = true;
+        $contact->save();
+
+        return response()->json(['success' => true]);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
@@ -26,9 +27,18 @@ Route::prefix("/")->middleware('localization')->group(function () {
 
 // dashboard routes
 Route::prefix("/dashboard")->name('dashboard.')->middleware('auth')->group(function () {
-    Route::get("/", [DashboardController::class, "index"])->name('analysis');
-    Route::get("/contacts", [ContactController::class, "index"])->name('contacts');
-    Route::get("/ajax-get-data-contacts", [ContactController::class, "ajaxGetDataContact"])->name('ajaxGetDataContact');
+    // DashboardController
+    Route::get('/', [DashboardController::class, 'index'])->name('index');
+    //    PostController routes
+    Route::prefix("/posts")->name('posts.')->group(function () {
+        Route::get("/create", [PostController::class, "create"])->name("create");
+    });
+    // ContactController routes
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+        Route::get("/", [ContactController::class, "index"])->name('index');
+        Route::get("/ajax-get-data-contacts", [ContactController::class, "ajaxGetDataContact"])->name('ajaxGetDataContact');
+        Route::post('/confirm/{id?}', [ContactController::class, 'confirm'])->name('confirm');
+    });
 });
 
 // auth routes
@@ -36,4 +46,8 @@ Route::prefix("/auth")->group(function () {
     Route::get("/login", [AuthController::class, "loginView"])->name("auth.login");
     Route::post("/login", [AuthController::class, "login"])->name("auth.login.post");
     Route::post("/logout", [AuthController::class, "logout"])->name("auth.logout");
+});
+
+Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
+    \UniSharp\LaravelFilemanager\Lfm::routes();
 });

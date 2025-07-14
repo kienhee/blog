@@ -9,7 +9,7 @@ class AuthController extends Controller
     public function loginView()
     {
         if (auth()->check()) {
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('analysis'));
         }
         return view('pages.admin.auth.login');
     }

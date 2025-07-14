@@ -10,7 +10,7 @@
     <title>@yield("title")</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
-    @include("layouts.client.style")
+    @include("layouts.client.styles")
 </head>
 
 <body class="index-page">
@@ -25,7 +25,7 @@
 <!-- Preloader -->
 <div id="preloader"></div>
 
-@include("layouts.client.script")
+@include("layouts.client.scripts")
 
 </body>
 

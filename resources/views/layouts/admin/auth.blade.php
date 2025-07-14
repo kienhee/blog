@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>AdminLTE 4 | Login Page</title>
-    @include("layouts.admin.style")
+    @include("layouts.admin.styles")
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -14,7 +14,7 @@
 
 <!-- /.login-box -->
 <!--begin::Script-->
-@include("layouts.admin.script")
+@include("layouts.admin.scripts")
 <!--end::Script-->
 </body>
 <!--end::Body-->

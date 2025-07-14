@@ -13,10 +13,7 @@ class Contact extends Model
         'email',
         'subject',
         'message',
+        'is_confirmed'
     ];
 
-    // public function getDataContact()
-    // {
-    //     return $self::query();
-    // }
 }
