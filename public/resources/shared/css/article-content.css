@@ -1,0 +1,534 @@
+/**
+ * Unified CSS for Article Content
+ * 
+ * This file ensures 100% visual consistency between:
+ * - TinyMCE editor preview (admin panel)
+ * - Client-side article view
+ * 
+ * All styles are scoped to .article-content wrapper class
+ */
+
+.article-content {
+    /* Base typography */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.7;
+    color: #333;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* Headings */
+.article-content h1 {
+    font-size: 1.75em;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 0.67em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+.article-content h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 0.83em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+.article-content h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+.article-content h4 {
+    font-size: 1.125em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+.article-content h5 {
+    font-size: 1.0625em;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+.article-content h6 {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #1a1a1a;
+}
+
+/* Paragraphs */
+.article-content p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.article-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Links */
+.article-content a {
+    color: #0066cc;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.article-content a:hover {
+    color: #0052a3;
+    text-decoration: underline;
+}
+
+.article-content a:visited {
+    color: #551a8b;
+}
+
+/* Lists */
+.article-content ul,
+.article-content ol {
+    margin-top: 0;
+    margin-bottom: 1em;
+    padding-left: 2em;
+}
+
+.article-content ul {
+    list-style-type: disc;
+}
+
+.article-content ol {
+    list-style-type: decimal;
+}
+
+.article-content li {
+    margin-bottom: 0.5em;
+    line-height: 1.7;
+}
+
+/* Nested lists */
+.article-content ul ul,
+.article-content ol ol,
+.article-content ul ol,
+.article-content ol ul {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.article-content ul ul {
+    list-style-type: circle;
+}
+
+.article-content ul ul ul {
+    list-style-type: square;
+}
+
+.article-content ol ol {
+    list-style-type: lower-alpha;
+}
+
+.article-content ol ol ol {
+    list-style-type: lower-roman;
+}
+
+/* Blockquotes */
+.article-content blockquote {
+    margin: 1.5em 0;
+    padding: 0.75em 1.5em;
+    border-left: 4px solid #ddd;
+    background-color: #f9f9f9;
+    color: #666;
+    font-style: italic;
+}
+
+.article-content blockquote p {
+    margin-bottom: 0.5em;
+}
+
+.article-content blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Inline code */
+.article-content code {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.9em;
+    background-color: #f4f4f4;
+    color: #e83e8c;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    word-break: break-word;
+}
+
+/* Code blocks - Support both old format and new hljs-code-block format */
+.article-content pre,
+.article-content pre.hljs-code-block {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin: 1.5em 0;
+    padding: 5px;
+    background-color: #282c34;
+    color: #abb2bf;
+    border-radius: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    word-wrap: normal;
+    word-break: normal;
+    white-space: pre;
+}
+
+.article-content pre code,
+.article-content pre.hljs-code-block code {
+    font-family: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    word-break: normal;
+    white-space: pre;
+    display: block;
+    overflow-x: auto;
+}
+
+/* Highlight.js code blocks */
+.article-content pre.hljs-code-block code[class*="language-"] {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+    background: transparent;
+    color: inherit;
+}
+
+/* Highlight.js code blocks */
+.article-content pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+    background: transparent;
+    color: inherit;
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR FOR CODE BLOCKS
+   ============================================ */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.article-content pre::-webkit-scrollbar,
+.article-content pre.hljs-code-block::-webkit-scrollbar {
+    height: 4px;
+}
+
+.article-content pre::-webkit-scrollbar-track,
+.article-content pre.hljs-code-block::-webkit-scrollbar-track {
+    background: #1e2126;
+    border-radius: 2px;
+}
+
+.article-content pre::-webkit-scrollbar-thumb,
+.article-content pre.hljs-code-block::-webkit-scrollbar-thumb {
+    background: #5c6370;
+    border-radius: 2px;
+    border: 0;
+}
+
+.article-content pre::-webkit-scrollbar-thumb:hover,
+.article-content pre.hljs-code-block::-webkit-scrollbar-thumb:hover {
+    background: #6c7280;
+}
+
+/* Firefox */
+.article-content pre,
+.article-content pre.hljs-code-block {
+    scrollbar-width: thin;
+    scrollbar-color: #5c6370 #1e2126;
+}
+
+/* Code element scrollbar (if code has overflow) */
+.article-content pre code::-webkit-scrollbar,
+.article-content pre.hljs-code-block code::-webkit-scrollbar {
+    height: 4px;
+}
+
+.article-content pre code::-webkit-scrollbar-track,
+.article-content pre.hljs-code-block code::-webkit-scrollbar-track {
+    background: #1e2126;
+    border-radius: 2px;
+}
+
+.article-content pre code::-webkit-scrollbar-thumb,
+.article-content pre.hljs-code-block code::-webkit-scrollbar-thumb {
+    background: #5c6370;
+    border-radius: 2px;
+    border: 0;
+}
+
+.article-content pre code::-webkit-scrollbar-thumb:hover,
+.article-content pre.hljs-code-block code::-webkit-scrollbar-thumb:hover {
+    background: #6c7280;
+}
+
+.article-content code.hljs {
+    padding: 0.2em 0.4em;
+    background-color: #f4f4f4;
+    color: #e83e8c;
+}
+
+/* Tables */
+.article-content table {
+    width: 100%;
+    margin: 1.5em 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow-x: auto;
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .article-content table {
+        display: table;
+    }
+}
+
+.article-content thead {
+    background-color: #f8f9fa;
+}
+
+.article-content th {
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75em;
+    border: 1px solid #dee2e6;
+    color: #1a1a1a;
+}
+
+.article-content td {
+    padding: 0.75em;
+    border: 1px solid #dee2e6;
+}
+
+.article-content tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.article-content tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Images */
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5em auto;
+    border-radius: 4px;
+}
+
+.article-content figure {
+    margin: 1.5em 0;
+    text-align: center;
+}
+
+.article-content figcaption {
+    margin-top: 0.5em;
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Text formatting */
+.article-content strong,
+.article-content b {
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.article-content em,
+.article-content i {
+    font-style: italic;
+}
+
+.article-content u {
+    text-decoration: underline;
+}
+
+.article-content s,
+.article-content strike,
+.article-content del {
+    text-decoration: line-through;
+    color: #666;
+}
+
+/* Text alignment classes */
+.article-content .text-left {
+    text-align: left;
+}
+
+.article-content .text-center {
+    text-align: center;
+}
+
+.article-content .text-right {
+    text-align: right;
+}
+
+.article-content .text-justify {
+    text-align: justify;
+}
+
+/* Horizontal rules */
+.article-content hr {
+    border: none;
+    border-top: 2px solid #ddd;
+    margin: 2em 0;
+    clear: both;
+}
+
+/* Accordion (TinyMCE plugin) */
+.article-content details {
+    margin: 1em 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.article-content details summary {
+    padding: 0.75em 1em;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+}
+
+.article-content details summary:hover {
+    background-color: #e9ecef;
+}
+
+.article-content details[open] summary {
+    border-bottom: 1px solid #ddd;
+}
+
+.article-content details > *:not(summary) {
+    padding: 1em;
+}
+
+/* Media (video/audio) */
+.article-content iframe,
+.article-content video,
+.article-content audio {
+    max-width: 100%;
+    display: block;
+    margin: 1.5em auto;
+}
+
+.article-content video,
+.article-content audio {
+    width: 100%;
+}
+
+/* Page breaks */
+.article-content .pagebreak {
+    page-break-after: always;
+    border: none;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    display: block;
+}
+
+/* Anchors */
+.article-content a[href^="#"] {
+    scroll-margin-top: 1em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .article-content {
+        font-size: 15px;
+    }
+
+    .article-content h1 {
+        font-size: 1.5em;
+    }
+
+    .article-content h2 {
+        font-size: 1.375em;
+    }
+
+    .article-content h3 {
+        font-size: 1.125em;
+    }
+
+    .article-content h4 {
+        font-size: 1.0625em;
+    }
+
+    .article-content pre {
+        font-size: 0.85em;
+        padding: 0.75em;
+    }
+
+    .article-content blockquote {
+        padding: 0.5em 1em;
+    }
+
+    .article-content table {
+        font-size: 0.9em;
+    }
+
+    .article-content th,
+    .article-content td {
+        padding: 0.5em;
+    }
+}
+
+/* Print styles */
+@media print {
+    .article-content {
+        font-size: 12pt;
+        line-height: 1.6;
+        color: #000;
+    }
+
+    .article-content a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    .article-content pre {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+
+    .article-content img {
+        page-break-inside: avoid;
+        max-width: 100%;
+    }
+
+    .article-content blockquote {
+        border-left: 3px solid #000;
+        background-color: transparent;
+    }
+}
+code[class*="language-"],
+pre[class*="language-"] {
+    text-shadow: none !important;
+}
