@@ -1,0 +1,47 @@
+/* Inter Font Face Definitions */
+@font-face {
+    font-family: "Inter";
+    src: url("/resources/shared/font/Inter/Inter-VariableFont_opsz,wght.ttf")
+        format("truetype-variations");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Inter";
+    src: url("/resources/shared/font/Inter/Inter-Italic-VariableFont_opsz,wght.ttf")
+        format("truetype-variations");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Override Bootstrap CSS variables to use Inter */
+:root {
+    --bs-font-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bs-body-font-family: "Inter", -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Apply Inter font to entire client with higher specificity */
+html,
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Ensure all elements inherit Inter */
+*,
+*::before,
+*::after {
+    font-family: inherit;
+}
+
+/* Override any Bootstrap classes that might use CSS variables */
+[class*="font-sans"],
+[class*="text-"] {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif !important;
+}

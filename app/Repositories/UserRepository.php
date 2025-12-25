@@ -98,7 +98,7 @@ class UserRepository extends BaseRepository
 
                 return '
                     <div class="d-inline-block text-nowrap">
-                        <a href="'.$editUrl.'" class="btn btn-sm btn-icon" title="Chỉnh sửa">
+                        <a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
                             <i class="bx bx-edit"></i>
                         </a>
                         <button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Ngừng hoạt động"

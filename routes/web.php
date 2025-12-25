@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 // Cient
 Route::prefix('/')->name('client.')->group(function () {
     Route::get('/', [AppController::class, 'home'])->name('home');
+    Route::get('/bai-viet', [AppController::class, 'posts'])->name('posts');
+    Route::get('/bai-viet/{slug}', [AppController::class, 'post'])->name('post');
+    Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
 });
 // Admin
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {

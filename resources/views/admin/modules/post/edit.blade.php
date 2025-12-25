@@ -18,8 +18,8 @@
                 'description' => 'Chỉnh sửa bài viết cho blog hoặc trang tin tức',
                 'button' => 'edit',
                 'listLink' => 'admin.posts.list',
-                'previewLink' => 'admin.posts.publish',
-                'previewId' => $data->id,
+                'previewLink' => 'client.post',
+                'previewId' => $data->slug ?? $data->id,
             ])
             <div class="row">
                 <div class="col-12 col-lg-8">

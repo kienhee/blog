@@ -187,11 +187,15 @@ class PostRepository extends BaseRepository
             ->addColumn('action_html', function ($row) {
                 $editUrl = route('admin.posts.edit', $row->id);
                 $deleteUrl = route('admin.posts.destroy', $row->id);
+                $previewUrl = route('client.post', $row->slug ?? $row->id);
                 $title = $row->title;
 
                 return '
                         <div class="d-inline-block text-nowrap">
-                            <a href="'.$editUrl.'" class="btn btn-sm btn-icon" title="Chỉnh sửa">
+                            <a href="'.$previewUrl.'" target="_blank" class="btn btn-sm btn-icon" title="Xem trước">
+                                <i class="bx bx-show"></i>
+                            </a>
+                            <a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
                                 <i class="bx bx-edit"></i>
                             </a>
 

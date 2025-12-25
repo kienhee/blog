@@ -103,3 +103,20 @@ if (! function_exists('hasActiveChild')) {
         }
     }
 }
+
+if (! function_exists('calculateReadingTime')) {
+    /**
+     * Tính thời gian đọc ước tính
+     */
+    function calculateReadingTime($content)
+    {
+        // Loại bỏ HTML tags
+        $text = strip_tags($content);
+        // Đếm số từ (khoảng trắng)
+        $wordCount = str_word_count($text);
+        // Ước tính 200 từ/phút
+        $minutes = max(1, ceil($wordCount / 200));
+
+        return $minutes;
+    }
+}

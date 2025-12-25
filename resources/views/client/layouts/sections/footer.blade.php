@@ -7,7 +7,7 @@
         <div class="container">
             <div class="row gx-0 gy-4 g-md-5">
                 <div class="col-lg-5">
-                    <a href="landing-page.html" class="app-brand-link mb-4">
+                    <a href="{{ route('client.home') }}" class="app-brand-link mb-4">
                         <span class="app-brand-logo demo">
                             <svg width="25" viewBox="0 0 25 42" version="1.1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

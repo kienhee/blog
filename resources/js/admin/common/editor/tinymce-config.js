@@ -71,7 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
             selector: "textarea#editor",
 
             // Basic settings
-            height: 500,
+            height: 600,
+            max_height: 800,
             menubar: false,
             promotion: false,
             branding: false,
@@ -136,7 +137,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Content style - prevent selection and cursor in code blocks + custom scrollbar
             content_style: `
-                body.article-content { padding: 1em; }
+                body.article-content { 
+                    padding: 1em; 
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                }
+                /* Custom scrollbar for editor content area */
+                body.article-content::-webkit-scrollbar {
+                    width: 10px;
+                }
+                body.article-content::-webkit-scrollbar-track {
+                    background: ${useDarkMode ? "#1e2126" : "#f1f1f1"};
+                    border-radius: 5px;
+                }
+                body.article-content::-webkit-scrollbar-thumb {
+                    background: ${useDarkMode ? "#5c6370" : "#888"};
+                    border-radius: 5px;
+                    border: 2px solid ${useDarkMode ? "#1e2126" : "#f1f1f1"};
+                }
+                body.article-content::-webkit-scrollbar-thumb:hover {
+                    background: ${useDarkMode ? "#6c7280" : "#555"};
+                }
                 /* Prevent text selection and cursor in Highlight.js code blocks */
                 body.article-content pre.hljs-code-block,
                 body.article-content pre.hljs-code-block code {
@@ -153,23 +174,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 body.article-content pre::-webkit-scrollbar-track,
                 body.article-content pre.hljs-code-block::-webkit-scrollbar-track {
-                    background: #1e2126;
+                    background: ${useDarkMode ? "#1e2126" : "#f1f1f1"};
                     border-radius: 2px;
                 }
                 body.article-content pre::-webkit-scrollbar-thumb,
                 body.article-content pre.hljs-code-block::-webkit-scrollbar-thumb {
-                    background: #5c6370;
+                    background: ${useDarkMode ? "#5c6370" : "#888"};
                     border-radius: 2px;
                     border: 0;
                 }
                 body.article-content pre::-webkit-scrollbar-thumb:hover,
                 body.article-content pre.hljs-code-block::-webkit-scrollbar-thumb:hover {
-                    background: #6c7280;
+                    background: ${useDarkMode ? "#6c7280" : "#555"};
                 }
                 body.article-content pre,
                 body.article-content pre.hljs-code-block {
                     scrollbar-width: thin;
-                    scrollbar-color: #5c6370 #1e2126;
+                    scrollbar-color: ${
+                        useDarkMode ? "#5c6370 #1e2126" : "#888 #f1f1f1"
+                    };
                 }
             `,
 
@@ -214,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Autoresize settings
             min_height: 600,
+            max_height: 800,
             autoresize_bottom_margin: 50,
             autoresize_overflow_padding: 50,
             autoresize_on_init: true,
@@ -365,5 +389,3 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
-

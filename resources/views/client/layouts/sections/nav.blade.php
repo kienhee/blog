@@ -65,21 +65,22 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="tf-icons bx bx-x bx-sm"></i>
             </button>
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav m-auto">
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" aria-current="page" href="landing-page.html#landingHero">Home</a>
+                    <a class="nav-link fw-medium" aria-current="page"
+                        href="{{ route('client.home') }}#landingHero">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="landing-page.html#landingFeatures">Features</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.posts') }}">Bài viết</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="landing-page.html#landingTeam">Team</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingTeam">Team</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="landing-page.html#landingFAQ">FAQ</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingFAQ">FAQ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="landing-page.html#landingContact">Contact us</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingContact">Contact us</a>
                 </li>
                 <li class="nav-item mega-dropdown">
                     <a href="javascript:void(0);"
@@ -279,7 +280,7 @@
                             </div>
                             <div class="col-lg-4 d-none d-lg-block">
                                 <div class="bg-body nav-img-col p-2">
-                                    <img src="../../assets/img/front-pages/misc/nav-item-col-img.png"
+                                    <img src="{{ asset_admin_url('assets/img/front-pages/misc/nav-item-col-img.png') }}"
                                         alt="nav item col image" class="w-100" />
                                 </div>
                             </div>
@@ -287,8 +288,8 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="../vertical-menu-template/index.html"
-                        target="_blank">Admin</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.contact') }}">Liên
+                        hệ</a>
                 </li>
             </ul>
         </div>
