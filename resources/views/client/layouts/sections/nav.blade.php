@@ -68,19 +68,13 @@
             <ul class="navbar-nav m-auto">
                 <li class="nav-item">
                     <a class="nav-link fw-medium" aria-current="page"
-                        href="{{ route('client.home') }}#landingHero">Home</a>
+                        href="{{ route('client.home') }}#landingHero">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link fw-medium" href="{{ route('client.posts') }}">Bài viết</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link fw-medium" href="{{ route('client.about') }}">Tác giả</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingFAQ">FAQ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingContact">Contact us</a>
                 </li>
                 <li class="nav-item mega-dropdown">
                     <a href="javascript:void(0);"

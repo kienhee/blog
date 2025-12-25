@@ -7,7 +7,7 @@
         <p class="text-center px-3 mb-0">Có câu hỏi hoặc góp ý? Hãy gửi tin nhắn cho chúng tôi</p>
     </section>
     <section id="landingContact" class="section-py bg-body landing-contact">
-        <div class="container">
+        <div class="main-container">
             <div class="row gy-4">
                 <div class="col-lg-5">
                     <div class="contact-img-box position-relative border p-2 h-100">

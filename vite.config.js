@@ -45,6 +45,9 @@ export default defineConfig({
                 "resources/js/admin/pages/user/list.js",
                 "resources/js/admin/pages/user/form.js",
                 // -----------Pages-----------
+
+                //Client
+                "resources/scss/client/client.scss",
             ],
             refresh: true,
         }),

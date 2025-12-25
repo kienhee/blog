@@ -1,0 +1,87 @@
+// Footer Styles
+// ====================================
+
+.landing-footer {
+  .footer-link {
+    transition: all $transition-fast ease-in-out;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .footer-top {
+    padding: 3.5rem 0;
+    border-top-left-radius: 3.75rem;
+    border-top-right-radius: 3.75rem;
+
+    @include respond-to(md) {
+      padding: $spacing-xl 0;
+    }
+
+    .footer-bg {
+      object-position: center;
+    }
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    .footer-logo-description {
+      max-width: 322px;
+    }
+  }
+
+  .footer-form {
+    max-width: 22.25rem;
+
+    input {
+      background-color: #232333;
+      border-color: #444564;
+      color: #d3d4dc;
+
+      &:hover:not([disabled]):not([focus]) {
+        border-color: #444564;
+      }
+
+      &::placeholder {
+        color: rgba(211, 212, 220, 0.5);
+      }
+    }
+
+    label {
+      color: rgba(211, 212, 220, 0.5);
+    }
+  }
+}
+
+// Light style footer
+.light-style .landing-footer {
+  .footer-link,
+  .footer-text {
+    color: #d3d4dc;
+  }
+
+  .footer-title {
+    color: $white;
+  }
+
+  .footer-bottom {
+    background-color: #282c3e;
+  }
+}
+
+// Dark style footer
+.dark-style .landing-footer {
+  .footer-link,
+  .footer-text {
+    color: #a3a4cc;
+  }
+
+  .footer-title {
+    color: #cbcbe2;
+  }
+
+  .footer-bottom {
+    background-color: #171925;
+  }
+}
+

@@ -11,6 +11,7 @@
     <title>@yield('title') | {{ env('APP_NAME') }} </title>
 
     <meta name="description" content="" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     @include('client.layouts.sections.styles')
 </head>

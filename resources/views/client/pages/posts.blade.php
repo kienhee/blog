@@ -1,7 +1,6 @@
 @extends('client.layouts.master')
 @section('title', 'Danh sách bài viết')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/front-page-help-center.css') }}" />
     <style>
         /* Limit card title to 2 lines */
         .card-title {
@@ -21,23 +20,9 @@
     </style>
 @endpush
 @section('content')
-    <section class="section-py first-section-pt help-center-header position-relative overflow-hidden">
-        <img class="banner-bg-img" src="{{ asset_admin_url('assets/img/pages/header.png') }}" alt="Help center header" />
-        <h2 class="text-center">Danh sách bài viết</h2>
-        <form method="GET" action="{{ route('client.posts') }}"
-            class="input-wrapper my-3 input-group input-group-lg input-group-merge position-relative mx-auto">
-            <span class="input-group-text" id="basic-addon1"><i class="bx bx-search bx-sm"></i></span>
-            <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bài viết..." aria-label="Search"
-                aria-describedby="basic-addon1" value="{{ request('search') }}" />
-            @if (request('category'))
-                <input type="hidden" name="category" value="{{ request('category') }}" />
-            @endif
-        </form>
-        <p class="text-center px-3 mb-0">Common troubleshooting topics: eCommerce, Blogging to payment</p>
-    </section>
     <!-- Blog List: Start -->
     <section class="section-py custom-pagination">
-        <div class="container">
+        <div class="main-container">
             <!-- Posts Grid -->
             @if ($posts->count() > 0)
                 <div class="row g-5 mb-5">

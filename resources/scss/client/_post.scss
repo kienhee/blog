@@ -1,0 +1,487 @@
+// Post Page Styles
+// ====================================
+
+// Hero Section
+.post-hero {
+  margin-bottom: $spacing-xl;
+  border-bottom: 2px solid $border-color;
+
+  .category-badge {
+    display: inline-block;
+    padding: 0.5em 1em;
+    @include gradient-primary;
+    color: $white;
+    border-radius: $radius-lg;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: $spacing-sm;
+    transition: transform $transition-fast;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: $white;
+    }
+  }
+
+  .post-title {
+    font-size: 2.5em;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: $spacing-sm;
+    color: $text-dark;
+
+    @include respond-to(md) {
+      font-size: 1.75em;
+    }
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    align-items: center;
+    color: $text-muted;
+    font-size: 0.95em;
+    margin-bottom: $spacing-md;
+
+    @include respond-to(md) {
+      font-size: 0.85em;
+      gap: $spacing-sm;
+    }
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+
+    i {
+      font-size: 1.1em;
+    }
+  }
+
+  .author-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+  }
+
+  .author-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-xl;
+    object-fit: cover;
+    border: 2px solid $border-color;
+  }
+}
+
+// Floating Share Buttons
+.floating-share {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: $z-index-floating;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @include respond-to(lg) {
+    display: none;
+  }
+}
+
+.floating-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-xl;
+  border: 1px solid #ddd;
+  background: $white;
+  color: $text-muted;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $primary-color;
+    color: $white;
+    border-color: $primary-color;
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  &.facebook:hover {
+    background: $facebook-color;
+    border-color: $facebook-color;
+  }
+
+  &.twitter:hover {
+    background: $twitter-color;
+    border-color: $twitter-color;
+  }
+
+  &.linkedin:hover {
+    background: $linkedin-color;
+    border-color: $linkedin-color;
+  }
+
+  &.whatsapp:hover {
+    background: $whatsapp-color;
+    border-color: $whatsapp-color;
+  }
+}
+
+// Main Content Layout
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: $spacing-xl;
+  margin-top: $spacing-lg;
+
+  @include respond-to(lg) {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+}
+
+.post-main {
+  min-width: 0;
+}
+
+.post-thumbnail {
+  margin-bottom: $spacing-lg;
+  border-radius: $radius-md;
+  overflow: hidden;
+  @include card-shadow;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.post-content {
+  margin-bottom: $spacing-xl;
+}
+
+// Tags Section
+.post-tags {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+
+  &-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: $spacing-sm;
+    color: $text-dark;
+  }
+
+  &-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75em;
+  }
+}
+
+.post-tag {
+  display: inline-block;
+  padding: 0.5em 1em;
+  background-color: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  border-radius: $radius-lg;
+  font-size: 0.9em;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: $primary-color;
+    color: $white;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  }
+}
+
+// Author Section
+.post-author {
+  background: $bg-light;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin: $spacing-xl 0;
+  display: flex;
+  gap: $spacing-md;
+  align-items: flex-start;
+
+  &-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: $radius-xl;
+    object-fit: cover;
+    border: 3px solid $white;
+    flex-shrink: 0;
+  }
+
+  &-info {
+    flex: 1;
+  }
+
+  &-label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75em;
+  }
+
+  &-name {
+    font-size: 1.25em;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 0.75em;
+  }
+
+  &-description {
+    color: $text-muted;
+    font-size: 0.95em;
+    line-height: 1.6;
+  }
+}
+
+// Sidebar
+.post-sidebar {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+
+  @include respond-to(lg) {
+    position: static;
+  }
+}
+
+.sidebar-widget {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  &-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: $text-dark;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $primary-color;
+    }
+
+    &-text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    i {
+      color: $primary-color;
+    }
+  }
+
+  &-toggle {
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: transform $transition-normal, color $transition-fast;
+    font-size: 1.2em;
+
+    &:hover {
+      color: $primary-color;
+    }
+
+    &.collapsed {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &-content {
+    overflow: hidden;
+    transition: max-height $transition-normal ease-out,
+      opacity $transition-normal ease-out,
+      margin-bottom $transition-normal ease-out;
+    max-height: 2000px;
+    opacity: 1;
+    margin-bottom: 0;
+
+    &.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+// Table of Contents
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin-bottom: 0.5rem;
+
+  &.level-2 {
+    padding-left: $spacing-sm;
+  }
+
+  &.level-3 {
+    padding-left: $spacing-lg;
+  }
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.toc-link {
+  color: $text-muted;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: color $transition-fast;
+  display: block;
+  padding: 0.5rem 0;
+  font-weight: 600;
+
+  &:hover {
+    color: $primary-color;
+
+    .toc-number {
+      color: $primary-dark;
+    }
+  }
+}
+
+.toc-number {
+  font-weight: 600;
+  color: $primary-color;
+  margin-right: 0.5rem;
+}
+
+.toc-text {
+  color: inherit;
+}
+
+// Related Posts
+.related-post-item {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.related-post-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.related-post-info {
+  flex: 1;
+}
+
+.related-post-title {
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+
+  a {
+    color: $text-dark;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.related-post-meta {
+  font-size: 0.85em;
+  color: $text-light;
+}
+
+// Categories
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  margin-bottom: 0.75rem;
+}
+
+.category-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: $text-muted;
+  text-decoration: none;
+  padding: 0.75rem;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+  background: $bg-light;
+
+  &:hover {
+    background: $bg-light;
+    color: $primary-color;
+  }
+}
+
+.category-count {
+  background: #e0e0e0;
+  color: $text-muted;
+  padding: 0.25em 0.5em;
+  border-radius: 12px;
+  font-size: 0.85em;
+}
+
+// Comments Section
+.post-comments {
+  margin-top: $spacing-xl;
+  padding-top: $spacing-xl;
+  border-top: 2px solid $border-color;
+}
+
+.comments-title {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-bottom: $spacing-lg;
+  color: $text-dark;
+}
+
+

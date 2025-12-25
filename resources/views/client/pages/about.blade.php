@@ -1,18 +1,13 @@
 @extends('client.layouts.master')
-@section('title', 'Về chúng tôi')
-@push('styles')
-    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/fonts/boxicons.css') }}" />
-    <link rel="stylesheet" href="{{ asset_client_url('css/post.css') }}">
-@endpush
-
+@section('title', 'Tác giả')
 @section('content')
     <!-- Hero Section -->
     <section class="section-py pb-5 bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-        <div class="container">
+        <div class="main-container">
             <div class="row align-items-center g-4">
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                     <div class="pe-lg-4">
-                        <h1 class="display-3 fw-bold mb-4">Xin chào, Tôi là Developer</h1>
+                        <h1 class="display-3 fw-bold mb-4">Xin chào, tôi là Trần Trung Kiên</h1>
                         <p class="lead mb-4 opacity-90">
                             Một Full-stack Developer đam mê với công nghệ, luôn tìm kiếm những giải pháp sáng tạo và hiệu
                             quả
@@ -47,13 +42,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                     <div class="ps-lg-4">
                         <div class="position-relative ms-auto" style="max-width: 500px;">
-                            <div class="mx-auto rounded-circle overflow-hidden border border-white border-opacity-50"
-                                style="width: 320px; height: 320px; border-width: 5px !important;">
+                            <div class="mx-auto  overflow-hidden border border-white border-opacity-50"
+                                style="width: 100%; height: 100%; border-width: 5px !important;">
                                 <img src="{{ asset_client_url('images/author.jpg') }}" alt="Developer Profile"
-                                    class="w-100 h-100" style="object-fit: cover;" />
+                                    class="w-100 h-100 rounded-3" style="object-fit: cover;" />
                             </div>
                         </div>
                     </div>
@@ -64,33 +59,48 @@
 
     <!-- About Content Section -->
     <section>
-        <div class="container">
+        <div class="main-container">
             <!-- About Section -->
-            <div class="py-5">
-                <h2 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Về tôi<span
+            <div class="py-4">
+                <h3 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Về tôi<span
                         class="position-absolute bottom-0 start-0 bg-primary rounded"
-                        style="width: 80px; height: 4px;"></span></h2>
+                        style="width: 80px; height: 4px;"></span></h3>
                 <div>
-                    <p class="fs-5 lh-lg text-muted mb-3">
-                        Tôi là một Full-stack Developer với nhiều năm kinh nghiệm trong việc phát triển các ứng dụng
-                        web từ đầu đến cuối. Tôi đam mê với việc tạo ra những sản phẩm chất lượng cao, có trải
-                        nghiệm
-                        người dùng tốt và hiệu năng cao.
+                    <p class="fs-5 lh-lg mb-3">
+                        Tôi là một Full-stack Developer với nhiều năm kinh nghiệm phát triển ứng dụng web. Đam mê tạo ra
+                        những sản phẩm chất lượng cao, có trải nghiệm người dùng tốt và hiệu năng tối ưu.
                     </p>
-                    <p class="fs-5 lh-lg text-muted mb-0">
-                        Với kiến thức sâu rộng về cả frontend và backend, tôi có thể làm việc độc lập hoặc trong một
-                        nhóm để đưa ra các giải pháp tối ưu cho các vấn đề phức tạp. Tôi luôn cập nhật những công
-                        nghệ
-                        mới nhất và không ngừng học hỏi để nâng cao kỹ năng của mình.
+                    <p class="fs-5 lh-lg mb-0">
+                        Với kiến thức sâu về frontend và backend, tôi luôn cập nhật công nghệ mới và không ngừng học hỏi.
+                        Website <a href="https://kienhee.com/" target="_blank" class="text-primary">kienhee.com</a> là blog
+                        cá nhân chuyên về lập trình, được thành lập từ <span
+                            class="fw-semibold text-primary">25-12-2016</span> và vẫn đang hoạt động.
+                    </p>
+                </div>
+            </div>
+
+            <div class="py-4">
+                <h3 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Mục Tiêu<span
+                        class="position-absolute bottom-0 start-0 bg-primary rounded"
+                        style="width: 80px; height: 4px;"></span></h3>
+                <div>
+                    <p class="fs-5 lh-lg mb-3">
+                        Kienhee.com được tạo ra với mục đích chia sẻ kiến thức lập trình và kinh nghiệm thực tế trong công
+                        việc. Blog sẽ tiếp tục mở rộng với nhiều chủ đề đa dạng, hỗ trợ nhu cầu tự học của sinh viên và các
+                        bạn đã đi làm.
+                    </p>
+                    <p class="fs-5 lh-lg mb-0">
+                        Trong tương lai, website sẽ bổ sung thêm các bài viết về SEO, Digital Marketing và các chủ đề liên
+                        quan. Rất mong nhận được sự đón đọc và ủng hộ từ các bạn.
                     </p>
                 </div>
             </div>
 
             <!-- Skills Section -->
-            <div class="py-5">
-                <h2 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Kỹ năng & Công nghệ<span
+            <div class="py-4">
+                <h3 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Kỹ năng & Công nghệ<span
                         class="position-absolute bottom-0 start-0 bg-primary rounded"
-                        style="width: 80px; height: 4px;"></span></h2>
+                        style="width: 80px; height: 4px;"></span></h3>
                 <div class="row g-4">
                     <div class="col-md-4">
                         <div class="card h-100 border shadow-sm">
@@ -152,10 +162,10 @@
             </div>
 
             <!-- Experience Section -->
-            <div class="py-5">
-                <h2 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Kinh nghiệm<span
+            <div class="py-4">
+                <h3 class="fw-bold mb-4 pb-3 position-relative d-inline-block">Kinh nghiệm<span
                         class="position-absolute bottom-0 start-0 bg-primary rounded"
-                        style="width: 80px; height: 4px;"></span></h2>
+                        style="width: 80px; height: 4px;"></span></h3>
                 <div class="position-relative ps-5">
                     <!-- Vertical Line -->
                     <div class="position-absolute top-0 bottom-0 border-start border-2 border-secondary"
@@ -201,7 +211,7 @@
         <div class="container">
             <div class="row align-items-center gy-5 gy-lg-0">
                 <div class="col-lg-6 text-center text-lg-start">
-                    <h6 class="h2 text-primary fw-bold mb-1">Có một dự án trong đầu?</h6>
+                    <h6 class="h3 text-primary fw-bold mb-1">Có một dự án trong đầu?</h6>
                     <p class="fw-medium mb-4">Hãy liên hệ với tôi để thảo luận về dự án của bạn. Tôi luôn sẵn sàng hợp tác
                         và đưa ra các giải pháp sáng tạo.
                     </p>

@@ -120,7 +120,7 @@ class AppController extends Controller
             })->toArray();
         }
 
-        return view('client.pages.post', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags'));
+        return view('client.pages.single', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags'));
     }
 
     /**
@@ -182,25 +182,37 @@ class AppController extends Controller
      */
     public function subscribeNewsletter(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|max:255',
-        ], [
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không đúng định dạng.',
-            'email.max' => 'Email không được vượt quá 255 ký tự.',
-        ]);
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email|max:255',
+            ], [
+                'email.required' => 'Vui lòng nhập email.',
+                'email.email' => 'Email không đúng định dạng.',
+                'email.max' => 'Email không được vượt quá 255 ký tự.',
+            ]);
 
-        $email = $request->input('email');
+            $email = $validated['email'];
 
-        // TODO: Lưu email vào database hoặc gửi đến service newsletter
-        // Ví dụ: Newsletter::firstOrCreate(['email' => $email]);
-        // Hoặc tích hợp với Mailchimp, SendGrid, etc.
+            // TODO: Lưu email vào database hoặc gửi đến service newsletter
+            // Ví dụ: Newsletter::firstOrCreate(['email' => $email]);
+            // Hoặc tích hợp với Mailchimp, SendGrid, etc.
 
-        // Hiện tại chỉ trả về thành công
-        // Bạn có thể mở rộng để lưu vào database sau
-        return response()->json([
-            'success' => true,
-            'message' => 'Cảm ơn bạn đã đăng ký nhận tin tức!',
-        ]);
+            // Hiện tại chỉ trả về thành công
+            // Bạn có thể mở rộng để lưu vào database sau
+            return response()->json([
+                'success' => true,
+                'message' => 'Cảm ơn bạn đã đăng ký nhận tin tức!',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first('email') ?? 'Dữ liệu không hợp lệ.',
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+            ], 500);
+        }
     }
 }

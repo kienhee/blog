@@ -1,0 +1,55 @@
+// Base Styles & Utilities
+// ====================================
+
+// Section Padding (common utility - merged from front-page.css)
+.section-py {
+  padding: $spacing-xxxl 0;
+
+  @include respond-to(xl) {
+    padding: $spacing-xxl 0;
+  }
+
+  @include respond-to(md) {
+    padding: $spacing-xxl 0;
+  }
+}
+
+// First section padding
+.first-section-pt {
+  padding-top: 8.84rem;
+
+  @include respond-to(xl) {
+    padding-top: 7.5rem;
+  }
+}
+
+// Banner background image
+.banner-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: left;
+}
+
+// Body background
+.light-style body {
+  background-color: $white;
+}
+
+.dark-style body {
+  background-color: #2b2c40;
+}
+
+// Card hover border
+.card[class*="card-hover-border-"] {
+  transition: all $transition-fast ease-in-out;
+}
+
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-sm;
+}

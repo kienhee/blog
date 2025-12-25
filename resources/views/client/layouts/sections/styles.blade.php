@@ -9,14 +9,13 @@
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/rtl/theme-default.css') }}"
     class="template-customizer-theme-css" />
 <link rel="stylesheet" href="{{ asset_admin_url('assets/css/demo.css') }}" />
-<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/front-page.css') }}" />
 <!-- Inter Font - Load after core CSS to override Public Sans -->
 <link rel="stylesheet" href="{{ asset_shared_url('css/inter-font.css') }}" />
 <!-- Vendors CSS -->
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/nouislider/nouislider.css') }}" />
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/swiper/swiper.css') }}" />
-<!-- Page CSS -->
-<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/front-page-landing.css') }}" />
+<!-- Client CSS (compiled from SCSS) -->
+@vite('resources/scss/client/client.scss')
 <!-- Helpers -->
 <script src="{{ asset_admin_url('assets/vendor/js/helpers.js') }}"></script>
 <script src="{{ asset_admin_url('assets/vendor/js/template-customizer.js') }}"></script>
