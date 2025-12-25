@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\CategoryRepository;
+use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
 use Illuminate\Http\Request;
@@ -16,11 +17,14 @@ class AppController extends Controller
 
     protected $categoryRepository;
 
-    public function __construct(PostRepository $postRepository, PostViewRepository $postViewRepository, CategoryRepository $categoryRepository)
+    protected $hashTagRepository;
+
+    public function __construct(PostRepository $postRepository, PostViewRepository $postViewRepository, CategoryRepository $categoryRepository, HashTagRepository $hashTagRepository)
     {
         $this->postRepository = $postRepository;
         $this->postViewRepository = $postViewRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->hashTagRepository = $hashTagRepository;
     }
 
     public function home()
@@ -93,7 +97,10 @@ class AppController extends Controller
         // Lấy categories cho sidebar
         $allCategories = $this->categoryRepository->getCategoryByType();
 
-        // Lấy hashtags nếu chưa có
+        // Lấy tất cả hashtags trong hệ thống cho sidebar
+        $allHashtags = $this->hashTagRepository->getHashTagByType();
+
+        // Lấy hashtags của bài viết hiện tại
         $hashtags = [];
         if (isset($post->hashtag_names) && $post->hashtag_names) {
             $hashtagNames = explode(', ', $post->hashtag_names);
@@ -113,7 +120,7 @@ class AppController extends Controller
             })->toArray();
         }
 
-        return view('client.pages.post', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags'));
+        return view('client.pages.post', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags'));
     }
 
     /**
@@ -163,5 +170,37 @@ class AppController extends Controller
     public function contact()
     {
         return view('client.pages.contact');
+    }
+
+    public function about()
+    {
+        return view('client.pages.about');
+    }
+
+    /**
+     * Xử lý đăng ký newsletter
+     */
+    public function subscribeNewsletter(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+        ], [
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.max' => 'Email không được vượt quá 255 ký tự.',
+        ]);
+
+        $email = $request->input('email');
+
+        // TODO: Lưu email vào database hoặc gửi đến service newsletter
+        // Ví dụ: Newsletter::firstOrCreate(['email' => $email]);
+        // Hoặc tích hợp với Mailchimp, SendGrid, etc.
+
+        // Hiện tại chỉ trả về thành công
+        // Bạn có thể mở rộng để lưu vào database sau
+        return response()->json([
+            'success' => true,
+            'message' => 'Cảm ơn bạn đã đăng ký nhận tin tức!',
+        ]);
     }
 }

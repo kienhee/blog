@@ -18,6 +18,8 @@ Route::prefix('/')->name('client.')->group(function () {
     Route::get('/bai-viet', [AppController::class, 'posts'])->name('posts');
     Route::get('/bai-viet/{slug}', [AppController::class, 'post'])->name('post');
     Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
+    Route::get('/ve-chung-toi', [AppController::class, 'about'])->name('about');
+    Route::post('/newsletter/subscribe', [AppController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 });
 // Admin
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {

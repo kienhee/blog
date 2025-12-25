@@ -10,7 +10,7 @@ class HashTagSeeder extends Seeder
 {
     private $tableName = 'hash_tags';
 
-    private $version = 1;
+    private $version = 2;
 
     /**
      * Run the database seeds.

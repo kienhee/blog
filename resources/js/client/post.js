@@ -61,12 +61,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Track used IDs to avoid duplicates
     const usedIds = new Set();
-    
+
     // Numbering counters for each level
     let counterH2 = 0; // Level 2 (h2)
     let counterH3 = 0; // Level 3 (h3)
     let counterH4 = 0; // Level 4 (h4)
-    
+
     // Track current parent numbers
     let currentH2 = 0;
     let currentH3 = 0;
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update counters based on level
         let numberPrefix = "";
-        
+
         if (level === 2) {
             // H2: Reset H3 and H4 counters, increment H2
             counterH2++;
@@ -122,16 +122,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const a = document.createElement("a");
         a.href = "#" + heading.id;
         a.className = "toc-link";
-        
+
         // Add number prefix to text
         const numberSpan = document.createElement("span");
         numberSpan.className = "toc-number";
         numberSpan.textContent = numberPrefix;
-        
+
         const textSpan = document.createElement("span");
         textSpan.className = "toc-text";
         textSpan.textContent = heading.textContent;
-        
+
         a.appendChild(numberSpan);
         a.appendChild(textSpan);
 
@@ -158,4 +158,95 @@ document.addEventListener("DOMContentLoaded", function () {
         li.appendChild(a);
         tocList.appendChild(li);
     });
+});
+
+// Newsletter Form Handler
+document.addEventListener("DOMContentLoaded", function () {
+    const newsletterForm = document.getElementById("newsletter-form");
+    const messageDiv = document.getElementById("newsletter-message");
+    const emailInput = document.getElementById("newsletter-email");
+
+    if (!newsletterForm) return;
+
+    newsletterForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const email = emailInput.value.trim();
+        const submitBtn = newsletterForm.querySelector(".newsletter-submit");
+        const originalBtnText = submitBtn.textContent;
+
+        // Validate email
+        if (!email) {
+            showMessage("Vui lòng nhập email của bạn.", "error");
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage("Email không đúng định dạng.", "error");
+            return;
+        }
+
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Đang gửi...";
+
+        // Hide previous message
+        messageDiv.style.display = "none";
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('input[name="_token"]').value;
+
+        // Send AJAX request (you'll need to create the route in your Laravel app)
+        fetch("/newsletter/subscribe", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                email: email,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    showMessage(
+                        data.message || "Cảm ơn bạn đã đăng ký!",
+                        "success"
+                    );
+                    emailInput.value = "";
+                } else {
+                    showMessage(
+                        data.message || "Đã có lỗi xảy ra. Vui lòng thử lại.",
+                        "error"
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                showMessage("Đã có lỗi xảy ra. Vui lòng thử lại sau.", "error");
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+    });
+
+    function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = "newsletter-message " + type;
+        messageDiv.style.display = "block";
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = "none";
+        }, 5000);
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
 });

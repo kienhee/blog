@@ -74,7 +74,7 @@
                     <a class="nav-link fw-medium" href="{{ route('client.posts') }}">Bài viết</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingTeam">Team</a>
+                    <a class="nav-link fw-medium" href="{{ route('client.about') }}">Tác giả</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link fw-medium" href="{{ route('client.home') }}#landingFAQ">FAQ</a>
