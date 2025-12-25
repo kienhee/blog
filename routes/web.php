@@ -9,12 +9,14 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Client\AppController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('auth.login');
+// Cient
+Route::prefix('/')->name('client.')->group(function () {
+    Route::get('/', [AppController::class, 'home'])->name('home');
 });
-
+// Admin
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [DashboardController::class, 'analytics'])->name('analytics');
