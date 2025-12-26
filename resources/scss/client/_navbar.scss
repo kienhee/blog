@@ -1,6 +1,20 @@
 // Navbar Styles
 // ====================================
 
+// Animations for mobile dropdown
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
 nav.layout-navbar {
   backdrop-filter: unset !important;
   height: auto !important;
@@ -49,6 +63,330 @@ nav.layout-navbar {
       inset-inline-start: 50% !important;
       transform: translateX(-50%);
       top: 100%;
+    }
+  }
+
+  // Multi-level dropdown
+  .nav-item.multi-level-dropdown {
+    position: relative;
+
+    > .dropdown-menu {
+      margin-top: 0;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0;
+      min-width: 200px;
+    }
+
+    .dropdown-item {
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+
+      &:hover,
+      &:focus {
+        background-color: transparent;
+      }
+    }
+
+    .dropdown-item-parent {
+      position: relative;
+
+      > .dropdown-item {
+        cursor: pointer;
+        
+        // Hide Bootstrap default dropdown icon (::after)
+        &.dropdown-toggle::after {
+          display: none !important;
+          content: none !important;
+        }
+      }
+
+      .dropdown-submenu {
+        position: absolute;
+        top: 0;
+        inset-inline-start: 100%;
+        margin-inline-start: 0.125rem;
+        display: none;
+        min-width: 200px;
+        z-index: 1001;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0;
+      }
+    }
+
+    // Desktop: hover behavior
+    @media (min-width: $breakpoint-lg) {
+      // Reset wrapper styles on desktop - make it transparent container
+      .dropdown-menu-wrapper {
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        display: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        overflow: visible !important;
+      }
+      
+      // Hide desktop menu by default
+      .dropdown-menu-desktop {
+        display: none;
+      }
+
+      // Show wrapper and menu when hovering over nav-item
+      &:hover {
+        > .dropdown-menu-wrapper {
+          display: block !important;
+          
+          > .dropdown-menu-desktop {
+            display: block;
+          }
+        }
+      }
+      
+      // Keep dropdown open when hovering over wrapper
+      .dropdown-menu-wrapper:hover {
+        display: block !important;
+      }
+
+      // Hide Bootstrap default dropdown icon on desktop menu items
+      .dropdown-item.dropdown-toggle::after {
+        display: none !important;
+        content: none !important;
+      }
+      
+      .dropdown-item-parent {
+        &:hover > .dropdown-submenu {
+          display: block;
+        }
+
+        // Auto-position submenu to left if it goes off screen
+        &:hover > .dropdown-submenu {
+          @supports (inset-inline-start: 0) {
+            // Check if viewport is near right edge
+            &::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: -100%;
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+      }
+
+      // Prevent dropdown from closing when hovering over submenu
+      .dropdown-menu-wrapper,
+      .dropdown-menu-desktop {
+        pointer-events: auto;
+      }
+    }
+
+    // Mobile: Stack navigation
+    @include respond-to(lg) {
+      // Hide desktop menu on mobile
+      .dropdown-menu-desktop {
+        display: none !important;
+      }
+
+      // Show mobile menu wrapper - override Bootstrap positioning
+      // Bootstrap adds .show class to .dropdown-menu when open
+      .dropdown-menu-wrapper {
+        position: fixed !important;
+        top: 0 !important;
+        inset-inline-start: -100% !important;
+        width: 80% !important;
+        max-width: 300px !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: $spacing-sm !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+        transform: none !important;
+        z-index: $z-index-menu !important;
+        transition: inset-inline-start $transition-normal ease-in-out;
+        display: block !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        
+        &.show {
+          inset-inline-start: 0 !important;
+        }
+      }
+
+      .dropdown-menu-mobile {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      // Overlay when menu stack is open (behind menu)
+      .menu-stack-overlay {
+        position: fixed;
+        display: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(67, 89, 113, 0.78);
+        transition: opacity $transition-fast ease-in-out;
+        z-index: $z-index-overlay;
+      }
+
+      // Stack navigation container
+      .menu-stack-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      // Menu stack panels
+      .menu-stack-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background-color: inherit;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+        overflow: hidden;
+
+        &.active {
+          transform: translateX(0);
+          z-index: 10;
+        }
+
+        &.prev {
+          transform: translateX(-30%);
+          opacity: 0.3;
+        }
+      }
+
+      // Menu stack header
+      .menu-stack-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        min-height: 56px;
+        border-bottom: 1px solid rgba(161, 172, 184, 0.2);
+        flex-shrink: 0;
+      }
+
+      .menu-stack-back {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        margin-inline-end: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: inherit;
+        font-size: 1.25rem;
+        transition: opacity 0.2s ease;
+        min-width: 40px;
+        min-height: 40px;
+
+        &:active {
+          opacity: 0.6;
+        }
+
+        i {
+          display: block;
+        }
+
+        // Close button (X icon) for root menu
+        &.menu-stack-close {
+          i.bx-x {
+            font-size: 1.5rem;
+          }
+        }
+      }
+
+      // Hide back button on root menu when there's no parent
+      .menu-stack-panel[data-level="0"] .menu-stack-back:not(.menu-stack-close) {
+        display: none;
+      }
+
+      .menu-stack-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        flex: 1;
+      }
+
+      // Menu stack list
+      .menu-stack-list {
+        list-style: none;
+        margin: 0;
+        padding: 0.5rem 0;
+        overflow-y: auto;
+        flex: 1;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .menu-stack-item {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        > span,
+        > a {
+          flex: 1;
+          padding: 0.875rem 1rem;
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: inherit;
+          font-size: 0.9375rem;
+        }
+
+        > a {
+          width: 100%;
+        }
+
+        i.bx-chevron-right {
+          padding: 0.875rem 1rem;
+          padding-inline-start: 0;
+          font-size: 1.125rem;
+          opacity: 0.6;
+        }
+
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    // Desktop: Hide mobile menu
+    @media (min-width: $breakpoint-lg) {
+      .dropdown-menu-mobile {
+        display: none !important;
+      }
+
+      .dropdown-menu-desktop {
+        display: block;
+      }
     }
   }
 
@@ -128,6 +466,63 @@ nav.layout-navbar {
     }
   }
 
+  // Multi-level dropdown styles for light mode
+  .nav-item.multi-level-dropdown {
+    .dropdown-menu,
+    .dropdown-submenu {
+      background-color: $white;
+      border: 1px solid rgba(161, 172, 184, 0.2);
+      box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45);
+    }
+
+    .dropdown-item {
+      color: #1f2132;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(235, 94, 40, 0.1);
+        color: #eb5e28;
+      }
+    }
+
+    .dropdown-item-parent > .dropdown-item:hover {
+      background-color: rgba(235, 94, 40, 0.1);
+    }
+
+    .dropdown-item-parent .dropdown-submenu {
+      border-inline-start-color: rgba(161, 172, 184, 0.2);
+    }
+
+    // Mobile styles for light mode
+    @include respond-to(lg) {
+      .menu-stack-container {
+        background-color: $white;
+      }
+
+      .menu-stack-panel {
+        background-color: $white;
+      }
+
+      .menu-stack-header {
+        border-bottom-color: rgba(161, 172, 184, 0.2);
+        background-color: $white;
+      }
+
+      .menu-stack-item {
+        color: #1f2132;
+
+        &:hover,
+        &:active {
+          background-color: rgba(235, 94, 40, 0.1);
+        }
+
+        > a {
+          color: #1f2132;
+        }
+      }
+    }
+  }
+
   @include respond-to(lg) {
     .landing-nav-menu {
       background-color: $white;
@@ -160,6 +555,67 @@ nav.layout-navbar {
     }
   }
 
+  // Multi-level dropdown styles for dark mode
+  .nav-item.multi-level-dropdown {
+    .dropdown-menu,
+    .dropdown-submenu {
+      background-color: #2b2c40;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.45);
+    }
+
+    .dropdown-item {
+      color: #cbcbe2;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(235, 94, 40, 0.2);
+        color: #eb5e28;
+      }
+    }
+
+    .dropdown-item-parent > .dropdown-item:hover {
+      background-color: rgba(235, 94, 40, 0.2);
+    }
+
+    .dropdown-item-parent .dropdown-submenu {
+      border-inline-start-color: rgba(255, 255, 255, 0.1);
+    }
+
+    // Mobile styles for dark mode
+    @include respond-to(lg) {
+      .dropdown-menu-wrapper {
+        background-color: #2b2c40;
+      }
+
+      .menu-stack-container {
+        background-color: transparent;
+      }
+
+      .menu-stack-panel {
+        background-color: transparent;
+      }
+
+      .menu-stack-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+        background-color: transparent;
+      }
+
+      .menu-stack-item {
+        color: #cbcbe2;
+
+        &:hover,
+        &:active {
+          background-color: rgba(235, 94, 40, 0.2);
+        }
+
+        > a {
+          color: #cbcbe2;
+        }
+      }
+    }
+  }
+
   @include respond-to(lg) {
     .landing-nav-menu {
       background-color: #2b2c40;
@@ -181,6 +637,15 @@ nav.layout-navbar {
 @media (min-width: $breakpoint-lg) {
   [dir="rtl"] .navbar.landing-navbar .navbar-nav .nav-item.mega-dropdown > .dropdown-menu {
     transform: translateX(50%);
+  }
+
+  [dir="rtl"] .navbar.landing-navbar .nav-item.multi-level-dropdown {
+    .dropdown-item-parent .dropdown-submenu {
+      inset-inline-start: auto;
+      inset-inline-end: 100%;
+      margin-inline-start: 0;
+      margin-inline-end: 0.125rem;
+    }
   }
 }
 

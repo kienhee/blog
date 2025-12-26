@@ -1,3 +1,31 @@
+@php
+    $menu = [
+        [
+            'title' => 'Trang chủ',
+            'url' => route('client.home'),
+            'isRoute' => true,
+        ],
+        [
+            'title' => 'Bài viết',
+            'url' => route('client.posts'),
+            'isRoute' => true,
+        ],
+        [
+            'title' => 'Tác giả',
+            'url' => route('client.about'),
+            'isRoute' => true,
+        ],
+        [
+            'title' => 'Liên hệ',
+            'url' => route('client.contact'),
+            'isRoute' => true,
+        ],
+    ];
+    function checkActiveMenu($url)
+    {
+        return url()->current() == $url ? 'active' : '';
+    }
+@endphp
 <nav class="layout-navbar shadow-none py-0">
     <div class="navbar navbar-expand-lg landing-navbar px-3 px-md-4">
         <!-- Menu logo wrapper: Start -->
@@ -66,21 +94,161 @@
                 <i class="tf-icons bx bx-x bx-sm"></i>
             </button>
             <ul class="navbar-nav m-auto">
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" aria-current="page"
-                        href="{{ route('client.home') }}#landingHero">Trang chủ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.posts') }}">Bài viết</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.about') }}">Tác giả</a>
+                @foreach ($menu as $item)
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium {{ checkActiveMenu($item['url']) }}"
+                            href="{{ $item['url'] }}">{{ $item['title'] }}</a>
+                    </li>
+                @endforeach
+                <li class="nav-item dropdown multi-level-dropdown">
+                    <a href="javascript:void(0);" class="nav-link dropdown-toggle fw-medium" id="multiLevelDropdown"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span>Danh mục</span>
+                    </a>
+                    <div class="menu-stack-overlay d-lg-none"></div>
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <!-- Desktop: Regular dropdown menu -->
+                        <ul class="dropdown-menu dropdown-menu-start dropdown-menu-desktop"
+                            aria-labelledby="multiLevelDropdown">
+                            <li class="dropdown-item-parent">
+                                <a class="dropdown-item dropdown-toggle" href="javascript:void(0);">
+                                    <span>Mục 1</span>
+                                    <i class="bx bx-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li><a class="dropdown-item" href="#"><span>Mục 1.1</span></a></li>
+                                    <li><a class="dropdown-item" href="#"><span>Mục 1.2</span></a></li>
+                                    <li class="dropdown-item-parent">
+                                        <a class="dropdown-item dropdown-toggle" href="javascript:void(0);">
+                                            <span>Mục 1.3</span>
+                                            <i class="bx bx-chevron-right float-end"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            <li><a class="dropdown-item" href="#"><span>Mục 1.3.1</span></a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"><span>Mục 1.3.2</span></a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"><span>Mục 1.3.3</span></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dropdown-item-parent">
+                                <a class="dropdown-item dropdown-toggle" href="javascript:void(0);">
+                                    <span>Mục 2</span>
+                                    <i class="bx bx-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li><a class="dropdown-item" href="#"><span>Mục 2.1</span></a></li>
+                                    <li><a class="dropdown-item" href="#"><span>Mục 2.2</span></a></li>
+                                    <li><a class="dropdown-item" href="#"><span>Mục 2.3</span></a></li>
+                                </ul>
+                            </li>
+                            <li><a class="dropdown-item" href="#"><span>Mục 3</span></a></li>
+                            <li><a class="dropdown-item" href="#"><span>Mục 4</span></a></li>
+                        </ul>
+
+                        <!-- Mobile: Stack navigation menu -->
+                        <div class="dropdown-menu-mobile menu-stack-container">
+                            <!-- Level 0: Root menu -->
+                            <div class="menu-stack-panel active" data-panel-id="0" data-level="0">
+                                <div class="menu-stack-header">
+                                    <button class="menu-stack-back menu-stack-close" type="button"
+                                        data-dismiss="dropdown">
+                                        <i class="bx bx-x"></i>
+                                    </button>
+                                    <span class="menu-stack-title">Danh mục</span>
+                                </div>
+                                <ul class="menu-stack-list">
+                                    <li class="menu-stack-item has-children" data-target="1">
+                                        <span>Mục 1</span>
+                                        <i class="bx bx-chevron-right"></i>
+                                    </li>
+                                    <li class="menu-stack-item has-children" data-target="2">
+                                        <span>Mục 2</span>
+                                        <i class="bx bx-chevron-right"></i>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 3</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 4</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Level 1: Mục 1 submenu -->
+                            <div class="menu-stack-panel" data-panel-id="1" data-level="1" data-parent="0">
+                                <div class="menu-stack-header">
+                                    <button class="menu-stack-back" type="button">
+                                        <i class="bx bx-chevron-left"></i>
+                                    </button>
+                                    <span class="menu-stack-title">Mục 1</span>
+                                </div>
+                                <ul class="menu-stack-list">
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 1.1</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 1.2</span></a>
+                                    </li>
+                                    <li class="menu-stack-item has-children" data-target="3">
+                                        <span>Mục 1.3</span>
+                                        <i class="bx bx-chevron-right"></i>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Level 1: Mục 2 submenu -->
+                            <div class="menu-stack-panel" data-panel-id="2" data-level="1" data-parent="0">
+                                <div class="menu-stack-header">
+                                    <button class="menu-stack-back" type="button">
+                                        <i class="bx bx-chevron-left"></i>
+                                    </button>
+                                    <span class="menu-stack-title">Mục 2</span>
+                                </div>
+                                <ul class="menu-stack-list">
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 2.1</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 2.2</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 2.3</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Level 2: Mục 1.3 submenu -->
+                            <div class="menu-stack-panel" data-panel-id="3" data-level="2" data-parent="1">
+                                <div class="menu-stack-header">
+                                    <button class="menu-stack-back" type="button">
+                                        <i class="bx bx-chevron-left"></i>
+                                    </button>
+                                    <span class="menu-stack-title">Mục 1.3</span>
+                                </div>
+                                <ul class="menu-stack-list">
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 1.3.1</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 1.3.2</span></a>
+                                    </li>
+                                    <li class="menu-stack-item">
+                                        <a href="#"><span>Mục 1.3.3</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 <li class="nav-item mega-dropdown">
                     <a href="javascript:void(0);"
                         class="nav-link dropdown-toggle navbar-ex-14-mega-dropdown mega-dropdown fw-medium"
                         aria-expanded="false" data-bs-toggle="mega-dropdown" data-trigger="hover">
-                        <span data-i18n="Pages">Pages</span>
+                        <span data-i18n="Pages">Tham khảo</span>
                     </a>
                     <div class="dropdown-menu p-4">
                         <div class="row gy-4">
@@ -281,10 +449,6 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-medium" href="{{ route('client.contact') }}">Liên
-                        hệ</a>
-                </li>
             </ul>
         </div>
         <div class="landing-menu-overlay d-lg-none"></div>
@@ -327,3 +491,238 @@
         <!-- Toolbar: End -->
     </div>
 </nav>
+
+@push('scripts')
+    <script>
+        (function() {
+            const multiLevelDropdown = document.querySelector('.multi-level-dropdown');
+            if (!multiLevelDropdown) return;
+
+            const menuStackContainer = multiLevelDropdown.querySelector('.menu-stack-container');
+            if (!menuStackContainer) return;
+
+            function isMobile() {
+                return window.innerWidth < 992;
+            }
+
+            // Menu stack navigation manager
+            class MenuStackNavigation {
+                constructor(container) {
+                    this.container = container;
+                    this.panels = Array.from(container.querySelectorAll('.menu-stack-panel'));
+                    this.activePanel = container.querySelector('.menu-stack-panel.active');
+                    this.history = [0]; // Track navigation history with panel indices
+                    this.init();
+                }
+
+                init() {
+                    // Set initial active panel
+                    if (this.activePanel) {
+                        const panelId = this.activePanel.dataset.panelId || '0';
+                        this.history = [parseInt(panelId)];
+                    }
+
+                    // Handle menu item clicks
+                    this.container.addEventListener('click', (e) => {
+                        // Check if clicked on a link (not a menu item with children)
+                        const link = e.target.closest('.menu-stack-item > a');
+                        if (link) {
+                            // Allow normal link navigation, don't prevent default
+                            return;
+                        }
+
+                        // Handle menu items with children (submenu)
+                        const menuItem = e.target.closest('.menu-stack-item.has-children');
+                        if (menuItem) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const targetId = menuItem.dataset.target;
+                            if (targetId) {
+                                this.navigateTo(parseInt(targetId));
+                            }
+                            return;
+                        }
+
+                        // Handle back/close button
+                        const backButton = e.target.closest('.menu-stack-back');
+                        if (backButton) {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            // If it's close button on root menu, close dropdown
+                            if (backButton.classList.contains('menu-stack-close')) {
+                                this.closeDropdown();
+                                return;
+                            }
+
+                            // Otherwise, go back in menu stack
+                            this.goBack();
+                        }
+                    });
+                }
+
+                closeDropdown() {
+                    const dropdownToggle = document.querySelector('#multiLevelDropdown');
+                    if (dropdownToggle) {
+                        // Try Bootstrap Dropdown API first
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                            const bsDropdown = bootstrap.Dropdown.getInstance(dropdownToggle);
+                            if (bsDropdown) {
+                                bsDropdown.hide();
+                                return;
+                            }
+                        }
+
+                        // Fallback: remove show class and aria-expanded
+                        dropdownToggle.setAttribute('aria-expanded', 'false');
+                        const dropdownMenu = dropdownToggle.nextElementSibling;
+                        if (dropdownMenu) {
+                            dropdownMenu.classList.remove('show');
+                        }
+
+                        // Trigger click to close (Bootstrap will handle it)
+                        dropdownToggle.click();
+                    }
+                }
+
+                navigateTo(targetId) {
+                    if (!isMobile()) return;
+
+                    const targetPanel = this.panels.find(p => p.dataset.panelId === String(targetId));
+                    if (!targetPanel) return;
+
+                    const currentId = this.history[this.history.length - 1];
+                    const currentPanel = this.panels.find(p => p.dataset.panelId === String(currentId));
+
+                    // Update classes
+                    if (currentPanel) {
+                        currentPanel.classList.remove('active');
+                        currentPanel.classList.add('prev');
+                    }
+
+                    targetPanel.classList.remove('prev');
+                    targetPanel.classList.add('active');
+
+                    // Update history
+                    this.history.push(targetId);
+
+                    // Remove prev class after animation
+                    setTimeout(() => {
+                        if (currentPanel) {
+                            currentPanel.classList.remove('prev');
+                        }
+                    }, 300);
+                }
+
+                goBack() {
+                    if (!isMobile()) return;
+                    if (this.history.length <= 1) return;
+
+                    // Remove current from history
+                    const currentId = this.history.pop();
+                    const previousId = this.history[this.history.length - 1];
+
+                    const currentPanel = this.panels.find(p => p.dataset.panelId === String(currentId));
+                    const previousPanel = this.panels.find(p => p.dataset.panelId === String(previousId));
+
+                    if (currentPanel && previousPanel) {
+                        // Slide out current
+                        currentPanel.classList.remove('active');
+                        currentPanel.style.transform = 'translateX(100%)';
+
+                        // Slide in previous
+                        previousPanel.classList.remove('prev');
+                        previousPanel.classList.add('active');
+
+                        // Reset transform after animation
+                        setTimeout(() => {
+                            currentPanel.style.transform = '';
+                        }, 300);
+                    }
+                }
+
+                reset() {
+                    // Reset to root panel
+                    this.panels.forEach(panel => {
+                        panel.classList.remove('active', 'prev');
+                        panel.style.transform = '';
+                    });
+
+                    const rootPanel = this.panels.find(p => p.dataset.panelId === '0');
+                    if (rootPanel) {
+                        rootPanel.classList.add('active');
+                        this.history = [0];
+                    }
+                }
+            }
+
+            // Initialize menu stack navigation
+            let menuStackNav = null;
+
+            function initMenuStack() {
+                if (isMobile() && menuStackContainer) {
+                    if (!menuStackNav) {
+                        menuStackNav = new MenuStackNavigation(menuStackContainer);
+                    }
+                } else if (menuStackNav) {
+                    menuStackNav.reset();
+                }
+            }
+
+            // Initialize on load
+            initMenuStack();
+
+            // Handle resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    initMenuStack();
+                }, 150);
+            });
+
+            // Handle dropdown show/hide events
+            const dropdownToggle = multiLevelDropdown.querySelector('[data-bs-toggle="dropdown"]');
+            const menuStackOverlay = multiLevelDropdown.querySelector('.menu-stack-overlay');
+            const dropdownWrapper = multiLevelDropdown.querySelector('.dropdown-menu-wrapper');
+
+            if (dropdownToggle) {
+                // Show overlay when dropdown opens
+                dropdownToggle.addEventListener('shown.bs.dropdown', function() {
+                    if (isMobile() && menuStackOverlay) {
+                        menuStackOverlay.style.display = 'block';
+                    }
+                    if (menuStackNav && isMobile()) {
+                        menuStackNav.reset();
+                    }
+                });
+
+                // Hide overlay and reset menu stack when dropdown closes
+                dropdownToggle.addEventListener('hidden.bs.dropdown', function() {
+                    if (menuStackOverlay) {
+                        menuStackOverlay.style.display = 'none';
+                    }
+                    if (menuStackNav) {
+                        menuStackNav.reset();
+                    }
+                });
+            }
+
+            // Also handle click on overlay to close dropdown
+            if (menuStackOverlay) {
+                menuStackOverlay.addEventListener('click', function() {
+                    if (dropdownToggle) {
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                            const bsDropdown = bootstrap.Dropdown.getInstance(dropdownToggle);
+                            if (bsDropdown) {
+                                bsDropdown.hide();
+                            }
+                        } else {
+                            dropdownToggle.click();
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+@endpush
