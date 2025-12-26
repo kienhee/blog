@@ -101,6 +101,8 @@ if (! function_exists('hasActiveChild')) {
                 return true;
             }
         }
+
+        return false;
     }
 }
 
@@ -118,5 +120,113 @@ if (! function_exists('calculateReadingTime')) {
         $minutes = max(1, ceil($wordCount / 200));
 
         return $minutes;
+    }
+}
+
+if (! function_exists('renderCategoryDesktop')) {
+    /**
+     * Render category menu for desktop (recursive)
+     *
+     * @param  array  $items
+     * @return string
+     */
+    function renderCategoryDesktop($items)
+    {
+        $html = '';
+        foreach ($items as $item) {
+            $hasChildren = !empty($item['children']) && count($item['children']) > 0;
+
+            if ($hasChildren) {
+                $html .= '<li class="dropdown-item-parent">';
+                $html .= '<a class="dropdown-item dropdown-toggle" href="' . e($item['url']) . '">';
+                $html .= '<span>' . e($item['title']) . '</span>';
+                $html .= '<i class="bx bx-chevron-right float-end"></i>';
+                $html .= '</a>';
+                $html .= '<ul class="dropdown-menu dropdown-submenu">';
+                $html .= renderCategoryDesktop($item['children']);
+                $html .= '</ul>';
+                $html .= '</li>';
+            } else {
+                $html .= '<li><a class="dropdown-item" href="' . e($item['url']) . '"><span>' . e($item['title']) . '</span></a></li>';
+            }
+        }
+
+        return $html;
+    }
+}
+
+if (! class_exists('CategoryMenuBuilder')) {
+    /**
+     * Class to build mobile category menu structure with stack navigation
+     */
+    class CategoryMenuBuilder
+    {
+        public $panelId = 1;
+        public $panels = [];
+        public $rootItems = '';
+
+        /**
+         * Build mobile menu structure recursively
+         *
+         * @param  array  $items
+         * @param  int  $level
+         * @param  int  $parentId
+         * @return string
+         */
+        public function buildMobileMenu($items, $level = 0, $parentId = 0)
+        {
+            $currentLevelItems = '';
+
+            foreach ($items as $item) {
+                $hasChildren = !empty($item['children']) && count($item['children']) > 0;
+
+                if ($hasChildren) {
+                    $currentPanelId = $this->panelId++;
+
+                    // Add to root items if level 0, otherwise add to current level items
+                    $itemHtml = '<li class="menu-stack-item has-children" data-target="' . $currentPanelId . '">';
+                    $itemHtml .= '<span>' . e($item['title']) . '</span>';
+                    $itemHtml .= '<i class="bx bx-chevron-right"></i>';
+                    $itemHtml .= '</li>';
+
+                    if ($level === 0) {
+                        $this->rootItems .= $itemHtml;
+                    } else {
+                        $currentLevelItems .= $itemHtml;
+                    }
+
+                    // Recursively build children for this panel
+                    $childrenItems = $this->buildMobileMenu($item['children'], $level + 1, $currentPanelId);
+
+                    // Create panel HTML
+                    $panelHtml = '<div class="menu-stack-panel" data-panel-id="' . $currentPanelId . '" data-level="' . ($level + 1) . '" data-parent="' . $parentId . '">';
+                    $panelHtml .= '<div class="menu-stack-header">';
+                    $panelHtml .= '<button class="menu-stack-back" type="button">';
+                    $panelHtml .= '<i class="bx bx-chevron-left"></i>';
+                    $panelHtml .= '</button>';
+                    $panelHtml .= '<span class="menu-stack-title">' . e($item['title']) . '</span>';
+                    $panelHtml .= '</div>';
+                    $panelHtml .= '<ul class="menu-stack-list">';
+                    $panelHtml .= $childrenItems;
+                    $panelHtml .= '</ul>';
+                    $panelHtml .= '</div>';
+
+                    $this->panels[] = $panelHtml;
+                } else {
+                    // Add item without children
+                    $itemHtml = '<li class="menu-stack-item">';
+                    $itemHtml .= '<a href="' . e($item['url']) . '"><span>' . e($item['title']) . '</span></a>';
+                    $itemHtml .= '</li>';
+
+                    if ($level === 0) {
+                        $this->rootItems .= $itemHtml;
+                    } else {
+                        $currentLevelItems .= $itemHtml;
+                    }
+                }
+            }
+
+            return $currentLevelItems;
+        }
     }
 }

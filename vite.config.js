@@ -48,6 +48,7 @@ export default defineConfig({
 
                 //Client
                 "resources/scss/client/client.scss",
+                "resources/js/client/navbar.js",
             ],
             refresh: true,
         }),

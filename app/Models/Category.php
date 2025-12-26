@@ -47,11 +47,15 @@ class Category extends Model
             if ($category['parent_id'] == $parent_id) { // nếu là null thì  tức là cha
                 unset($categories[$key]); // bỏ qua lần sau không duyệt nữa
                 $children = $this->buildMenuClient($categories, $category['id']);
+                // Use posts route with category filter instead of categories route
+                $url = route('client.posts', ['category' => $category['slug']]);
                 $branch[] = [
                     'title'=> $category['name'],
-                    'url'=> route('client.categories', ['slug' => $category['slug']]),
+                    'url'=> $url,
                     'isRoute' => true,
-                    'children' => $children
+                    'children' => $children,
+                    'slug' => $category['slug'] ?? null,
+                    'id' => $category['id'] ?? null
                 ];
             }
         }

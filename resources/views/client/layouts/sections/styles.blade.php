@@ -3,6 +3,8 @@
 
 <!-- Fonts -->
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/fonts/boxicons.css') }}" />
+<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/fonts/fontawesome.css') }}" />
+<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/fonts/flag-icons.css') }}" />
 <!-- Core CSS -->
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/rtl/core.css') }}"
     class="template-customizer-core-css" />
@@ -18,6 +20,5 @@
 @vite('resources/scss/client/client.scss')
 <!-- Helpers -->
 <script src="{{ asset_admin_url('assets/vendor/js/helpers.js') }}"></script>
-<script src="{{ asset_admin_url('assets/vendor/js/template-customizer.js') }}"></script>
 <script src="{{ asset_admin_url('assets/js/front-config.js') }}"></script>
 @stack('styles')

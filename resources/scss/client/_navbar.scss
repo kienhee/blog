@@ -165,8 +165,24 @@ nav.layout-navbar {
       }
       
       .dropdown-item-parent {
+        // Hide submenu by default
+        > .dropdown-submenu {
+          display: none !important;
+        }
+
+        // Show submenu only when hovering over the parent item
         &:hover > .dropdown-submenu {
-          display: block;
+          display: block !important;
+        }
+
+        // Hide submenu when parent is not hovered
+        &:not(:hover) > .dropdown-submenu {
+          display: none !important;
+        }
+
+        // Keep submenu visible when hovering directly over it (bridge gap)
+        .dropdown-submenu:hover {
+          display: block !important;
         }
 
         // Auto-position submenu to left if it goes off screen
@@ -180,6 +196,7 @@ nav.layout-navbar {
               left: -100%;
               width: 100%;
               height: 100%;
+              pointer-events: none; // Allow clicks to pass through
             }
           }
         }
