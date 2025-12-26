@@ -23,6 +23,9 @@ Route::prefix('/')->name('client.')->group(function () {
 });
 // Admin
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard.analytics');
+    })->name('index');
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [DashboardController::class, 'analytics'])->name('analytics');
     });
