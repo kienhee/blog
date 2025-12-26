@@ -8,6 +8,7 @@ use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppController extends Controller
 {
@@ -29,7 +30,103 @@ class AppController extends Controller
 
     public function home()
     {
-        return view('client.pages.home');
+        // Lấy 6 bài viết mới nhất
+        $latestPosts = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->orderBy('posts.created_at', 'desc')
+            ->limit(6)
+            ->get();
+
+        // Lấy bài viết nổi bật lớn (bài viết đầu tiên có thumbnail, loại trừ 6 bài mới nhất)
+        $excludedIds = $latestPosts->pluck('id')->toArray();
+        $featuredPost = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->whereNotNull('posts.thumbnail')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->whereNotIn('posts.id', $excludedIds)
+            ->orderBy('posts.created_at', 'desc')
+            ->first();
+
+        // Lấy 4 bài viết gần đây cho tab "Tất cả" (loại trừ featured post và 6 bài mới nhất)
+        $allExcludedIds = $excludedIds;
+        if ($featuredPost) {
+            $allExcludedIds[] = $featuredPost->id;
+        }
+        $recentPosts = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->whereNotIn('posts.id', $allExcludedIds)
+            ->orderBy('posts.created_at', 'desc')
+            ->limit(4)
+            ->get();
+
+        // Lấy 3 bài viết cho sidebar (loại trừ featured post và recent posts)
+        $excludedIds = $recentPosts->pluck('id')->toArray();
+        if ($featuredPost) {
+            $excludedIds[] = $featuredPost->id;
+        }
+        
+        $sidebarPosts = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->when(count($excludedIds) > 0, function ($q) use ($excludedIds) {
+                $q->whereNotIn('posts.id', $excludedIds);
+            })
+            ->orderBy('posts.created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        // Lấy các danh mục chính (có bài viết, giới hạn 5)
+        $categories = $this->categoryRepository->gridData()
+            ->having('post_count', '>', 0)
+            ->orderBy('post_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('client.pages.home', compact('latestPosts', 'featuredPost', 'recentPosts', 'sidebarPosts', 'categories'));
+    }
+
+    public function search(Request $request)
+    {
+        $searchQuery = $request->get('q', '');
+        $posts = collect();
+
+        if (! empty($searchQuery)) {
+            $query = $this->postRepository->gridData()
+                ->where('posts.status', 'published')
+                ->whereNull('posts.deleted_at')
+                ->where(function ($q) {
+                    $q->whereNull('posts.scheduled_at')
+                        ->orWhere('posts.scheduled_at', '<=', now());
+                })
+                ->where(function ($q) use ($searchQuery) {
+                    $q->where('posts.title', 'like', '%'.$searchQuery.'%')
+                        ->orWhere('posts.description', 'like', '%'.$searchQuery.'%')
+                        ->orWhere('posts.content', 'like', '%'.$searchQuery.'%');
+                })
+                ->orderBy('posts.created_at', 'desc');
+
+            $posts = $query->paginate(12)->withQueryString();
+        }
+
+        return view('client.pages.search', compact('posts', 'searchQuery'));
     }
 
     public function posts(Request $request)
@@ -42,11 +139,6 @@ class AppController extends Controller
                     ->orWhere('posts.scheduled_at', '<=', now());
             })
             ->orderBy('posts.created_at', 'desc');
-
-        // Filter by category if provided
-        if ($request->has('category') && $request->category) {
-            $query->where('categories.slug', $request->category);
-        }
 
         // Filter by search term
         if ($request->has('search') && $request->search) {
@@ -100,18 +192,9 @@ class AppController extends Controller
         // Lấy tất cả hashtags trong hệ thống cho sidebar
         $allHashtags = $this->hashTagRepository->getHashTagByType();
 
-        // Lấy hashtags của bài viết hiện tại
+        // Lấy hashtags của bài viết hiện tại từ relationship
         $hashtags = [];
-        if (isset($post->hashtag_names) && $post->hashtag_names) {
-            $hashtagNames = explode(', ', $post->hashtag_names);
-            $hashtagSlugs = isset($post->hashtag_slugs) ? explode(', ', $post->hashtag_slugs) : [];
-            foreach ($hashtagNames as $index => $name) {
-                $hashtags[] = [
-                    'name' => trim($name),
-                    'slug' => isset($hashtagSlugs[$index]) ? trim($hashtagSlugs[$index]) : null,
-                ];
-            }
-        } elseif ($postModel) {
+        if ($postModel) {
             $hashtags = $postModel->hashtags->map(function ($tag) {
                 return [
                     'name' => $tag->name,
@@ -165,6 +248,110 @@ class AppController extends Controller
         }
 
         return $relatedPosts->take(4);
+    }
+
+    public function getPostsByCategory(Request $request)
+    {
+        $categoryId = $request->get('category_id');
+        
+        $query = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            });
+
+        if ($categoryId) {
+            $category = $this->categoryRepository->findById($categoryId);
+            if ($category) {
+                // Get all child category IDs (recursive)
+                $allChildrenIds = $this->categoryRepository->getAllChildrenIds($category->id);
+                $categoryIds = array_merge([$category->id], $allChildrenIds);
+                $query->whereIn('categories.id', $categoryIds);
+            }
+        }
+
+        // Get recent posts (limit 4, không lấy featured post)
+        $recentPosts = $query->orderBy('posts.created_at', 'desc')
+            ->limit(4)
+            ->get();
+
+        // Format recent posts
+        $formattedPosts = $recentPosts->map(function ($post) {
+            return [
+                'id' => $post->id,
+                'title' => $post->title,
+                'slug' => $post->slug,
+                'thumbnail' => $post->thumbnail,
+                'category_name' => $post->category_name ?? '',
+                'meta_description' => $post->meta_description ?? '',
+                'content' => $post->content ?? '',
+                'created_at' => $post->created_at ? $post->created_at->format('d F Y') : '',
+                'created_at_diff' => $post->created_at ? $post->created_at->diffForHumans() : '',
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'posts' => $formattedPosts,
+        ]);
+    }
+
+    public function category($slug)
+    {
+        $category = $this->categoryRepository->getCategoryBySlug($slug);
+
+        if (! $category) {
+            abort(404, 'Danh mục không tồn tại');
+        }
+
+        // Get all child category IDs (recursive)
+        $allChildrenIds = $this->categoryRepository->getAllChildrenIds($category->id);
+        $categoryIds = array_merge([$category->id], $allChildrenIds);
+
+        // Get posts from this category and all its children
+        $posts = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->whereIn('categories.id', $categoryIds)
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(12);
+
+        return view('client.pages.category', compact('category', 'posts'));
+    }
+
+    public function hashtag($slug)
+    {
+        $hashtag = $this->hashTagRepository->getHashTagBySlug($slug);
+
+        if (! $hashtag) {
+            abort(404, 'Hashtag không tồn tại');
+        }
+
+        // Get post IDs with this hashtag
+        $postIds = DB::table('post_hashtags')
+            ->where('hashtag_id', $hashtag->id)
+            ->pluck('post_id')
+            ->toArray();
+
+        // Get posts with this hashtag
+        $posts = $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->whereIn('posts.id', $postIds)
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(12);
+
+        return view('client.pages.hashtag', compact('hashtag', 'posts'));
     }
 
     public function contact()

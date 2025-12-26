@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 // Cient
 Route::prefix('/')->name('client.')->group(function () {
     Route::get('/', [AppController::class, 'home'])->name('home');
+    Route::get('/tim-kiem', [AppController::class, 'search'])->name('search');
     Route::get('/bai-viet', [AppController::class, 'posts'])->name('posts');
+    Route::get('/api/posts-by-category', [AppController::class, 'getPostsByCategory'])->name('api.posts-by-category');
     Route::get('/bai-viet/{slug}', [AppController::class, 'post'])->name('post');
+    Route::get('/danh-muc/{slug}', [AppController::class, 'category'])->name('category');
+    Route::get('/tag/{slug}', [AppController::class, 'hashtag'])->name('hashtag');
     Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
     Route::get('/ve-chung-toi', [AppController::class, 'about'])->name('about');
     Route::post('/newsletter/subscribe', [AppController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');

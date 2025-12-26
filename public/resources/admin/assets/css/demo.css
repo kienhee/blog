@@ -431,3 +431,18 @@
     cursor: pointer;
     border-radius: 0.5rem;
 }
+/* Limit card title to 2 lines */
+.card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 3em;
+    /* 2 lines * 1.5 line-height */
+}
+
+.card-title a {
+    display: block;
+}

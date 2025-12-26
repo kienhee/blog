@@ -214,4 +214,18 @@ class HashTagRepository extends BaseRepository
             ->whereNotNull('deleted_at')
             ->forceDelete();
     }
+
+    /**
+     * Get hashtag by slug
+     *
+     * @param string $slug
+     * @return \App\Models\HashTag|null
+     */
+    public function getHashTagBySlug($slug)
+    {
+        return $this->gridData()
+            ->where('slug', $slug)
+            ->whereNull('deleted_at')
+            ->first();
+    }
 }

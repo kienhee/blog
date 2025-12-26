@@ -192,6 +192,13 @@ class CategoryRepository extends BaseRepository
         return $grid->where('id', $id)->first();
     }
 
+    public function getCategoryBySlug($slug)
+    {
+        $grid = $this->gridData();
+
+        return $grid->where('slug', $slug)->whereNull('deleted_at')->first();
+    }
+
     public function checkHasChildrenById($id)
     {
         $grid = $this->gridData();
