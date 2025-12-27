@@ -2,12 +2,12 @@
 // ====================================
 
 // Import order matters
-@import "variables";
-@import "mixins";
-@import "base";
-@import "navbar";
-@import "footer";
-@import "post";
-@import "login-modal";
-@import "landing";
+@import "_variables";
+@import "_mixins";
+@import "_base";
+@import "_navbar";
+@import "_footer";
+@import "_post";
+@import "_login-modal";
+@import "_landing";
 

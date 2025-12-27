@@ -340,21 +340,71 @@
 
             {{-- navbar button: Start --}}
             @auth
-                <li>
-                    <a href="{{ route('client.home') }}" class="btn btn-outline-secondary">
-                        <span class="tf-icons bx bx-user me-md-1"></span>
-                        <span class="d-none d-md-block">{{ Auth::user()->full_name ?? Auth::user()->email }}</span>
+                @php
+                    $user = Auth::user();
+                @endphp
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="#" data-bs-toggle="dropdown">
+                        <div class="avatar avatar-online">
+                            <img src="{{ $user && $user->avatar ? thumb_path($user->avatar) : asset_shared_url('images/default.png') }}"
+                                alt="avatar" class="w-px-40 h-auto rounded-circle" />
+                        </div>
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <span class="dropdown-item-text">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="avatar avatar-online">
+                                            <img src="{{ $user && $user->avatar ? thumb_path($user->avatar) : asset_shared_url('images/default.png') }}"
+                                                alt="avatar" class="w-px-40 h-auto rounded-circle" />
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <span class="fw-medium d-block" id="currentUser">{{ $user->full_name ?? '' }}</span>
+                                        <small class="text-muted truncate-1" style="max-width:120px"
+                                            title="{{ $user->email ?? '' }}">{{ $user->email ?? '' }}</small>
+                                    </div>
+                                </div>
+                            </span>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        {{-- Quản lý tài khoản trên giao diện client, chỉ cho phép đổi thông tin cá nhân và mật khẩu --}}
+                        <li>
+                            <a class="dropdown-item" href="{{ route('client.profile.index') }}">
+                                <i class="bx bx-user me-2"></i>
+                                <span class="align-middle">Thông tin cá nhân</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('client.profile.savedPosts') }}">
+                                <i class="bx bx-bookmark me-2"></i>
+                                <span class="align-middle">Bài viết đã lưu</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('client.profile.changePassword') }}">
+                                <i class='bx bx-lock-alt me-2'></i>
+                                <span class="align-middle">Đổi mật khẩu</span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ route('client.auth.logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bx bx-power-off me-2"></i>
+                                    <span class="align-middle">Đăng xuất</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </li>
-                <li>
-                    <form action="{{ route('client.auth.logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">
-                            <span class="tf-icons bx bx-log-out me-md-1"></span>
-                            <span class="d-none d-md-block">Đăng xuất</span>
-                        </button>
-                    </form>
-                </li>
+                <!--/ User Dropdown -->
             @else
                 <li>
                     <a href="{{ route('client.auth.login') }}" class="btn btn-primary">

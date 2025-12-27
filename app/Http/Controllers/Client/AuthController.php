@@ -7,6 +7,7 @@ use App\Repositories\AuthRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -20,7 +21,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (Auth::check()) {
-            return redirect()->route('client.home');
+            $user = Auth::user();
+            $user->load('roles');
+            
+            // Kiểm tra role và redirect tương ứng
+            if ($user->hasRole('guest')) {
+                return redirect()->route('client.home');
+            } else {
+                return redirect()->route('admin.dashboard.analytics');
+            }
         }
 
         return view('client.pages.auth.login');
@@ -44,8 +53,18 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-
-            return redirect()->intended(route('client.home'))->with('success', 'Đăng nhập thành công!');
+            
+            $user = Auth::user();
+            $user->load('roles');
+            
+            // Kiểm tra role và redirect tương ứng
+            if ($user->hasRole('guest')) {
+                // Role guest -> redirect về client
+                return redirect()->intended(route('client.home'))->with('success', 'Đăng nhập thành công!');
+            } else {
+                // Các role khác (superadmin, editor, ...) -> redirect về admin
+                return redirect()->intended(route('admin.dashboard.analytics'))->with('success', 'Đăng nhập thành công!');
+            }
         }
 
         return back()->withErrors([
@@ -87,12 +106,18 @@ class AuthController extends Controller
 
         try {
             $userRepository = app(UserRepository::class);
-            $userRepository->createUser([
+            $user = $userRepository->createUser([
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'] ?? null,
                 'password' => $validated['password'],
             ]);
+
+            // Gán role guest cho user mới đăng ký
+            $guestRole = Role::where('name', 'guest')->first();
+            if ($guestRole && $user) {
+                $user->assignRole($guestRole);
+            }
 
             // Tự động đăng nhập sau khi đăng ký
             $credentials = ['email' => $validated['email'], 'password' => $validated['password']];

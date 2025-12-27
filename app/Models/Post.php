@@ -42,6 +42,11 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function savedPosts()
+    {
+        return $this->hasMany(SavedPost::class);
+    }
+
     protected $fillable = [
         'thumbnail',
         'title',

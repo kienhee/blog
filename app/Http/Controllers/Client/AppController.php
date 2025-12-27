@@ -8,6 +8,7 @@ use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AppController extends Controller
@@ -203,7 +204,15 @@ class AppController extends Controller
             })->toArray();
         }
 
-        return view('client.pages.single', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags'));
+        // Kiểm tra xem bài viết đã được lưu chưa (nếu user đã đăng nhập)
+        $isSaved = false;
+        if (Auth::check()) {
+            $isSaved = \App\Models\SavedPost::where('user_id', auth()->id())
+                ->where('post_id', $post->id)
+                ->exists();
+        }
+
+        return view('client.pages.single', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags', 'isSaved'));
     }
 
     /**

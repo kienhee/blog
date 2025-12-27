@@ -20,5 +20,12 @@
         class="floating-share-btn" title="Sao chép link" style="border: none; cursor: pointer;">
         <i class="bx bx-link"></i>
     </button>
+    @auth
+        <button id="savePostBtn" 
+                class="floating-share-btn save-post-btn {{ $isSaved ?? false ? 'saved' : '' }}" 
+                data-post-id="{{ $post->id ?? '' }}"
+                title="{{ ($isSaved ?? false) ? 'Bỏ lưu bài viết' : 'Lưu bài viết' }}">
+            <i class="bx {{ ($isSaved ?? false) ? 'bxs-bookmark' : 'bx-bookmark' }}"></i>
+        </button>
+    @endauth
 </div>
-

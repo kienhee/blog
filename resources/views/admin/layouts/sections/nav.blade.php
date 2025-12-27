@@ -22,8 +22,13 @@
         <!-- /Search -->
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('client.home') }}" target="_blank">
+                    <i class="fa-solid fa-house fs-4"></i>
+                </a>
+            </li>
             <!-- Language -->
-            <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
+            {{-- <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <i class="bx bx-globe bx-sm"></i>
                 </a>
@@ -41,7 +46,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
             <!-- /Language -->
 
             <!-- Style Switcher -->

@@ -6,12 +6,14 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HashTagController;
 use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\AppController;
 use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\ProfileController;
+use App\Http\Controllers\Client\SavedPostController;
 use Illuminate\Support\Facades\Route;
 
 // Client
@@ -39,9 +41,28 @@ Route::prefix('/')->name('client.')->group(function () {
         Route::get('/dat-lai-mat-khau', [AuthController::class, 'showResetPasswordForm'])->name('reset-password');
         Route::post('/dat-lai-mat-khau', [AuthController::class, 'updatePassword'])->name('reset-password.update');
     });
+
+    // Client Profile Routes (require auth)
+    Route::middleware('auth')->group(function () {
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'profile'])->name('index');
+            Route::put('/', [ProfileController::class, 'updateProfile'])->name('update');
+            Route::get('/bai-viet-da-luu', [ProfileController::class, 'savedPosts'])->name('savedPosts');
+            Route::get('/doi-mat-khau', [ProfileController::class, 'showChangePassword'])->name('changePassword');
+            Route::post('/doi-mat-khau', [ProfileController::class, 'changePassword'])->name('changePassword.post');
+        });
+
+        // Saved Posts
+        Route::prefix('saved-posts')->name('saved-posts.')->group(function () {
+            Route::post('/{postId}/toggle', [SavedPostController::class, 'toggle'])->name('toggle');
+        });
+    });
+
+    // Saved posts check route (accessible even when not logged in)
+    Route::get('/saved-posts/{postId}/check', [SavedPostController::class, 'check'])->name('saved-posts.check');
 });
 // Admin
-Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin.')->group(function () {
     Route::get('/', function () {
         return redirect()->route('admin.dashboard.analytics');
     })->name('index');
@@ -162,9 +183,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
         Route::post('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:user.delete');
 
         // Trang cá nhân & đổi mật khẩu (không cần permission, user có thể tự cập nhật profile của mình)
-        Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
-        Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('updateProfile');
-        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('changePassword');
+        Route::get('/profile', [AdminProfileController::class, 'profile'])->name('profile');
+        Route::put('/profile', [AdminProfileController::class, 'updateProfile'])->name('updateProfile');
+        Route::post('/change-password', [AdminProfileController::class, 'changePassword'])->name('changePassword');
     });
     Route::prefix('roles')->name('roles.')->group(function () {
         // Roles management - sử dụng role permissions riêng

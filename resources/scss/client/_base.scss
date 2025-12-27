@@ -56,3 +56,11 @@
 #template-customizer {
   display: none !important;
 }
+
+#profileBannerImg {
+  height: 21.875rem;
+
+  @include respond-to(lg) {
+    height: 15.625rem;
+  }
+}

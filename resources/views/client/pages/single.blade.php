@@ -60,5 +60,5 @@
 
 @push('scripts')
     <script src="{{ asset_shared_url('vendor/highlight/highlight.min.js') }}"></script>
-    <script src="{{ asset_client_url('js/post.js') }}"></script>
+    @vite(['resources/js/client/post.js'])
 @endpush

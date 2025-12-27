@@ -133,6 +133,64 @@
     background: $whatsapp-color;
     border-color: $whatsapp-color;
   }
+
+  &.save-post-btn {
+    position: relative;
+    
+    &.saved {
+      background: $primary-color;
+      color: $white;
+      border-color: $primary-color;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      
+      &:hover:not(:disabled) {
+        background: $primary-dark;
+        border-color: $primary-dark;
+        transform: translateY(-2px) scale(1.1);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+      }
+    }
+
+    &:hover:not(.saved):not(:disabled) {
+      background: $primary-color;
+      color: $white;
+      border-color: $primary-color;
+      transform: translateY(-2px) scale(1.1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    // Loading state
+    &.loading {
+      opacity: 0.7;
+      cursor: wait;
+      pointer-events: none;
+      
+      i {
+        animation: spin 1s linear infinite;
+      }
+    }
+    
+    // Disabled state
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    // Active state animation
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.95);
+    }
+  }
+  
+  // Spin animation for loading icon
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 // Main Content Layout
@@ -515,6 +573,39 @@
       background: $primary-color;
       color: $white;
       border-color: $primary-color;
+    }
+
+    &.save-post-btn {
+      &.saved {
+        background: $primary-color;
+        color: $white;
+        border-color: $primary-color;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+      
+      &:hover:not(.saved):not(:disabled) {
+        background: $primary-color;
+        color: $white;
+        border-color: $primary-color;
+      }
+      
+      &.loading {
+        opacity: 0.7;
+        cursor: wait;
+        
+        i {
+          animation: spin 1s linear infinite;
+        }
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      
+      &:active:not(:disabled) {
+        transform: translateY(0) scale(0.95);
+      }
     }
   }
 
