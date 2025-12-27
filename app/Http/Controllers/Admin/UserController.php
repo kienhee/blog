@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\StoreRequest;
 use App\Http\Requests\Admin\User\UpdateRequest;
 use App\Repositories\UserRepository;
+use App\Repositories\RoleRepository;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     protected $userRepository;
+    protected $roleRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, RoleRepository $roleRepository)
     {
         $this->userRepository = $userRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     public function list()
@@ -40,7 +43,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('admin.modules.user.create');
+        $roles = $this->roleRepository->getAllForSelect();
+        return view('admin.modules.user.create', compact('roles'));
     }
 
     public function store(StoreRequest $request)
@@ -75,12 +79,13 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->userRepository->findById($id)->load('roles');
         if (! $user) {
             return redirect()->route('admin.users.list')->with('error', 'Người dùng không tồn tại');
         }
 
-        return view('admin.modules.user.edit', compact('user'));
+        $roles = $this->roleRepository->getAllForSelect();
+        return view('admin.modules.user.edit', compact('user', 'roles'));
     }
 
     public function update(UpdateRequest $request, $id)

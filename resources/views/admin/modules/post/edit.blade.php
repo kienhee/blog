@@ -20,6 +20,7 @@
                 'listLink' => 'admin.posts.list',
                 'previewLink' => 'client.post',
                 'previewId' => $data->slug ?? $data->id,
+                'buttonPermission' => 'post.update',
             ])
             <div class="row">
                 <div class="col-12 col-lg-8">

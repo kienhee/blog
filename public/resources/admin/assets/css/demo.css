@@ -41,6 +41,34 @@
     padding-top: 62px !important;
 }
 
+/* Logo Theme Switcher */
+/* Default: Show light logo, hide dark logo */
+.logo-dark {
+    display: none !important;
+}
+
+.logo-light {
+    display: block !important;
+}
+
+/* Dark mode: Hide light logo, show dark logo */
+html.dark-style .logo-light {
+    display: none !important;
+}
+
+html.dark-style .logo-dark {
+    display: block !important;
+}
+
+/* Light mode: Show light logo, hide dark logo */
+html.light-style .logo-light {
+    display: block !important;
+}
+
+html.light-style .logo-dark {
+    display: none !important;
+}
+
 /* Navbar page z-index issue solution */
 .content-wrapper .navbar {
     z-index: auto;

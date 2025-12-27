@@ -17,6 +17,7 @@
                 'description' => 'Viết bài mới cho blog hoặc trang tin tức',
                 'button' => 'create',
                 'listLink' => 'admin.posts.list',
+                'buttonPermission' => 'post.create',
             ])
             <div class="row">
                 <div class="col-12 col-lg-8">

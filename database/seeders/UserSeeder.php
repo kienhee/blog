@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -18,7 +19,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (seed_version($this->tableName, $this->version)) {
-            $users = [
+            $userData = [
                 'avatar' => null,
                 'full_name' => 'Super Admin',
                 'description' => null,
@@ -37,7 +38,17 @@ class UserSeeder extends Seeder
                 'created_at' => now()->subYears(2),
                 'updated_at' => now(),
             ];
-            DB::table($this->tableName)->insert($users);
+
+            $user = User::firstOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+
+            // Gán role superadmin cho user (nếu chưa có)
+            $superAdminRole = Role::where('name', 'superadmin')->first();
+            if ($superAdminRole && ! $user->hasRole('superadmin')) {
+                $user->assignRole($superAdminRole);
+            }
         }
     }
 }

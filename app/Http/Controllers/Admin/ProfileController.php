@@ -12,7 +12,7 @@ class ProfileController extends Controller
 {
     public function profile()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
 
         return view('admin.modules.profile.index', compact('user'));
     }

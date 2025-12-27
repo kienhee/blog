@@ -16,9 +16,11 @@
     <div class="d-flex gap-2">
         @switch($button)
             @case('add')
-                <a href="{{ route($buttonLink) }}" class="btn btn-primary">
-                    <i class='bx bx-plus-circle me-1'></i> Thêm mới
-                </a>
+                @if (empty($buttonPermission) || auth()->user()->can($buttonPermission))
+                    <a href="{{ route($buttonLink) }}" class="btn btn-primary">
+                        <i class='bx bx-plus-circle me-1'></i> Thêm mới
+                    </a>
+                @endif
             @break
 
             @case('create')
@@ -28,10 +30,12 @@
                             <i class='bx bx-arrow-back'></i> Quay lại
                         </a>
                     @endif
-                    <button type="submit" id="submit_btn" class="btn btn-primary">
-                        <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
-                        <i class='bx bx-plus-circle me-1'></i> Thêm mới
-                    </button>
+                    @if (empty($buttonPermission) || auth()->user()->can($buttonPermission))
+                        <button type="submit" id="submit_btn" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
+                            <i class='bx bx-plus-circle me-1'></i> Thêm mới
+                        </button>
+                    @endif
                 </div>
             @break
 
@@ -47,10 +51,12 @@
                             <i class='bx bx-show'></i> Xem trước
                         </a>
                     @endif
-                    <button type="submit" id="submit_btn" class="btn btn-primary">
-                        <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
-                        <i class='bx bx-save me-1'></i> Cập nhật
-                    </button>
+                    @if (empty($buttonPermission) || auth()->user()->can($buttonPermission))
+                        <button type="submit" id="submit_btn" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
+                            <i class='bx bx-save me-1'></i> Cập nhật
+                        </button>
+                    @endif
                 </div>
             @break
 

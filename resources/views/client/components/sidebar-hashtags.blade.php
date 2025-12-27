@@ -6,10 +6,11 @@
             Khám phá
         </h3>
         <ul class="list-unstyled d-flex flex-wrap gap-2">
-            @foreach ($allHashtags->take(10) as $hashtag)
+            @foreach ($allHashtags as $hashtag)
                 <li>
                     @if ($hashtag->slug)
-                        <a href="{{ route('client.hashtag', ['slug' => $hashtag->slug]) }}" class="badge rounded-pill bg-label-secondary">
+                        <a href="{{ route('client.hashtag', ['slug' => $hashtag->slug]) }}"
+                            class="badge rounded-pill bg-label-secondary">
                             <span>{{ $hashtag->name }}</span>
                         </a>
                     @else
@@ -22,4 +23,3 @@
         </ul>
     </div>
 @endif
-

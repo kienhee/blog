@@ -28,6 +28,8 @@ class UpdateRequest extends FormRequest
             'instagram_url' => ['nullable', 'url', 'max:255', 'regex:/^https:\/\/(www\.)?instagram\.com\/.+$/'],
             'linkedin_url' => ['nullable', 'url', 'max:255', 'regex:/^https:\/\/(www\.)?linkedin\.com\/(in|company)\/.+$/'],
             'password' => ['nullable', 'string', 'min:6', 'max:255', 'confirmed'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['exists:roles,id'],
         ];
     }
 
@@ -54,6 +56,10 @@ class UpdateRequest extends FormRequest
             'password.min' => 'Mật khẩu phải có ít nhất :min ký tự',
             'password.max' => 'Mật khẩu không được vượt quá :max ký tự',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp',
+            'roles.required' => 'Vui lòng chọn ít nhất một vai trò',
+            'roles.array' => 'Danh sách vai trò không hợp lệ',
+            'roles.min' => 'Vui lòng chọn ít nhất một vai trò',
+            'roles.*.exists' => 'Một hoặc nhiều vai trò không tồn tại',
         ];
     }
 }

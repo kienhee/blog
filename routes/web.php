@@ -1,18 +1,20 @@
 <?php
 
-use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HashTagController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\AppController;
+use App\Http\Controllers\Client\AuthController;
 use Illuminate\Support\Facades\Route;
 
-// Cient
+// Client
 Route::prefix('/')->name('client.')->group(function () {
     Route::get('/', [AppController::class, 'home'])->name('home');
     Route::get('/tim-kiem', [AppController::class, 'search'])->name('search');
@@ -24,6 +26,19 @@ Route::prefix('/')->name('client.')->group(function () {
     Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
     Route::get('/ve-chung-toi', [AppController::class, 'about'])->name('about');
     Route::post('/newsletter/subscribe', [AppController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
+
+    // Client Auth Routes
+    Route::prefix('auth')->name('auth.')->group(function () {
+        Route::get('/dang-nhap', [AuthController::class, 'login'])->name('login');
+        Route::post('/dang-nhap', [AuthController::class, 'loginHandle'])->name('loginHandle');
+        Route::get('/dang-ky', [AuthController::class, 'register'])->name('register');
+        Route::post('/dang-ky', [AuthController::class, 'registerHandle'])->name('registerHandle');
+        Route::post('/dang-xuat', [AuthController::class, 'logout'])->name('logout');
+        Route::get('/quen-mat-khau', [AuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
+        Route::post('/quen-mat-khau', [AuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
+        Route::get('/dat-lai-mat-khau', [AuthController::class, 'showResetPasswordForm'])->name('reset-password');
+        Route::post('/dat-lai-mat-khau', [AuthController::class, 'updatePassword'])->name('reset-password.update');
+    });
 });
 // Admin
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
@@ -34,113 +49,163 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
         Route::get('/', [DashboardController::class, 'analytics'])->name('analytics');
     });
     Route::prefix('categories')->name('categories.')->group(function () {
-        Route::get('/', [CategoryController::class, 'list'])->name('list');
-        Route::get('/ajax-get-data', [CategoryController::class, 'ajaxGetData'])->name('ajaxGetData');
-        Route::get('/ajax-get-trashed-data', [CategoryController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData');
-        Route::get('/ajax-get-tree-view/{type}', [CategoryController::class, 'ajaxGetTreeView'])->name('ajax-get-tree-view');
-        Route::get('/create', [CategoryController::class, 'create'])->name('create');
-        Route::get('/ajax-get-category-by-type', [CategoryController::class, 'ajaxGetCategoryByType'])->name('ajax-get-category-by-type');
-        Route::post('/store', [CategoryController::class, 'store'])->name('store');
-        Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder');
-        Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
-        Route::post('/restore/{id}', [CategoryController::class, 'restore'])->name('restore')->where('id', '[0-9]+');
-        Route::delete('/force-delete/{id}', [CategoryController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+');
-        Route::delete('/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('bulkDelete');
-        Route::post('/bulk-restore', [CategoryController::class, 'bulkRestore'])->name('bulkRestore');
-        Route::delete('/bulk-force-delete', [CategoryController::class, 'bulkForceDelete'])->name('bulkForceDelete');
-        Route::get('/delete-info/{id}', [CategoryController::class, 'getDeleteInfo'])->name('deleteInfo')->where('id', '[0-9]+');
-        Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('edit')->where('id', '[0-9]+');
-        Route::put('/update/{id}', [CategoryController::class, 'update'])->name('update')->where('id', '[0-9]+');
-        Route::post('/quick-store', [CategoryController::class, 'quickStore'])->name('quickStore');
+        // Read permissions
+        Route::get('/', [CategoryController::class, 'list'])->name('list')->middleware('permission:category.read');
+        Route::get('/ajax-get-data', [CategoryController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:category.read');
+        Route::get('/ajax-get-trashed-data', [CategoryController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData')->middleware('permission:category.read');
+        Route::get('/ajax-get-tree-view/{type}', [CategoryController::class, 'ajaxGetTreeView'])->name('ajax-get-tree-view')->middleware('permission:category.read');
+        Route::get('/ajax-get-category-by-type', [CategoryController::class, 'ajaxGetCategoryByType'])->name('ajax-get-category-by-type')->middleware('permission:category.read');
+        Route::get('/delete-info/{id}', [CategoryController::class, 'getDeleteInfo'])->name('deleteInfo')->where('id', '[0-9]+')->middleware('permission:category.read');
+        Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:category.read');
+
+        // Create permissions
+        Route::get('/create', [CategoryController::class, 'create'])->name('create')->middleware('permission:category.create');
+        Route::post('/store', [CategoryController::class, 'store'])->name('store')->middleware('permission:category.create');
+        Route::post('/quick-store', [CategoryController::class, 'quickStore'])->name('quickStore')->middleware('permission:category.create');
+
+        // Update permissions
+        Route::put('/update/{id}', [CategoryController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:category.update');
+        Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder')->middleware('permission:category.update');
+        Route::post('/restore/{id}', [CategoryController::class, 'restore'])->name('restore')->where('id', '[0-9]+')->middleware('permission:category.update');
+        Route::post('/bulk-restore', [CategoryController::class, 'bulkRestore'])->name('bulkRestore')->middleware('permission:category.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:category.delete');
+        Route::delete('/force-delete/{id}', [CategoryController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+')->middleware('permission:category.delete');
+        Route::delete('/bulk-delete', [CategoryController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:category.delete');
+        Route::delete('/bulk-force-delete', [CategoryController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:category.delete');
     });
     Route::prefix('posts')->name('posts.')->group(function () {
-        Route::get('/', [PostController::class, 'list'])->name('list');
-        Route::get('/ajax-get-data', [PostController::class, 'ajaxGetData'])->name('ajaxGetData');
-        Route::get('/ajax-get-trashed-data', [PostController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData');
-        Route::get('/create', [PostController::class, 'create'])->name('create');
-        Route::post('/store', [PostController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [PostController::class, 'edit'])->name('edit')->where('id', '[0-9]+');
-        Route::put('/update/{id}', [PostController::class, 'update'])->name('update')->where('id', '[0-9]+');
-        Route::delete('/destroy/{id}', [PostController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
-        Route::post('/restore/{id}', [PostController::class, 'restore'])->name('restore')->where('id', '[0-9]+');
-        Route::delete('/force-delete/{id}', [PostController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+');
-        Route::delete('/bulk-delete', [PostController::class, 'bulkDelete'])->name('bulkDelete');
-        Route::post('/bulk-restore', [PostController::class, 'bulkRestore'])->name('bulkRestore');
-        Route::delete('/bulk-force-delete', [PostController::class, 'bulkForceDelete'])->name('bulkForceDelete');
-        Route::post('/bulk-move-category', [PostController::class, 'bulkMoveCategory'])->name('bulkMoveCategory');
-        Route::get('/{id}/publish', [PostController::class, 'publish'])->name('publish')->where('id', '[0-9]+');
-        Route::get('/{id}/views', [PostController::class, 'getPostViews'])->name('views')->where('id', '[0-9]+');
+        // Read permissions
+        Route::get('/', [PostController::class, 'list'])->name('list')->middleware('permission:post.read');
+        Route::get('/ajax-get-data', [PostController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:post.read');
+        Route::get('/ajax-get-trashed-data', [PostController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData')->middleware('permission:post.read');
+        Route::get('/edit/{id}', [PostController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:post.read');
+        Route::get('/{id}/views', [PostController::class, 'getPostViews'])->name('views')->where('id', '[0-9]+')->middleware('permission:post.read');
+
+        // Create permissions
+        Route::get('/create', [PostController::class, 'create'])->name('create')->middleware('permission:post.create');
+        Route::post('/store', [PostController::class, 'store'])->name('store')->middleware('permission:post.create');
+
+        // Update permissions
+        Route::put('/update/{id}', [PostController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:post.update');
+        Route::post('/restore/{id}', [PostController::class, 'restore'])->name('restore')->where('id', '[0-9]+')->middleware('permission:post.update');
+        Route::post('/bulk-restore', [PostController::class, 'bulkRestore'])->name('bulkRestore')->middleware('permission:post.update');
+        Route::post('/bulk-move-category', [PostController::class, 'bulkMoveCategory'])->name('bulkMoveCategory')->middleware('permission:post.update');
+        Route::get('/{id}/publish', [PostController::class, 'publish'])->name('publish')->where('id', '[0-9]+')->middleware('permission:post.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [PostController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:post.delete');
+        Route::delete('/force-delete/{id}', [PostController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+')->middleware('permission:post.delete');
+        Route::delete('/bulk-delete', [PostController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:post.delete');
+        Route::delete('/bulk-force-delete', [PostController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:post.delete');
     });
     Route::prefix('contacts')->name('contacts.')->group(function () {
-        Route::get('/', [ContactController::class, 'list'])->name('list');
-        Route::get('/ajax-get-data', [ContactController::class, 'ajaxGetData'])->name('ajaxGetData');
-        Route::get('/count-pending', [ContactController::class, 'countPending'])->name('countPending');
-        Route::get('/{id}', [ContactController::class, 'show'])->name('show')->where('id', '[0-9]+');
-        Route::post('/{id}/reply', [ContactController::class, 'reply'])->name('reply')->where('id', '[0-9]+');
+        // Read permissions
+        Route::get('/', [ContactController::class, 'list'])->name('list')->middleware('permission:contact.read');
+        Route::get('/ajax-get-data', [ContactController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:contact.read');
+        Route::get('/count-pending', [ContactController::class, 'countPending'])->name('countPending')->middleware('permission:contact.read');
+        Route::get('/{id}', [ContactController::class, 'show'])->name('show')->where('id', '[0-9]+')->middleware('permission:contact.read');
+
+        // Update permissions
+        Route::post('/{id}/reply', [ContactController::class, 'reply'])->name('reply')->where('id', '[0-9]+')->middleware('permission:contact.update');
         Route::put('/change-status/{id}/{status}', [ContactController::class, 'changeStatus'])
             ->where(['id' => '[0-9]+', 'status' => '[0-3]'])
-            ->name('changeStatus');
+            ->name('changeStatus')
+            ->middleware('permission:contact.update');
     });
     Route::prefix('hashtags')->name('hashtags.')->group(function () {
-        Route::get('/', [HashTagController::class, 'list'])->name('list');
-        Route::get('/ajax-get-data', [HashTagController::class, 'ajaxGetData'])->name('ajaxGetData');
-        Route::get('/ajax-get-trashed-data', [HashTagController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData');
-        Route::get('/create', [HashTagController::class, 'create'])->name('create');
-        Route::post('/store', [HashTagController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [HashTagController::class, 'edit'])->name('edit')->where('id', '[0-9]+');
-        Route::put('/update/{id}', [HashTagController::class, 'update'])->name('update')->where('id', '[0-9]+');
-        Route::delete('/destroy/{id}', [HashTagController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
-        Route::post('/restore/{id}', [HashTagController::class, 'restore'])->name('restore')->where('id', '[0-9]+');
-        Route::delete('/force-delete/{id}', [HashTagController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+');
-        Route::delete('/bulk-delete', [HashTagController::class, 'bulkDelete'])->name('bulkDelete');
-        Route::post('/bulk-restore', [HashTagController::class, 'bulkRestore'])->name('bulkRestore');
-        Route::delete('/bulk-force-delete', [HashTagController::class, 'bulkForceDelete'])->name('bulkForceDelete');
-        Route::get('/search', [HashTagController::class, 'search'])->name('search');
-        Route::post('/quick-store', [HashTagController::class, 'quickStore'])->name('quickStore');
+        // Read permissions
+        Route::get('/', [HashTagController::class, 'list'])->name('list')->middleware('permission:hashtag.read');
+        Route::get('/ajax-get-data', [HashTagController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:hashtag.read');
+        Route::get('/ajax-get-trashed-data', [HashTagController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData')->middleware('permission:hashtag.read');
+        Route::get('/edit/{id}', [HashTagController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:hashtag.read');
+        Route::get('/search', [HashTagController::class, 'search'])->name('search')->middleware('permission:hashtag.read');
+
+        // Create permissions
+        Route::get('/create', [HashTagController::class, 'create'])->name('create')->middleware('permission:hashtag.create');
+        Route::post('/store', [HashTagController::class, 'store'])->name('store')->middleware('permission:hashtag.create');
+        Route::post('/quick-store', [HashTagController::class, 'quickStore'])->name('quickStore')->middleware('permission:hashtag.create');
+
+        // Update permissions
+        Route::put('/update/{id}', [HashTagController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:hashtag.update');
+        Route::post('/restore/{id}', [HashTagController::class, 'restore'])->name('restore')->where('id', '[0-9]+')->middleware('permission:hashtag.update');
+        Route::post('/bulk-restore', [HashTagController::class, 'bulkRestore'])->name('bulkRestore')->middleware('permission:hashtag.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [HashTagController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:hashtag.delete');
+        Route::delete('/force-delete/{id}', [HashTagController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+')->middleware('permission:hashtag.delete');
+        Route::delete('/bulk-delete', [HashTagController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:hashtag.delete');
+        Route::delete('/bulk-force-delete', [HashTagController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:hashtag.delete');
     });
 
     Route::prefix('users')->name('users.')->group(function () {
-        // Quản lý người dùng
-        Route::get('/', [UserController::class, 'list'])->name('list');
-        Route::get('/ajax-get-data', [UserController::class, 'ajaxGetData'])->name('ajaxGetData');
-        Route::get('/ajax-get-trashed-data', [UserController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData');
-        Route::get('/create', [UserController::class, 'create'])->name('create');
-        Route::post('/store', [UserController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->where('id', '[0-9]+');
-        Route::put('/update/{id}', [UserController::class, 'update'])->name('update')->where('id', '[0-9]+');
-        Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
-        Route::post('/restore/{id}', [UserController::class, 'restore'])->name('restore')->where('id', '[0-9]+');
-        Route::delete('/force-delete/{id}', [UserController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+');
+        // Quản lý người dùng - Read permissions
+        Route::get('/', [UserController::class, 'list'])->name('list')->middleware('permission:user.read');
+        Route::get('/ajax-get-data', [UserController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:user.read');
+        Route::get('/ajax-get-trashed-data', [UserController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData')->middleware('permission:user.read');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:user.read');
 
-        // Bulk actions
-        Route::post('/bulk-delete', [UserController::class, 'bulkDelete'])->name('bulkDelete');
-        Route::post('/bulk-restore', [UserController::class, 'bulkRestore'])->name('bulkRestore');
-        Route::post('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulkForceDelete');
+        // Create permissions
+        Route::get('/create', [UserController::class, 'create'])->name('create')->middleware('permission:user.create');
+        Route::post('/store', [UserController::class, 'store'])->name('store')->middleware('permission:user.create');
 
-        // Trang cá nhân & đổi mật khẩu
+        // Update permissions
+        Route::put('/update/{id}', [UserController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:user.update');
+        Route::post('/restore/{id}', [UserController::class, 'restore'])->name('restore')->where('id', '[0-9]+')->middleware('permission:user.update');
+        Route::post('/bulk-restore', [UserController::class, 'bulkRestore'])->name('bulkRestore')->middleware('permission:user.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:user.delete');
+        Route::delete('/force-delete/{id}', [UserController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+')->middleware('permission:user.delete');
+        Route::post('/bulk-delete', [UserController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:user.delete');
+        Route::post('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:user.delete');
+
+        // Trang cá nhân & đổi mật khẩu (không cần permission, user có thể tự cập nhật profile của mình)
         Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
         Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('updateProfile');
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('changePassword');
+    });
+    Route::prefix('roles')->name('roles.')->group(function () {
+        // Roles management - sử dụng role permissions riêng
+        // Read permissions
+        Route::get('/', [RoleController::class, 'list'])->name('list')->middleware('permission:role.read');
+        Route::get('/ajax-get-data', [RoleController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:role.read');
+        Route::get('/edit/{id}', [RoleController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:role.read');
+
+        // Create permissions
+        Route::get('/create', [RoleController::class, 'create'])->name('create')->middleware('permission:role.create');
+        Route::post('/store', [RoleController::class, 'store'])->name('store')->middleware('permission:role.create');
+
+        // Update permissions
+        Route::put('/update/{id}', [RoleController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:role.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [RoleController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:role.delete');
     });
     Route::get('media', function () {
         return view('admin.modules.media.index');
     })->name('media');
 
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/', [SettingController::class, 'index'])->name('index');
-        Route::post('/', [SettingController::class, 'update'])->name('update');
-        Route::get('/test-email-setup', [SettingController::class, 'testEmailSetup'])->name('testEmailSetup');
+        // Settings - Read permissions
+        Route::get('/', [SettingController::class, 'index'])->name('index')->middleware('permission:setting.read');
+        Route::get('/test-email-setup', [SettingController::class, 'testEmailSetup'])->name('testEmailSetup')->middleware('permission:setting.read');
+
+        // Update permissions
+        Route::post('/', [SettingController::class, 'update'])->name('update')->middleware('permission:setting.update');
     });
 });
-// Authentication routes
+// Admin Authentication routes
 Route::prefix('auth')->name('auth.')->group(function () {
-    Route::get('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/loginHandle', [AuthController::class, 'loginHandle'])->name('loginHandle');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
-    Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
-    Route::get('/reset-password', [AuthController::class, 'showResetPasswordForm'])->name('reset-password');
-    Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('reset-password.update');
+    Route::get('/login', [AdminAuthController::class, 'login'])->name('login');
+    Route::post('/loginHandle', [AdminAuthController::class, 'loginHandle'])->name('loginHandle');
+    Route::post('/register', [AdminAuthController::class, 'register'])->name('register');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+    Route::get('/forgot-password', [AdminAuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
+    Route::post('/forgot-password', [AdminAuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
+    Route::get('/reset-password', [AdminAuthController::class, 'showResetPasswordForm'])->name('reset-password');
+    Route::post('/reset-password', [AdminAuthController::class, 'updatePassword'])->name('reset-password.update');
 });
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {

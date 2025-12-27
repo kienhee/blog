@@ -78,17 +78,27 @@ class HashTagRepository extends BaseRepository
                 $deleteUrl = route('admin.hashtags.destroy', $row->id);
                 $title = $row->name;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <a href="' . $editUrl . '" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
-                            <i class="bx bx-edit"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
-                            data-url="' . $deleteUrl . '" data-title="' . htmlspecialchars($title) . '">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </div>
-                ';
+                $canEdit = auth()->user()->can('hashtag.update');
+                $canDelete = auth()->user()->can('hashtag.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canEdit) {
+                    $html .= '<a href="' . $editUrl . '" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
+                        <i class="bx bx-edit"></i>
+                    </a>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
+                        data-url="' . $deleteUrl . '" data-title="' . htmlspecialchars($title) . '">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'name_html', 'slug_html', 'created_at_html', 'action_html'])
             ->make(true);
@@ -142,18 +152,28 @@ class HashTagRepository extends BaseRepository
                 $forceDeleteUrl = route('admin.hashtags.forceDelete', $row->id);
                 $title = $row->name;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
-                            data-url="' . $restoreUrl . '" data-title="' . htmlspecialchars($title) . '">
-                            <i class="bx bx-undo"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
-                            data-url="' . $forceDeleteUrl . '" data-title="' . htmlspecialchars($title) . '">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </div>
-                ';
+                $canUpdate = auth()->user()->can('hashtag.update');
+                $canDelete = auth()->user()->can('hashtag.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canUpdate) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
+                        data-url="' . $restoreUrl . '" data-title="' . htmlspecialchars($title) . '">
+                        <i class="bx bx-undo"></i>
+                    </button>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
+                        data-url="' . $forceDeleteUrl . '" data-title="' . htmlspecialchars($title) . '">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'name_html', 'slug_html', 'deleted_at_html', 'action_html'])
             ->make(true);

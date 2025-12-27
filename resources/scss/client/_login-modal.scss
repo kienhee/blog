@@ -1,0 +1,180 @@
+// Login Modal Styles
+// ====================================
+.login-modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 0;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .login-modal-logo {
+      display: flex;
+      align-items: center;
+
+      svg {
+        height: 40px;
+        width: auto;
+      }
+    }
+
+    .btn-close {
+      padding: 0.5rem;
+      margin: 0;
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .modal-body {
+    padding-top: 0;
+  }
+
+  .login-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+
+  .login-btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-width: 1.5px;
+
+    svg,
+    i {
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Form styles
+  .form-label {
+    font-weight: 500;
+    color: #566a7f;
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border-color: #d9dee3;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+  }
+
+  .form-check-label {
+    font-size: 0.875rem;
+    color: #697a8d;
+  }
+
+  .form-check-input {
+    &:checked {
+      background-color: #667eea;
+      border-color: #667eea;
+    }
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+  }
+
+}
+
+// Dark mode for login modal
+.dark-style {
+  .login-modal-content {
+    background-color: #2b2c40;
+    color: #a3a4cc;
+
+    .login-modal-title {
+      color: #cbcbe2;
+    }
+
+    .alert-warning {
+      background-color: #3a3b5c;
+      border-color: #ffc107;
+      color: #ffc107;
+    }
+
+    .login-btn-social {
+      background-color: #3a3b5c;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #cbcbe2;
+
+      &:hover {
+        background-color: #444564;
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+      }
+    }
+
+    .form-label {
+      color: #cbcbe2;
+    }
+
+    .form-control {
+      background-color: #3a3b5c;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #cbcbe2;
+
+      &:focus {
+        background-color: #3a3b5c;
+        border-color: #667eea;
+        color: #cbcbe2;
+      }
+
+      &::placeholder {
+        color: #7071a4;
+      }
+
+      &::placeholder {
+        color: #7071a4;
+      }
+    }
+
+    .form-check-label {
+      color: #a3a4cc;
+    }
+
+    .form-check-input {
+      background-color: #3a3b5c;
+      border-color: rgba(255, 255, 255, 0.2);
+
+      &:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+      }
+    }
+  }
+}
+

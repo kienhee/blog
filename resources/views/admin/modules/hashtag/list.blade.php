@@ -15,6 +15,7 @@
             'description' => 'Quản lý hashtag cho bài viết',
             'button' => 'add',
             'buttonLink' => 'admin.hashtags.create',
+            'buttonPermission' => 'hashtag.create',
         ])
 
         <div class="card">
@@ -48,20 +49,22 @@
                 </ul>
                 <div class="tab-content border-0">
                     <div class="tab-pane fade show active" id="hashtags_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainerHashtags"
-                            style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCountHashtags">Đã chọn: <strong>0</strong>
-                                        mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtnHashtags">
-                                        <i class="bx bx-trash me-1"></i> Xóa đã chọn
-                                    </button>
+                        @can('hashtag.delete')
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainerHashtags"
+                                style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCountHashtags">Đã chọn: <strong>0</strong>
+                                            mục</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtnHashtags">
+                                            <i class="bx bx-trash me-1"></i> Xóa đã chọn
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcan
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="hashtag_datatable"
                                 data-url="{{ route('admin.hashtags.ajaxGetData') }}">
@@ -81,21 +84,27 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="trash_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
-                                        <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
-                                        <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
-                                    </button>
+                        @canany(['hashtag.update', 'hashtag.delete'])
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
+                                    </div>
+                                    <div>
+                                        @can('hashtag.update')
+                                            <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
+                                                <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
+                                            </button>
+                                        @endcan
+                                        @can('hashtag.delete')
+                                            <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
+                                                <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
+                                            </button>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcanany
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="hashtag_datatable_trash"
                                 data-url="{{ route('admin.hashtags.ajaxGetTrashedData') }}">

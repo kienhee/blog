@@ -15,7 +15,8 @@
                     [
                         'description' => 'Quản lý và cấu hình các thiết lập cho website',
                         'button' => 'edit',
-                        'listLink' => ''
+                        'listLink' => '',
+                        'buttonPermission' => 'setting.update',
                     ])
 
         <div class="card">

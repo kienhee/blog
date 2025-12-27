@@ -1,5 +1,5 @@
 <!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="{{ asset_admin_url('assets/img/favicon/favicon.ico') }}" />
+<link rel="icon" type="image/png" href="{{ asset_shared_url('images/favicon.png') }}" />
 
 <!-- Fonts -->
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/fonts/boxicons.css') }}" />
@@ -20,5 +20,6 @@
 @vite('resources/scss/client/client.scss')
 <!-- Helpers -->
 <script src="{{ asset_admin_url('assets/vendor/js/helpers.js') }}"></script>
+<script src="{{ asset_admin_url('assets/vendor/js/template-customizer.js') }}"></script>
 <script src="{{ asset_admin_url('assets/js/front-config.js') }}"></script>
 @stack('styles')

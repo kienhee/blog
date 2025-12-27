@@ -25,8 +25,8 @@
     <!-- Navbar: End -->
 
     <!-- Sections:Start -->
-@yield('content')
-    
+    @yield('content')
+
     <!-- / Sections:End -->
 
     <!-- Footer: Start -->

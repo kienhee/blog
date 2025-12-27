@@ -35,6 +35,7 @@
                 'description' => 'Thêm danh mục cho bài viết',
                 'listLink' => 'admin.categories.list',
                 'button' => 'create',
+                'buttonPermission' => 'category.create',
             ])
             <div class="row">
                 <div class="col-12 col-lg-8">

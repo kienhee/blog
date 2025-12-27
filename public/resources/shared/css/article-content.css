@@ -10,7 +10,7 @@
 
 .article-content {
     /* Base typography */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
         "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 16px;
@@ -531,4 +531,126 @@
 code[class*="language-"],
 pre[class*="language-"] {
     text-shadow: none !important;
+}
+
+/* ============================================
+   DARK MODE STYLES
+   ============================================ */
+.dark-style .article-content {
+    color: #a3a4cc;
+}
+
+/* Headings */
+.dark-style .article-content h1,
+.dark-style .article-content h2,
+.dark-style .article-content h3,
+.dark-style .article-content h4,
+.dark-style .article-content h5,
+.dark-style .article-content h6 {
+    color: #cbcbe2;
+}
+
+/* Links */
+.dark-style .article-content a {
+    color: #8b9aff;
+}
+
+.dark-style .article-content a:hover {
+    color: #a8b4ff;
+}
+
+.dark-style .article-content a:visited {
+    color: #b19dff;
+}
+
+/* Blockquotes */
+.dark-style .article-content blockquote {
+    border-left-color: rgba(255, 255, 255, 0.3);
+    background-color: #2b2c40;
+    color: #a3a4cc;
+}
+
+/* Inline code */
+.dark-style .article-content code {
+    background-color: #3a3b5c;
+    color: #ff7ab2;
+}
+
+.dark-style .article-content code.hljs {
+    background-color: #3a3b5c;
+    color: #ff7ab2;
+}
+
+/* Code blocks - Keep dark theme for syntax highlighting */
+.dark-style .article-content pre,
+.dark-style .article-content pre.hljs-code-block {
+    background-color: #282c34;
+    color: #abb2bf;
+}
+
+/* Tables */
+.dark-style .article-content thead {
+    background-color: #3a3b5c;
+}
+
+.dark-style .article-content th {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #cbcbe2;
+}
+
+.dark-style .article-content td {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a3a4cc;
+}
+
+.dark-style .article-content tbody tr:nth-child(even) {
+    background-color: #2b2c40;
+}
+
+.dark-style .article-content tbody tr:hover {
+    background-color: #3a3b5c;
+}
+
+/* Images */
+.dark-style .article-content img {
+    opacity: 0.95;
+}
+
+.dark-style .article-content figcaption {
+    color: #7071a4;
+}
+
+/* Text formatting */
+.dark-style .article-content strong,
+.dark-style .article-content b {
+    color: #cbcbe2;
+}
+
+.dark-style .article-content s,
+.dark-style .article-content strike,
+.dark-style .article-content del {
+    color: #7071a4;
+}
+
+/* Horizontal rules */
+.dark-style .article-content hr {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Accordion */
+.dark-style .article-content details {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-style .article-content details summary {
+    background-color: #2b2c40;
+    color: #cbcbe2;
+}
+
+.dark-style .article-content details summary:hover {
+    background-color: #3a3b5c;
+}
+
+.dark-style .article-content details[open] summary {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
 }

@@ -17,6 +17,7 @@
             'description' => 'Quản lý danh mục bài viết',
             'button' => 'add',
             'buttonLink' => 'admin.categories.create',
+            'buttonPermission' => 'category.create',
         ])
 
         <div class="card">
@@ -56,20 +57,22 @@
                 </ul>
                 <div class="tab-content border-0">
                     <div class="tab-pane fade show active" id="ovrview_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainerCategories"
-                            style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCountCategories">Đã chọn: <strong>0</strong>
-                                        mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtnCategories">
-                                        <i class="bx bx-trash me-1"></i> Xóa đã chọn
-                                    </button>
+                        @can('category.delete')
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainerCategories"
+                                style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCountCategories">Đã chọn: <strong>0</strong>
+                                            mục</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtnCategories">
+                                            <i class="bx bx-trash me-1"></i> Xóa đã chọn
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcan
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="category_datatable"
                                 data-url="{{ route('admin.categories.ajaxGetData') }}">
@@ -119,21 +122,27 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="trash_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
-                                        <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
-                                        <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
-                                    </button>
+                        @canany(['category.update', 'category.delete'])
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
+                                    </div>
+                                    <div>
+                                        @can('category.update')
+                                            <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
+                                                <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
+                                            </button>
+                                        @endcan
+                                        @can('category.delete')
+                                            <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
+                                                <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
+                                            </button>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcanany
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="category_datatable_trash"
                                 data-url="{{ route('admin.categories.ajaxGetTrashedData') }}">

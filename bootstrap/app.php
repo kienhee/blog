@@ -14,6 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Khi chưa đăng nhập, chuyển về trang login; Laravel sẽ tự lưu intended URL
         $middleware->redirectGuestsTo(fn (Request $request) => $request->expectsJson() ? null : route('auth.login'));
+
+        // Đăng ký middleware cho Spatie Permission
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

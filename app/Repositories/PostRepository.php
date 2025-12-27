@@ -190,21 +190,32 @@ class PostRepository extends BaseRepository
                 $previewUrl = route('client.post', $row->slug ?? $row->id);
                 $title = $row->title;
 
-                return '
-                        <div class="d-inline-block text-nowrap">
-                            <a href="'.$previewUrl.'" target="_blank" class="btn btn-sm btn-icon" title="Xem trước">
-                                <i class="bx bx-show"></i>
-                            </a>
-                            <a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
-                                <i class="bx bx-edit"></i>
-                            </a>
+                $canEdit = auth()->user()->can('post.update');
+                $canDelete = auth()->user()->can('post.delete');
 
-                            <button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
-                                data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                                <i class="bx bx-trash"></i>
-                            </button>
-                        </div>
-                    ';
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                // Preview button - luôn hiển thị vì chỉ là xem
+                $html .= '<a href="'.$previewUrl.'" target="_blank" class="btn btn-sm btn-icon" title="Xem trước">
+                    <i class="bx bx-show"></i>
+                </a>';
+                
+                if ($canEdit) {
+                    $html .= '<a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
+                        <i class="bx bx-edit"></i>
+                    </a>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
+                        data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html;
             })
 
             ->rawColumns(['checkbox_html', 'title_html', 'status_html', 'allow_comment_html', 'created_at_html', 'action_html', 'view_count_html'])
@@ -301,18 +312,28 @@ class PostRepository extends BaseRepository
                 $forceDeleteUrl = route('admin.posts.forceDelete', $row->id);
                 $title = $row->title;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
-                            data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-undo"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
-                            data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </div>
-                ';
+                $canUpdate = auth()->user()->can('post.update');
+                $canDelete = auth()->user()->can('post.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canUpdate) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
+                        data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-undo"></i>
+                    </button>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
+                        data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'title_html', 'status_html', 'allow_comment_html', 'deleted_at_html', 'action_html', 'view_count_html'])
             ->make(true);

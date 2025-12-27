@@ -56,6 +56,31 @@ nav.layout-navbar {
     }
   }
 
+  // Logo responsive
+  .app-brand-link {
+    display: inline-flex;
+    align-items: center;
+
+    svg {
+      width: 7.5rem;
+      height: auto;
+      transition: width $transition-fast ease-in-out;
+    }
+
+    @media (min-width: $breakpoint-md) {
+      svg {
+        width: 7.5rem;
+      }
+    }
+
+    @media (min-width: $breakpoint-lg) {
+      svg {
+        width: 12.625rem;
+        height: 3.125rem;
+      }
+    }
+  }
+
   // Mega dropdown
   @media (min-width: $breakpoint-lg) {
     .navbar-nav .nav-item.mega-dropdown > .dropdown-menu {

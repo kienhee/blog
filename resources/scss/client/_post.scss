@@ -484,4 +484,160 @@
   color: $text-dark;
 }
 
+// Dark Mode Styles
+// ====================================
+.dark-style {
+  // Hero Section
+  .post-hero {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+
+    .post-title {
+      color: #cbcbe2;
+    }
+
+    .post-meta {
+      color: #a3a4cc;
+    }
+
+    .author-avatar-small {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  // Floating Share Buttons
+  .floating-share-btn {
+    background: #2b2c40;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #a3a4cc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      background: $primary-color;
+      color: $white;
+      border-color: $primary-color;
+    }
+  }
+
+  // Post Tags
+  .post-tags {
+    border-top-color: rgba(255, 255, 255, 0.1);
+
+    &-title {
+      color: #cbcbe2;
+    }
+  }
+
+  .post-tag {
+    background-color: #3a3b5c;
+    color: #a3a4cc;
+
+    &:hover {
+      background-color: $primary-color;
+      color: $white;
+    }
+  }
+
+  // Author Section
+  .post-author {
+    background: #2b2c40;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &-avatar {
+      border-color: #2b2c40;
+    }
+
+    &-label {
+      color: #7071a4;
+    }
+
+    &-name {
+      color: #cbcbe2;
+    }
+
+    &-description {
+      color: #a3a4cc;
+    }
+  }
+
+  // Sidebar Widgets
+  .sidebar-widget {
+    background: #2b2c40;
+    border-color: rgba(255, 255, 255, 0.1);
+
+    &-title {
+      color: #cbcbe2;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+
+    &-toggle {
+      color: #a3a4cc;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  // Table of Contents
+  .toc-link {
+    color: #a3a4cc;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  // Related Posts
+  .related-post-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .related-post-title {
+    a {
+      color: #cbcbe2;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .related-post-meta {
+    color: #7071a4;
+  }
+
+  // Categories
+  .category-link {
+    background: #3a3b5c;
+    color: #a3a4cc;
+
+    &:hover {
+      background: #444564;
+      color: $primary-color;
+    }
+  }
+
+  .category-count {
+    background: #444564;
+    color: #a3a4cc;
+  }
+
+  // Comments Section
+  .post-comments {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .comments-title {
+    color: #cbcbe2;
+  }
+
+  // Post Thumbnail
+  .post-thumbnail {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
 

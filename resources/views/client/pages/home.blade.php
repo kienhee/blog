@@ -1,99 +1,6 @@
 @extends('client.layouts.master')
 @section('title', 'Trang chủ')
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const categoryTabs = document.querySelectorAll('#categoryTabs button[data-category-id]');
-            const loadedCategories = new Set(['']); // Track loaded categories, '' means all
 
-            categoryTabs.forEach(function(tab) {
-                tab.addEventListener('shown.bs.tab', function(event) {
-                    const categoryId = event.target.getAttribute('data-category-id');
-                    const targetPaneId = event.target.getAttribute('data-bs-target').replace('#',
-                        '');
-                    const postsGrid = document.getElementById('posts-grid-' + categoryId);
-
-                    // If not loaded yet, load posts
-                    if (!loadedCategories.has(categoryId) && postsGrid) {
-                        loadCategoryPosts(categoryId, postsGrid);
-                        loadedCategories.add(categoryId);
-                    }
-                });
-            });
-
-            function loadCategoryPosts(categoryId, container) {
-                const url = '{{ route('client.api.posts-by-category') }}?category_id=' + categoryId;
-
-                fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            renderCategoryPosts(null, data.posts, container);
-                        } else {
-                            container.innerHTML =
-                                '<div class="text-center py-5"><p class="text-muted">Không có bài viết nào trong danh mục này.</p></div>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading posts:', error);
-                        container.innerHTML =
-                            '<div class="text-center py-5"><p class="text-danger">Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại.</p></div>';
-                    });
-            }
-
-            function renderCategoryPosts(featured, posts, container) {
-                let html = '';
-
-                // Render posts grid (không hiển thị featured post trong tab)
-                if (posts && posts.length > 0) {
-                    html += '<div class="row g-4">';
-
-                    posts.forEach(function(post) {
-                        const thumbnail = post.thumbnail || '';
-                        const description = post.meta_description || post.content || '';
-                        const shortDescription = description.length > 120 ? description.substring(0, 120) +
-                            '...' : description;
-
-                        html += `
-                            <div class="col-md-6">
-                                <div class="card h-100">
-                                    ${thumbnail ? `
-                                                <a href="/bai-viet/${post.slug}">
-                                                    <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 250px; object-fit: cover;">
-                                                </a>
-                                            ` : ''}
-                                    <div class="card-body d-flex flex-column">
-                                        ${post.category_name ? `<div class="mb-2"><span class="badge bg-label-primary">${post.category_name}</span></div>` : ''}
-                                        <h5 class="card-title mb-2">
-                                            <a href="/bai-viet/${post.slug}" class="text-heading text-decoration-none">${post.title}</a>
-                                        </h5>
-                                        <p class="card-text text-muted flex-grow-1">${shortDescription.replace(/<[^>]*>/g, '')}</p>
-                                        <a href="/bai-viet/${post.slug}" class="text-primary mt-auto">
-                                            <i class="bx bx-chevron-right"></i> Đọc thêm
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    html += '</div>';
-                } else {
-                    html =
-                        '<div class="text-center py-5"><p class="text-muted">Không có bài viết nào trong danh mục này.</p></div>';
-                }
-
-                container.innerHTML = html;
-            }
-        });
-    </script>
-@endpush
 @section('content')
     <div data-bs-spy="scroll" class="scrollspy-example">
         <!-- Hero Search: Start -->
@@ -162,7 +69,7 @@
 
         {{-- Featured Post Banner ở giữa --}}
         @if (isset($featuredPost) && $featuredPost)
-            <section class="section-py pt-0">
+            <section class="section-py">
                 <div class="container">
                     <div class="card border-0 shadow-lg position-relative overflow-hidden">
                         @if ($featuredPost->thumbnail)
@@ -200,7 +107,7 @@
         @endif
 
         {{-- Bài viết theo danh mục (Tabs) --}}
-        <section class="section-py bg-body pt-0">
+        <section class="section-py bg-body">
             <div class="container">
                 <div class="row">
                     {{-- Main Content Column --}}
@@ -319,3 +226,97 @@
     </div>
 
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryTabs = document.querySelectorAll('#categoryTabs button[data-category-id]');
+            const loadedCategories = new Set(['']); // Track loaded categories, '' means all
+
+            categoryTabs.forEach(function(tab) {
+                tab.addEventListener('shown.bs.tab', function(event) {
+                    const categoryId = event.target.getAttribute('data-category-id');
+                    const targetPaneId = event.target.getAttribute('data-bs-target').replace('#',
+                        '');
+                    const postsGrid = document.getElementById('posts-grid-' + categoryId);
+
+                    // If not loaded yet, load posts
+                    if (!loadedCategories.has(categoryId) && postsGrid) {
+                        loadCategoryPosts(categoryId, postsGrid);
+                        loadedCategories.add(categoryId);
+                    }
+                });
+            });
+
+            function loadCategoryPosts(categoryId, container) {
+                const url = '{{ route('client.api.posts-by-category') }}?category_id=' + categoryId;
+
+                fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            renderCategoryPosts(null, data.posts, container);
+                        } else {
+                            container.innerHTML =
+                                '<div class="text-center py-5"><p class="text-muted">Không có bài viết nào trong danh mục này.</p></div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading posts:', error);
+                        container.innerHTML =
+                            '<div class="text-center py-5"><p class="text-danger">Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại.</p></div>';
+                    });
+            }
+
+            function renderCategoryPosts(featured, posts, container) {
+                let html = '';
+
+                // Render posts grid (không hiển thị featured post trong tab)
+                if (posts && posts.length > 0) {
+                    html += '<div class="row g-4">';
+
+                    posts.forEach(function(post) {
+                        const thumbnail = post.thumbnail || '';
+                        const description = post.meta_description || post.content || '';
+                        const shortDescription = description.length > 120 ? description.substring(0, 120) +
+                            '...' : description;
+
+                        html += `
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    ${thumbnail ? `
+                                                                    <a href="/bai-viet/${post.slug}">
+                                                                        <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                                                    </a>
+                                                                ` : ''}
+                                    <div class="card-body d-flex flex-column">
+                                        ${post.category_name ? `<div class="mb-2"><span class="badge bg-label-primary">${post.category_name}</span></div>` : ''}
+                                        <h5 class="card-title mb-2">
+                                            <a href="/bai-viet/${post.slug}" class="text-heading text-decoration-none">${post.title}</a>
+                                        </h5>
+                                        <p class="card-text text-muted flex-grow-1">${shortDescription.replace(/<[^>]*>/g, '')}</p>
+                                        <a href="/bai-viet/${post.slug}" class="text-primary mt-auto">
+                                            <i class="bx bx-chevron-right"></i> Đọc thêm
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                } else {
+                    html =
+                        '<div class="text-center py-5"><p class="text-muted">Không có bài viết nào trong danh mục này.</p></div>';
+                }
+
+                container.innerHTML = html;
+            }
+        });
+    </script>
+@endpush

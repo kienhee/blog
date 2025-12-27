@@ -15,6 +15,7 @@
                 'description' => 'Cập nhật thông tin hashtag',
                 'listLink' => 'admin.hashtags.list',
                 'button' => 'edit',
+                'buttonPermission' => 'hashtag.update',
             ])
             <div class="row">
                 <div class="col-12">

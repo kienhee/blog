@@ -1,11 +1,6 @@
 @extends('client.layouts.master')
 @section('title', 'Liên hệ')
 @section('content')
-    <section class="section-py first-section-pt help-center-header position-relative overflow-hidden">
-        <img class="banner-bg-img" src="{{ asset_admin_url('assets/img/pages/header.png') }}" alt="Help center header" />
-        <h2 class="text-center">Liên hệ</h2>
-        <p class="text-center px-3 mb-0">Có câu hỏi hoặc góp ý? Hãy gửi tin nhắn cho chúng tôi</p>
-    </section>
     <section id="landingContact" class="section-py bg-body landing-contact">
         <div class="main-container">
             <div class="row gy-4">

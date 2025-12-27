@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserRepository extends BaseRepository
@@ -19,6 +20,7 @@ class UserRepository extends BaseRepository
         $query = $this->model::query();
         $query->select('*');
         $query->where('id', '!=', auth()->id());
+        $query->with('roles');
 
         return $query;
     }
@@ -54,7 +56,7 @@ class UserRepository extends BaseRepository
                 return '<input type="checkbox" class="form-check-input row-checkbox" value="'.$row->id.'" />';
             })
             ->addColumn('user_html', function ($row) {
-                $avatar = thumb_path($row->avatar) ?: asset_shared_url('images/default.png');
+                $avatar = $row->avatar ? thumb_path($row->avatar) : asset_shared_url('images/default.png');
                 $displayName = $row->full_name ?: $row->email;
                 $editUrl = route('admin.users.edit', $row->id);
 
@@ -91,24 +93,45 @@ class UserRepository extends BaseRepository
 
                 return '<span class="badge bg-label-warning">Chưa xác minh</span>';
             })
+            ->addColumn('roles_html', function ($row) {
+                if ($row->roles && $row->roles->count() > 0) {
+                    $badges = $row->roles->map(function ($role) {
+                        return '<span class="badge bg-label-primary me-1">'.e(ucfirst($role->name)).'</span>';
+                    })->implode('');
+
+                    return $badges;
+                }
+
+                return '<span class="text-muted">—</span>';
+            })
             ->addColumn('action_html', function ($row) {
                 $editUrl = route('admin.users.edit', $row->id);
                 $deleteUrl = route('admin.users.destroy', $row->id);
                 $title = $row->full_name ?: $row->email;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
-                            <i class="bx bx-edit"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Ngừng hoạt động"
-                            data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-user-x"></i>
-                        </button>
-                    </div>
-                ';
+                $canEdit = auth()->user()->can('user.update');
+                $canDelete = auth()->user()->can('user.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canEdit) {
+                    $html .= '<a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
+                        <i class="bx bx-edit"></i>
+                    </a>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Ngừng hoạt động"
+                        data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-user-x"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
-            ->rawColumns(['checkbox_html', 'user_html', 'email_html', 'phone_html', 'created_at_html', 'email_verified_html', 'action_html'])
+            ->rawColumns(['checkbox_html', 'user_html', 'email_html', 'phone_html', 'created_at_html', 'email_verified_html', 'roles_html', 'action_html'])
             ->make(true);
     }
 
@@ -145,18 +168,28 @@ class UserRepository extends BaseRepository
                 $forceDeleteUrl = route('admin.users.forceDelete', $row->id);
                 $title = $row->full_name ?: $row->email;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Kích hoạt lại"
-                            data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-check-circle"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
-                            data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </div>
-                ';
+                $canUpdate = auth()->user()->can('user.update');
+                $canDelete = auth()->user()->can('user.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canUpdate) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Kích hoạt lại"
+                        data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-check-circle"></i>
+                    </button>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
+                        data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'user_html', 'email_html', 'deleted_at_html', 'checkbox_html', 'action_html'])
             ->make(true);
@@ -207,21 +240,46 @@ class UserRepository extends BaseRepository
 
     public function createUser(array $data)
     {
+        $roleIds = $data['roles'] ?? [];
+        unset($data['roles']);
+
         if (isset($data['password']) && $data['password']) {
             $data['password'] = Hash::make($data['password']);
         }
 
-        return $this->create($data);
+        $user = $this->create($data);
+
+        if ($user && ! empty($roleIds)) {
+            $roles = Role::whereIn('id', $roleIds)->get();
+            $user->syncRoles($roles);
+        }
+
+        return $user;
     }
 
     public function updateUser($id, array $data)
     {
+        $roleIds = $data['roles'] ?? [];
+        unset($data['roles']);
+
         if (isset($data['password']) && $data['password']) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
 
-        return $this->update($id, $data);
+        $user = $this->update($id, $data);
+
+        if ($user && isset($roleIds)) {
+            if (! empty($roleIds)) {
+                $roles = Role::whereIn('id', $roleIds)->get();
+                $user->syncRoles($roles);
+            } else {
+                // Nếu không có roles được chọn, xóa tất cả roles
+                $user->syncRoles([]);
+            }
+        }
+
+        return $user;
     }
 }

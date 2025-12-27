@@ -49,6 +49,11 @@ $(function () {
                 orderable: false,
                 searchable: false,
             },
+            {
+                data: "roles_html",
+                orderable: false,
+                searchable: false,
+            },
             { data: "action_html", orderable: false, searchable: false },
         ],
         drawCallback: function () {

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/animate-css/animate.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/select2/select2.css') }}" />
 @endpush
 
 @section('content')
@@ -16,6 +17,7 @@
                 'description' => 'Thêm người dùng mới cho hệ thống',
                 'button' => 'create',
                 'listLink' => 'admin.users.list',
+                'buttonPermission' => 'user.create',
             ])
 
             <div class="row">
@@ -43,6 +45,24 @@
                                 <label class="form-label" for="password_confirmation">Xác nhận mật khẩu</label>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
                                     class="form-control" placeholder="Nhập lại mật khẩu" maxlength="255">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="roles">Vai trò <span class="text-danger">*</span></label>
+                                <select id="roles" name="roles[]"
+                                    class="form-select select2 @error('roles') is-invalid @enderror" multiple required>
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->id }}" @selected(in_array($role->id, old('roles', [])))>
+                                            {{ ucfirst($role->name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Chọn một hoặc nhiều vai trò cho người dùng này</small>
+                                @error('roles')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                @error('roles.*')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -80,8 +100,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label" for="birthday">Ngày sinh</label>
-                                    <input type="text" id="birthday" name="birthday" class="form-control date-picker"
-                                        value="{{ old('birthday') }}" placeholder="DD/MM/YYYY">
+                                    <input type="text" id="birthday" name="birthday"
+                                        class="form-control date-picker" value="{{ old('birthday') }}"
+                                        placeholder="DD/MM/YYYY">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label" for="description">Giới thiệu</label>
@@ -163,14 +184,11 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/select2/select2.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
-    @vite([
-        'resources/js/admin/common/uploads/upload-image-alone.js',
-        'resources/js/admin/common/uploads/upload-avatar.js',
-        'resources/js/admin/pages/user/form.js'
-    ])
+    @vite(['resources/js/admin/common/forms/forms-selects.js', 'resources/js/admin/common/uploads/upload-image-alone.js', 'resources/js/admin/common/uploads/upload-avatar.js', 'resources/js/admin/pages/user/form.js'])
 @endpush

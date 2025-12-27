@@ -25,6 +25,18 @@
                             <span>{{ $user->phone ?? '—' }}</span>
                         </li>
                         <li class="d-flex align-items-center mb-3">
+                            <i class="bx bx-shield"></i><span class="fw-medium mx-2">Vai trò:</span>
+                            <span>
+                                @if ($user->roles->count() > 0)
+                                    @foreach ($user->roles as $role)
+                                        <span class="badge bg-label-primary me-1">{{ ucfirst($role->name) }}</span>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </span>
+                        </li>
+                        <li class="d-flex align-items-center mb-3">
                             <i class='bx bx-user-circle'></i><span class="fw-medium mx-2">Giới tính:</span>
                             @php
                                 $genderMap = [0 => 'Nam', 1 => 'Nữ', 2 => 'Khác'];

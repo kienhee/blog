@@ -16,6 +16,7 @@
             'description' => 'Quản lý người dùng hệ thống',
             'button' => 'add',
             'buttonLink' => 'admin.users.create',
+            'buttonPermission' => 'user.create',
         ])
 
         <div class="card">
@@ -57,19 +58,21 @@
                 </ul>
                 <div class="tab-content border-0">
                     <div class="tab-pane fade show active" id="user_list_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainerUsers" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCountUsers">Đã chọn: <strong>0</strong>
-                                        người dùng</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-warning btn-sm" id="bulkDeleteBtnUsers">
-                                        <i class="bx bx-user-x me-1"></i> Ngừng hoạt động đã chọn
-                                    </button>
+                        @can('user.delete')
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainerUsers" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCountUsers">Đã chọn: <strong>0</strong>
+                                            người dùng</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-warning btn-sm" id="bulkDeleteBtnUsers">
+                                            <i class="bx bx-user-x me-1"></i> Ngừng hoạt động đã chọn
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcan
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="user_datatable"
                                 data-url="{{ route('admin.users.ajaxGetData') }}">
@@ -84,6 +87,7 @@
                                         <th>Số điện thoại</th>
                                         <th>Ngày tạo</th>
                                         <th>Xác minh email</th>
+                                        <th>Vai trò</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
@@ -92,23 +96,29 @@
                     </div>
 
                     <div class="tab-pane fade" id="user_trash_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainerUsersTrash"
-                            style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCountUsersTrash">Đã chọn: <strong>0</strong>
-                                        người dùng</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtnUsers">
-                                        <i class="bx bx-check-circle me-1"></i> Kích hoạt lại đã chọn
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtnUsers">
-                                        <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
-                                    </button>
+                        @canany(['user.update', 'user.delete'])
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainerUsersTrash"
+                                style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCountUsersTrash">Đã chọn: <strong>0</strong>
+                                            người dùng</span>
+                                    </div>
+                                    <div>
+                                        @can('user.update')
+                                            <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtnUsers">
+                                                <i class="bx bx-check-circle me-1"></i> Kích hoạt lại đã chọn
+                                            </button>
+                                        @endcan
+                                        @can('user.delete')
+                                            <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtnUsers">
+                                                <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
+                                            </button>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcanany
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="user_datatable_trash"
                                 data-url="{{ route('admin.users.ajaxGetTrashedData') }}">

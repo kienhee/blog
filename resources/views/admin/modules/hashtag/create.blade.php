@@ -15,6 +15,7 @@
                 'description' => 'Thêm hashtag mới cho bài viết',
                 'listLink' => 'admin.hashtags.list',
                 'button' => 'create',
+                'buttonPermission' => 'hashtag.create',
             ])
             <div class="row">
                 <div class="col-12">

@@ -102,22 +102,31 @@ class CategoryRepository extends BaseRepository
                 // Không cho phép xóa và sửa danh mục "Chưa phân loại" (ID 9999)
                 $isUncategorized = $this->isUncategorizedCategory($row->id);
 
-                if (! $isUncategorized) {
-                    return '
-                        <div class="d-inline-block text-nowrap">
-                            <a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
-                                <i class="bx bx-edit"></i>
-                            </a>
-                            '.'<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
-                        data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                        <i class="bx bx-trash"></i>
-                    </button>'.'
-                        </div>
-                    ';
+                if ($isUncategorized) {
+                    return '<span class="text-muted">—</span>';
                 }
 
-                // Trả về dash cho uncategorized category
-                return '<span class="text-muted">—</span>';
+                $canEdit = auth()->user()->can('category.update');
+                $canDelete = auth()->user()->can('category.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canEdit) {
+                    $html .= '<a href="'.$editUrl.'" class="btn btn-sm btn-icon text-warning" title="Chỉnh sửa">
+                        <i class="bx bx-edit"></i>
+                    </a>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa"
+                        data-url="'.$deleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'name_html', 'post_count_html', 'created_at_html', 'action_html'])
             ->make(true);
@@ -708,18 +717,28 @@ class CategoryRepository extends BaseRepository
                 $forceDeleteUrl = route('admin.categories.forceDelete', $row->id);
                 $title = $row->name;
 
-                return '
-                    <div class="d-inline-block text-nowrap">
-                        <button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
-                            data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-undo"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
-                            data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </div>
-                ';
+                $canUpdate = auth()->user()->can('category.update');
+                $canDelete = auth()->user()->can('category.delete');
+
+                $html = '<div class="d-inline-block text-nowrap">';
+                
+                if ($canUpdate) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon btn-success btn-restore" title="Khôi phục"
+                        data-url="'.$restoreUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-undo"></i>
+                    </button>';
+                }
+                
+                if ($canDelete) {
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-force-delete" title="Xóa vĩnh viễn"
+                        data-url="'.$forceDeleteUrl.'" data-title="'.htmlspecialchars($title).'">
+                        <i class="bx bx-trash"></i>
+                    </button>';
+                }
+                
+                $html .= '</div>';
+
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['checkbox_html', 'name_html', 'post_count_html', 'deleted_at_html', 'action_html'])
             ->make(true);

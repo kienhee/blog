@@ -16,6 +16,7 @@
             'description' => 'Quản lý các bài viết trên blog hoặc trang tin tức',
             'button' => 'add',
             'buttonLink' => 'admin.posts.create',
+            'buttonPermission' => 'post.create',
         ])
         <div class="card">
             <div class="card-header border-bottom">
@@ -64,21 +65,27 @@
                 </ul>
                 <div class="tab-content border-0">
                     <div class="tab-pane fade show active" id="posts_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainerPosts" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCountPosts">Đã chọn: <strong>0</strong> mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-outline-primary btn-sm me-2" id="bulkMoveBtn">
-                                        <i class="bx bx-transfer me-1"></i> Chuyển danh mục
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtn">
-                                        <i class="bx bx-trash me-1"></i> Xóa đã chọn
-                                    </button>
+                        @canany(['post.update', 'post.delete'])
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainerPosts" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCountPosts">Đã chọn: <strong>0</strong> mục</span>
+                                    </div>
+                                    <div>
+                                        @can('post.update')
+                                            <button type="button" class="btn btn-outline-primary btn-sm me-2" id="bulkMoveBtn">
+                                                <i class="bx bx-transfer me-1"></i> Chuyển danh mục
+                                            </button>
+                                        @endcan
+                                        @can('post.delete')
+                                            <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtn">
+                                                <i class="bx bx-trash me-1"></i> Xóa đã chọn
+                                            </button>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcanany
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="datatable_blog">
                                 <thead>
@@ -100,21 +107,27 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="trash_tab" role="tabpanel">
-                        <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
-                                        <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
-                                        <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
-                                    </button>
+                        @canany(['post.update', 'post.delete'])
+                            <div class="card-header border-bottom mb-3" id="bulkActionsContainer" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-muted" id="selectedCount">Đã chọn: <strong>0</strong> mục</span>
+                                    </div>
+                                    <div>
+                                        @can('post.update')
+                                            <button type="button" class="btn btn-success btn-sm me-2" id="bulkRestoreBtn">
+                                                <i class="bx bx-undo me-1"></i> Khôi phục đã chọn
+                                            </button>
+                                        @endcan
+                                        @can('post.delete')
+                                            <button type="button" class="btn btn-danger btn-sm" id="bulkForceDeleteBtn">
+                                                <i class="bx bx-trash me-1"></i> Xóa vĩnh viễn đã chọn
+                                            </button>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcanany
                         <div class="card-datatable table-responsive">
                             <table class="table border-top" id="datatable_blog_trash">
                                 <thead>

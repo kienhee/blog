@@ -166,6 +166,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             },
         },
+        "roles[]": {
+            validators: {
+                notEmpty: {
+                    message: "Vui lòng chọn ít nhất một vai trò",
+                },
+            },
+        },
     };
 
     // Thêm rule cho password nếu có field (thường chỉ ở trang create)
@@ -257,7 +264,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 eleInvalidClass: "",
             }),
             autoFocus: new FormValidation.plugins.AutoFocus(),
-            submitButton: new FormValidation.plugins.SubmitButton(),
         },
         init: (instance) => {
             instance.on("plugins.message.placed", function (e) {
@@ -271,16 +277,155 @@ document.addEventListener("DOMContentLoaded", function () {
                         e.messageElement
                     );
                 }
+                // Xử lý select2: đặt message sau container của select2
+                if (
+                    e.element.classList.contains("select2") ||
+                    $(e.element).hasClass("select2-hidden-accessible")
+                ) {
+                    const $select = $(e.element);
+                    const $container = $select
+                        .parent()
+                        .find(".select2-container");
+                    if ($container.length) {
+                        $container.after(e.messageElement);
+                        // Thêm class invalid vào container
+                        $container.addClass("is-invalid");
+                    }
+                }
+            });
+            instance.on("core.field.validated", function (e) {
+                // Khi field hợp lệ, xóa class invalid khỏi select2 container
+                const $select = $(e.element);
+                if ($select.hasClass("select2-hidden-accessible")) {
+                    const $container = $select
+                        .parent()
+                        .find(".select2-container");
+                    if ($container.length && e.valid) {
+                        $container.removeClass("is-invalid");
+                    }
+                }
             });
         },
     });
 
-    // Xử lý loading khi form validation thành công
-    fv.on("core.form.valid", function () {
-        const btn = $("#submit_btn");
-        btn.prop("disabled", true);
-        btn.find(".spinner-border").removeClass("d-none");
-        form.submit();
+    // ======================================
+    // 🔍 VALIDATE ROLES (SELECT2 MULTIPLE)
+    // ======================================
+    const $rolesSelect = $("#roles");
+    if ($rolesSelect.length) {
+        // Xóa lỗi khi user chọn role
+        $rolesSelect.on("change", function () {
+            const rolesValue = $(this).val();
+            if (
+                rolesValue &&
+                Array.isArray(rolesValue) &&
+                rolesValue.length > 0
+            ) {
+                // Xóa class invalid và message lỗi
+                const rolesContainer = $(this)
+                    .parent()
+                    .find(".select2-container");
+                rolesContainer.removeClass("is-invalid");
+                $(this).removeClass("is-invalid");
+                rolesContainer.siblings(".invalid-feedback").remove();
+            }
+            // Revalidate field
+            fv.revalidateField("roles[]");
+        });
+    }
+
+    // ======================================
+    // 📤 FORM SUBMIT HANDLER
+    // ======================================
+    const $form = $(form);
+    const $submitBtn = $("#submit_btn");
+
+    // Handle submit button click - PHẢI validate tất cả (bao gồm roles) trước khi submit
+    $submitBtn.on("click", function (e) {
+        e.preventDefault();
+
+        // Validate roles trước bằng cách kiểm tra trực tiếp
+        const rolesValue = $rolesSelect.val();
+        if (
+            !rolesValue ||
+            !Array.isArray(rolesValue) ||
+            rolesValue.length === 0
+        ) {
+            // Hiển thị lỗi cho roles
+            const rolesContainer = $rolesSelect
+                .parent()
+                .find(".select2-container");
+            rolesContainer.addClass("is-invalid");
+            $rolesSelect.addClass("is-invalid");
+
+            // Hiển thị message lỗi
+            let errorMsg = rolesContainer.siblings(".invalid-feedback");
+            if (!errorMsg.length) {
+                errorMsg = $(
+                    '<div class="invalid-feedback d-block">Vui lòng chọn ít nhất một vai trò</div>'
+                );
+                const $small = $rolesSelect.siblings("small.text-muted");
+                if ($small.length) {
+                    $small.after(errorMsg);
+                } else {
+                    rolesContainer.after(errorMsg);
+                }
+            }
+
+            // Scroll to roles field
+            $("html, body").animate(
+                {
+                    scrollTop: rolesContainer.offset().top - 100,
+                },
+                300
+            );
+
+            // Mở select2 dropdown
+            $rolesSelect.select2("open");
+
+            return false;
+        }
+
+        // Validate tất cả fields trong FormValidation (bao gồm roles)
+        fv.validate().then(function (status) {
+            if (status !== "Valid") {
+                // Validation failed - không cho phép submit
+                console.log("Validation failed, không thể submit form");
+
+                // Scroll to first error field
+                const firstError = $form.find(".is-invalid").first();
+                if (firstError.length) {
+                    const errorOffset = firstError.offset();
+                    if (errorOffset) {
+                        $("html, body").animate(
+                            {
+                                scrollTop: errorOffset.top - 100,
+                            },
+                            300
+                        );
+                        firstError.focus();
+                    }
+                }
+
+                // Nếu có lỗi ở roles, focus vào select2
+                if ($rolesSelect.length) {
+                    const rolesContainer = $rolesSelect
+                        .parent()
+                        .find(".select2-container");
+                    if (rolesContainer.hasClass("is-invalid")) {
+                        $rolesSelect.select2("open");
+                    }
+                }
+
+                return false;
+            }
+
+            $submitBtn.prop("disabled", true);
+            $submitBtn.find(".spinner-border").removeClass("d-none");
+
+            // Submit form lên backend
+            $form[0].submit();
+        });
     });
 
     window.fvUserForm = fv;

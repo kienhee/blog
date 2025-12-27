@@ -19046,7 +19046,9 @@ html:not(.layout-footer-fixed) .content-wrapper {
   display: flex;
   align-items: center;
 }
-
+#sider-logo{
+  width: 9.375rem;
+}
 .app-brand-logo {
   display: block;
   flex-grow: 0;
@@ -19071,7 +19073,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 
 .menu-vertical .app-brand {
   padding-right: 2rem;
-  padding-left: 2rem;
+  padding-left: 1.5rem;
 }
 
 .menu-horizontal .app-brand,

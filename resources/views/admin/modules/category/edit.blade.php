@@ -34,6 +34,7 @@
                 'description' => 'Cập nhật thông tin danh mục bài viết',
                 'listLink' => 'admin.categories.list',
                 'button' => 'edit',
+                'buttonPermission' => 'category.update',
             ])
             <div class="row">
                 <div class="col-12 col-lg-8">
@@ -127,9 +128,5 @@
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/jstree/jstree.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js') }}"></script>
-    @vite([
-        'resources/js/admin/common/forms/generate-slug.js',
-        'resources/js/admin/common/uploads/upload-image-alone.js',
-        'resources/js/admin/pages/category/form.js'
-    ])
+    @vite(['resources/js/admin/common/forms/generate-slug.js', 'resources/js/admin/common/uploads/upload-image-alone.js', 'resources/js/admin/pages/category/form.js'])
 @endpush

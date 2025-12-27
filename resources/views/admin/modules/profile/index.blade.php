@@ -39,6 +39,13 @@
                                         <li class="list-inline-item fw-medium"><i class="bx bx-phone"></i> <span
                                                 id="profilePhone">{{ $user->phone }}</span></li>
                                     @endif
+                                    @if ($user->roles->count() > 0)
+                                        <li class="list-inline-item fw-medium"><i class="bx bx-shield"></i>
+                                            @foreach ($user->roles as $role)
+                                                <span class="badge bg-label-primary">{{ $role->name }}</span>
+                                            @endforeach
+                                        </li>
+                                    @endif
                                 </ul>
                             </div>
 
@@ -106,9 +113,5 @@
                 $errors->has('instagram_url') ||
                 $errors->has('linkedin_url'));
     </script>
-    @vite([
-        'resources/js/admin/common/uploads/upload-image-alone.js',
-        'resources/js/admin/common/uploads/upload-avatar.js',
-        'resources/js/admin/pages/profile/index.js'
-    ])
+    @vite(['resources/js/admin/common/uploads/upload-image-alone.js', 'resources/js/admin/common/uploads/upload-avatar.js', 'resources/js/admin/pages/profile/index.js'])
 @endpush
