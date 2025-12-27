@@ -64,10 +64,10 @@
                             <div class="col-md-6">
                                 <div class="card border-0 shadow-sm h-100">
                                     ${thumbnail ? `
-                                                    <a href="/bai-viet/${post.slug}">
-                                                        <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                                    </a>
-                                                ` : ''}
+                                                                <a href="/bai-viet/${post.slug}">
+                                                                    <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                                                </a>
+                                                            ` : ''}
                                     <div class="card-body">
                                         ${post.category_name ? `<div class="mb-2"><span class="badge bg-label-secondary">${post.category_name}</span></div>` : ''}
                                         <div class="text-muted small mb-2">${post.created_at}</div>
@@ -186,7 +186,7 @@
                         @endforeach
                     </div>
                     <div class="text-center mt-4">
-                    <a href="{{ route('client.posts') }}" class="btn btn-outline-primary">Xem thêm</a>   
+                        <a href="{{ route('client.posts') }}" class="btn btn-outline-primary">Xem thêm</a>
                     </div>
                 </div>
             </section>
@@ -325,12 +325,12 @@
                             @endif
                         </div>
 
-                       
+
                     </div>
-                     {{-- Sidebar --}}
-                     <div class="col-lg-4">
+                    {{-- Sidebar --}}
+                    <div class="col-lg-4">
                         @if (isset($sidebarPosts) && $sidebarPosts->count() > 0)
-                            <div class="sticky-top" style="top: 20px;">
+                            <div class="sticky-top" style="top: 20px; z-index: 998;">
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-header bg-white border-bottom">
                                         <h5 class="mb-0 fw-bold">Bài viết gợi ý</h5>
@@ -343,8 +343,7 @@
                                                         @if ($post->thumbnail)
                                                             <a href="{{ route('client.post', $post->slug) }}">
                                                                 <img src="{{ $post->thumbnail }}"
-                                                                    alt="{{ $post->title }}"
-                                                                    class="img-fluid rounded"
+                                                                    alt="{{ $post->title }}" class="img-fluid rounded"
                                                                     style="height: 80px; width: 100%; object-fit: cover;">
                                                             </a>
                                                         @endif
