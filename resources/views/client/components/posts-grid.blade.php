@@ -4,45 +4,13 @@
     <div class="row g-5 mb-5">
         @foreach ($posts as $post)
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
-                    {{-- Post Thumbnail --}}
-                    @if ($post->thumbnail)
-                        <a href="{{ route('client.post', $post->slug) }}">
-                            <img class="card-img-top" src="{{ $post->thumbnail }}" alt="{{ $post->title }}"
-                                style="height: 250px; object-fit: cover;">
-                        </a>
-                    @endif
-
-                    <div class="card-body d-flex flex-column">
-                        {{-- Category Badge --}}
-                        @if ($post->category_name)
-                            <div class="mb-2">
-                                <span class="badge bg-label-primary">{{ $post->category_name }}</span>
-                            </div>
-                        @endif
-
-                        {{-- Post Title --}}
-                        <h5 class="card-title">
-                            <a href="{{ route('client.post', $post->slug) }}" class="text-heading">
-                                {{ $post->title }}
-                            </a>
-                        </h5>
-
-                        {{-- Post Description --}}
-                        @if ($post->meta_description)
-                            <p class="card-text text-muted flex-grow-1">
-                                {{ \Illuminate\Support\Str::limit($post->meta_description, 120) }}
-                            </p>
-                        @else
-                            <p class="card-text text-muted flex-grow-1">
-                                {{ \Illuminate\Support\Str::limit(strip_tags($post->content ?? ''), 120) }}
-                            </p>
-                        @endif
-                        <a href="{{ route('client.post', $post->slug) }}" class="text-primary">
-                            <i class="bx bx-chevron-right"></i> Đọc thêm
-                        </a>
-                    </div>
-                </div>
+                @include('client.components.post-card', [
+                    'post' => $post,
+                    'showButton' => true,
+                    'buttonText' => 'Đọc thêm',
+                    'buttonClass' => 'text-primary',
+                    'descriptionLimit' => 120,
+                ])
             </div>
         @endforeach
     </div>

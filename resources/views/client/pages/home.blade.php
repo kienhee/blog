@@ -57,25 +57,26 @@
                     posts.forEach(function(post) {
                         const thumbnail = post.thumbnail || '';
                         const description = post.meta_description || post.content || '';
-                        const shortDescription = description.length > 100 ? description.substring(0, 100) +
+                        const shortDescription = description.length > 120 ? description.substring(0, 120) +
                             '...' : description;
 
                         html += `
                             <div class="col-md-6">
-                                <div class="card border-0 shadow-sm h-100">
+                                <div class="card h-100">
                                     ${thumbnail ? `
-                                                                <a href="/bai-viet/${post.slug}">
-                                                                    <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                                                </a>
-                                                            ` : ''}
-                                    <div class="card-body">
-                                        ${post.category_name ? `<div class="mb-2"><span class="badge bg-label-secondary">${post.category_name}</span></div>` : ''}
-                                        <div class="text-muted small mb-2">${post.created_at}</div>
+                                                <a href="/bai-viet/${post.slug}">
+                                                    <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                                </a>
+                                            ` : ''}
+                                    <div class="card-body d-flex flex-column">
+                                        ${post.category_name ? `<div class="mb-2"><span class="badge bg-label-primary">${post.category_name}</span></div>` : ''}
                                         <h5 class="card-title mb-2">
                                             <a href="/bai-viet/${post.slug}" class="text-heading text-decoration-none">${post.title}</a>
                                         </h5>
-                                        <p class="card-text text-muted small">${shortDescription.replace(/<[^>]*>/g, '')}</p>
-                                        <a href="/bai-viet/${post.slug}" class="btn btn-sm btn-outline-primary mt-2">Xem bài viết</a>
+                                        <p class="card-text text-muted flex-grow-1">${shortDescription.replace(/<[^>]*>/g, '')}</p>
+                                        <a href="/bai-viet/${post.slug}" class="text-primary mt-auto">
+                                            <i class="bx bx-chevron-right"></i> Đọc thêm
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -142,46 +143,13 @@
                     <div class="row g-4">
                         @foreach ($latestPosts->take(6) as $post)
                             <div class="col-md-6 col-lg-4">
-                                <div class="card border-0 shadow-sm h-100">
-                                    @if ($post->thumbnail)
-                                        <a href="{{ route('client.post', $post->slug) }}">
-                                            <img src="{{ $post->thumbnail }}" alt="{{ $post->title }}" class="card-img-top"
-                                                style="height: 250px; object-fit: cover;">
-                                        </a>
-                                    @endif
-                                    <div class="card-body">
-                                        @if ($post->category_name)
-                                            <div class="mb-2">
-                                                <span class="badge bg-label-secondary">{{ $post->category_name }}</span>
-                                            </div>
-                                        @endif
-                                        <h5 class="card-title mb-2">
-                                            <a href="{{ route('client.post', $post->slug) }}"
-                                                class="text-heading text-decoration-none">
-                                                {{ $post->title }}
-                                            </a>
-                                        </h5>
-                                        <div class="d-flex align-items-center text-muted small mb-2">
-                                            @if (isset($post->user_name))
-                                                <span class="me-3">{{ $post->user_name }}</span>
-                                            @endif
-                                            @if (isset($post->created_at))
-                                                <span>{{ $post->created_at->format('d F Y') }}</span>
-                                            @endif
-                                        </div>
-                                        @if ($post->meta_description)
-                                            <p class="card-text text-muted small">
-                                                {{ \Illuminate\Support\Str::limit($post->meta_description, 100) }}
-                                            </p>
-                                        @else
-                                            <p class="card-text text-muted small">
-                                                {{ \Illuminate\Support\Str::limit(strip_tags($post->content ?? ''), 100) }}
-                                            </p>
-                                        @endif
-                                        <a href="{{ route('client.post', $post->slug) }}"
-                                            class="btn btn-sm btn-outline-primary mt-2">Xem bài viết</a>
-                                    </div>
-                                </div>
+                                @include('client.components.post-card', [
+                                    'post' => $post,
+                                    'showButton' => true,
+                                    'buttonText' => 'Đọc thêm',
+                                    'buttonClass' => 'text-primary',
+                                    'descriptionLimit' => 120,
+                                ])
                             </div>
                         @endforeach
                     </div>
@@ -270,37 +238,13 @@
                                     <div class="row g-4" id="posts-grid-all">
                                         @foreach ($recentPosts as $post)
                                             <div class="col-md-6">
-                                                <div class="card border-0 shadow-sm h-100">
-                                                    @if ($post->thumbnail)
-                                                        <a href="{{ route('client.post', $post->slug) }}">
-                                                            <img src="{{ $post->thumbnail }}" alt="{{ $post->title }}"
-                                                                class="card-img-top"
-                                                                style="height: 200px; object-fit: cover;">
-                                                        </a>
-                                                    @endif
-                                                    <div class="card-body">
-                                                        <div class="text-muted small mb-2">
-                                                            @if (isset($post->created_at))
-                                                                {{ $post->created_at->format('d F Y') }}
-                                                            @endif
-                                                        </div>
-                                                        <h5 class="card-title mb-2">
-                                                            <a href="{{ route('client.post', $post->slug) }}"
-                                                                class="text-heading text-decoration-none">
-                                                                {{ $post->title }}
-                                                            </a>
-                                                        </h5>
-                                                        @if ($post->meta_description)
-                                                            <p class="card-text text-muted small">
-                                                                {{ \Illuminate\Support\Str::limit($post->meta_description, 100) }}
-                                                            </p>
-                                                        @else
-                                                            <p class="card-text text-muted small">
-                                                                {{ \Illuminate\Support\Str::limit(strip_tags($post->content ?? ''), 100) }}
-                                                            </p>
-                                                        @endif
-                                                    </div>
-                                                </div>
+                                                @include('client.components.post-card', [
+                                                    'post' => $post,
+                                                    'showButton' => true,
+                                                    'buttonText' => 'Đọc thêm',
+                                                    'buttonClass' => 'text-primary',
+                                                    'descriptionLimit' => 120,
+                                                ])
                                             </div>
                                         @endforeach
                                     </div>
