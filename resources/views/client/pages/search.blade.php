@@ -44,7 +44,7 @@
             @if (!empty($searchQuery))
                 @if ($posts->count() > 0)
                     <!-- Posts Grid -->
-                    @include('client.components.posts-grid', ['posts' => $posts])
+                    @include('client.components.post.posts-grid', ['posts' => $posts])
                 @else
                     <!-- Empty State -->
                     <div class="text-center py-5">

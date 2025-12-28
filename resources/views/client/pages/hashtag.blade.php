@@ -10,7 +10,7 @@
             </header>
 
             {{-- Posts Grid --}}
-            @include('client.components.posts-grid', ['posts' => $posts])
+            @include('client.components.post.posts-grid', ['posts' => $posts])
         </div>
     </section>
 @endsection

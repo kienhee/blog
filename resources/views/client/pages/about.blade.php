@@ -2,7 +2,7 @@
 @section('title', 'Tác giả')
 @section('content')
     <!-- Hero Section -->
-    <section class="section-py pb-5 bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <section class="section-py pb-5">
         <div class="main-container">
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">

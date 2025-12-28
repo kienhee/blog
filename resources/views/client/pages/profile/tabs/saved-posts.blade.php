@@ -20,7 +20,7 @@
                 @foreach ($posts as $post)
                     @if($post)
                         <div class="col-md-6">
-                            @include('client.components.post-card', [
+                            @include('client.components.post.post-card', [
                                 'post' => $post,
                                 'showButton' => true,
                                 'buttonText' => 'Đọc thêm',

@@ -4,7 +4,7 @@
     <div class="row g-5 mb-5">
         @foreach ($posts as $post)
             <div class="col-md-6 col-lg-4">
-                @include('client.components.post-card', [
+                @include('client.components.post.post-card', [
                     'post' => $post,
                     'showButton' => true,
                     'buttonText' => 'Đọc thêm',

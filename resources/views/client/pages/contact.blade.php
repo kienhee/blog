@@ -2,7 +2,7 @@
 @section('title', 'Liên hệ')
 @section('content')
     <section id="landingContact" class="section-py bg-body landing-contact">
-        <div class="main-container">
+        <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-5">
                     <div class="contact-img-box position-relative border p-2 h-100">
@@ -57,6 +57,11 @@
                                         <label class="form-label" for="contact-form-email">Email</label>
                                         <input type="text" id="contact-form-email" class="form-control"
                                             placeholder="nguyenvana@gmail.com" />
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label" for="contact-form-phone">Số điện thoại</label>
+                                        <input type="text" id="contact-form-phone" class="form-control"
+                                            placeholder="0123 456 789" />
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label" for="contact-form-message">Tin nhắn</label>

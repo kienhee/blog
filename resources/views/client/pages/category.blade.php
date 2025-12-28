@@ -2,7 +2,7 @@
 @section('title', $category->name ?? 'Danh mục')
 
 @section('content')
-    <section class="section-py">
+    <section class="section-py bg-gradient">
         <div class="main-container">
             {{-- Category Header --}}
             <header class="category-header mb-5">
@@ -13,7 +13,7 @@
             </header>
 
             {{-- Posts Grid --}}
-            @include('client.components.posts-grid', ['posts' => $posts])
+            @include('client.components.post.posts-grid', ['posts' => $posts])
         </div>
     </section>
 @endsection

@@ -38,10 +38,3 @@ body {
 *::after {
     font-family: inherit;
 }
-
-/* Override any Bootstrap classes that might use CSS variables */
-[class*="font-sans"],
-[class*="text-"] {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, sans-serif !important;
-}

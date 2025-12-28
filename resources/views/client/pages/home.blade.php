@@ -50,7 +50,7 @@
                     <div class="row g-4">
                         @foreach ($latestPosts->take(6) as $post)
                             <div class="col-md-6 col-lg-4">
-                                @include('client.components.post-card', [
+                                @include('client.components.post.post-card', [
                                     'post' => $post,
                                     'showButton' => true,
                                     'buttonText' => 'Đọc thêm',
@@ -145,7 +145,7 @@
                                     <div class="row g-4" id="posts-grid-all">
                                         @foreach ($recentPosts as $post)
                                             <div class="col-md-6">
-                                                @include('client.components.post-card', [
+                                                @include('client.components.post.post-card', [
                                                     'post' => $post,
                                                     'showButton' => true,
                                                     'buttonText' => 'Đọc thêm',
@@ -183,7 +183,7 @@
                         @if (isset($sidebarPosts) && $sidebarPosts->count() > 0)
                             <div class="sticky-top" style="top: 20px; z-index: 998;">
                                 <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-white border-bottom">
+                                    <div class="card-header border-bottom">
                                         <h5 class="mb-0 fw-bold">Bài viết gợi ý</h5>
                                     </div>
                                     <div class="card-body p-0">

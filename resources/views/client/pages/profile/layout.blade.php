@@ -3,8 +3,6 @@
     $user = auth()->user();
 @endphp
 @push('styles')
-    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
-    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/animate-css/animate.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-profile.css') }}" />
 @endpush
@@ -14,7 +12,7 @@
     <!--/ Header -->
     @include('admin.components.showMessage')
     <!-- Profile Content -->
-    <div class="container mb-3">
+    <div class="container mb-5">
         <div class="row">
             <div class="col-xl-4 col-lg-5">
                 @include('client.pages.profile.partials.sidebar')
@@ -34,7 +32,6 @@
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
-    <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
     <script>
         // Truyền biến để JS có thể sử dụng
         window.hasProfileErrors = @json(

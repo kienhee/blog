@@ -14,8 +14,7 @@
 <!-- Inter Font - Load after core CSS to override Public Sans -->
 <link rel="stylesheet" href="{{ asset_shared_url('css/inter-font.css') }}" />
 <!-- Vendors CSS -->
-<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/nouislider/nouislider.css') }}" />
-<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/swiper/swiper.css') }}" />
+<link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
 <!-- Client CSS (compiled from SCSS) -->
 @vite('resources/scss/client/client.scss')
 <!-- Helpers -->

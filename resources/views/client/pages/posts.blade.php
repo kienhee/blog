@@ -13,7 +13,7 @@
                 <h1 class="category-title mb-3">Danh sách bài viết</h1>
             </header>
             <!-- Posts Grid -->
-            @include('client.components.posts-grid', ['posts' => $posts])
+            @include('client.components.post.posts-grid', ['posts' => $posts])
         </div>
     </section>
     <!-- Blog List: End -->

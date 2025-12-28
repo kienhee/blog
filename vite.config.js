@@ -49,9 +49,13 @@ export default defineConfig({
 
                 //Client
                 "resources/scss/client/client.scss",
-                "resources/js/client/navbar.js",
-                "resources/js/client/post.js",
-                "resources/js/client/pages/profile/index.js"
+                // Client - Layout
+                "resources/js/client/layout/navbar.js",
+                // Client - Post
+                "resources/js/client/post/index.js",
+                // Client - Pages
+                "resources/js/client/pages/profile/index.js",
+                "resources/js/client/pages/profile/change-password.js"
             ],
             refresh: true,
         }),

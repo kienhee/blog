@@ -361,7 +361,7 @@
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <span class="fw-medium d-block" id="currentUser">{{ $user->full_name ?? '' }}</span>
+                                        <span class="fw-medium truncate-1" style="max-width:120px" id="currentUser" title="{{ $user->full_name ?? '' }}">{{ $user->full_name ?? '' }}</span>
                                         <small class="text-muted truncate-1" style="max-width:120px"
                                             title="{{ $user->email ?? '' }}">{{ $user->email ?? '' }}</small>
                                     </div>
@@ -420,5 +420,5 @@
 </nav>
 
 @push('scripts')
-    @vite('resources/js/client/navbar.js')
+    @vite('resources/js/client/layout/navbar.js')
 @endpush
