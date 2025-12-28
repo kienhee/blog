@@ -222,7 +222,6 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'login'])->name('login');
     Route::post('/loginHandle', [AdminAuthController::class, 'loginHandle'])->name('loginHandle');
-    Route::post('/register', [AdminAuthController::class, 'register'])->name('register');
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     Route::get('/forgot-password', [AdminAuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
     Route::post('/forgot-password', [AdminAuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');

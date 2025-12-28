@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\User\ChangePasswordRequest;
+use App\Http\Requests\Admin\Profile\ChangePasswordRequest;
 use App\Http\Requests\Admin\User\UpdateProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

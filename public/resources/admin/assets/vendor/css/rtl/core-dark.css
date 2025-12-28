@@ -24198,8 +24198,8 @@ html:not(.layout-footer-fixed) .content-wrapper {
     display: flex;
     align-items: center;
 }
-#sider-logo{
-  width: 9.375rem;
+#sidebar-logo{
+  width: 10.625rem;
 }
 
 .app-brand-logo {

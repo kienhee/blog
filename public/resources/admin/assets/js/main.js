@@ -58,7 +58,7 @@ if (document.getElementById("layout-menu")) {
         if (window.Helpers.isCollapsed()) {
             $("#sidebar-logo").css("width", "unset");
         } else {
-            $("#sidebar-logo").css("width", "");
+            $("#sidebar-logo").css("width", "10.625rem");
         }
     };
 
