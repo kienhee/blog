@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendContactNotificationEmail;
 use App\Models\Contact;
 use App\Repositories\ContactRepository;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ class ContactController extends Controller
             ]);
 
             // Tạo contact mới với status mặc định là PENDING (0)
-            Contact::create([
+            $contact = Contact::create([
                 'full_name' => $validated['fullname'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
@@ -58,6 +59,9 @@ class ContactController extends Controller
                 'message' => $validated['message'],
                 'status' => ContactRepository::STATUS_PENDING,
             ]);
+
+            // Gửi email thông báo đến admin qua queue
+            SendContactNotificationEmail::dispatch($contact);
 
             return response()->json([
                 'status' => true,

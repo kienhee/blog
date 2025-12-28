@@ -60,6 +60,16 @@
                 </div>
             @break
 
+            @case('list')
+                <div class="d-flex gap-2">
+                    @if ($listLink)
+                        <a href="{{ route($listLink) }}" class="btn btn-label-secondary">
+                            <i class='bx bx-arrow-back'></i> Quay lại
+                        </a>
+                    @endif
+                </div>
+            @break
+
             @default
                 {{-- Có thể thêm mặc định nếu cần --}}
         @endswitch

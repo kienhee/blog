@@ -50,40 +50,52 @@ class ContactController extends Controller
         $contact = $this->contactRepository->findById($id);
 
         if (! $contact) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Liên hệ không tồn tại.',
-            ], 404);
+            // Nếu là AJAX request, trả về JSON
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Liên hệ không tồn tại.',
+                ], 404);
+            }
+            // Nếu là request thường, trả về 404 page
+            abort(404, 'Liên hệ không tồn tại.');
         }
 
         // Load replies với user information
         $contact->load(['replies.user']);
 
-        $replies = $contact->replies->map(function ($reply) {
-            return [
-                'id' => $reply->id,
-                'subject' => $reply->subject,
-                'message' => $reply->message,
-                'user_name' => $reply->user ? $reply->user->full_name ?? $reply->user->email : 'Hệ thống',
-                'created_at' => $reply->created_at->format('d/m/Y H:i'),
-            ];
-        });
+        // Nếu là AJAX request, trả về JSON (cho modal trong list page)
+        if (request()->ajax() || request()->wantsJson()) {
+            $replies = $contact->replies->map(function ($reply) {
+                return [
+                    'id' => $reply->id,
+                    'subject' => $reply->subject,
+                    'message' => $reply->message,
+                    'user_name' => $reply->user ? $reply->user->full_name ?? $reply->user->email : 'Hệ thống',
+                    'created_at' => $reply->created_at->format('d/m/Y H:i'),
+                ];
+            });
 
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'id' => $contact->id,
-                'full_name' => $contact->full_name,
-                'email' => $contact->email,
-                'phone' => $contact->phone,
-                'subject' => $contact->subject,
-                'message' => $contact->message,
-                'status' => $contact->status,
-                'created_at' => $contact->created_at->format('d/m/Y H:i'),
-                'updated_at' => $contact->updated_at->format('d/m/Y H:i'),
-                'replies' => $replies,
-            ],
-        ]);
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'id' => $contact->id,
+                    'full_name' => $contact->full_name,
+                    'email' => $contact->email,
+                    'phone' => $contact->phone,
+                    'subject' => $contact->subject,
+                    'message' => $contact->message,
+                    'status' => $contact->status,
+                    'created_at' => $contact->created_at->format('d/m/Y H:i'),
+                    'updated_at' => $contact->updated_at->format('d/m/Y H:i'),
+                    'replies' => $replies,
+                ],
+            ]);
+        }
+
+        // Nếu là request thường, trả về view page
+        $statusLabels = $this->contactRepository->getStatusLabel();
+        return view('admin.modules.contact.show', compact('contact', 'statusLabels'));
     }
 
     public function reply(ReplyRequest $request, $id)

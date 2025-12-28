@@ -148,19 +148,30 @@ class ContactRepository extends BaseRepository
                 $viewUrl = route('admin.contacts.show', $row->id);
                 $currentStatus = $row->status;
 
+                $canRead = auth()->user()->can('contact.read');
                 $canUpdate = auth()->user()->can('contact.update');
 
                 $html = '<div class="d-inline-block text-nowrap">';
 
-                // View button - luôn hiển thị vì chỉ là xem
-                $html .= '<button type="button"
-                        class="btn btn-sm btn-icon btn-view-contact"
-                        data-id="'.$row->id.'"
-                        data-url="'.htmlspecialchars($viewUrl).'"
-                        title="Xem chi tiết">
-                    <i class="bx bx-show"></i>
-                </button>';
+                // View button - mở modal (chỉ hiển thị nếu có quyền read)
+                if ($canRead) {
+                    $html .= '<button type="button"
+                            class="btn btn-sm btn-icon btn-view-contact"
+                            data-id="'.$row->id.'"
+                            data-url="'.htmlspecialchars($viewUrl).'"
+                            title="Xem chi tiết (Modal)">
+                        <i class="bx bx-show"></i>
+                    </button>';
 
+                    // Link đến page chi tiết (icon mới)
+                    $html .= '<a href="'.$viewUrl.'"
+                            class="btn btn-sm btn-icon"
+                            title="Xem chi tiết (Page)">
+                        <i class="bx bx-file"></i>
+                    </a>';
+                }
+
+                // Change status button - chỉ hiển thị nếu có quyền update
                 if ($canUpdate) {
                     $html .= '<button type="button"
                             class="btn btn-sm btn-icon change-status-item"
@@ -173,7 +184,7 @@ class ContactRepository extends BaseRepository
 
                 $html .= '</div>';
 
-                return $html;
+                return $html ?: '<span class="text-muted">—</span>';
             })
             ->rawColumns(['status', 'subject', 'message', 'created_at', 'action'])
             ->make(true);
