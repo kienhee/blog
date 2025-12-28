@@ -61,6 +61,12 @@ return [
             ],
         ],
     ],
+    [
+        'title' => 'Quản lý newsletter',
+        'icon' => 'bx-envelope',
+        'url' => 'admin.newsletters.list',
+        'permission' => 'newsletter.read',
+    ],
     // [
     //     'title' => 'Module Người dùng',
     //     'divider' => true,

@@ -23,7 +23,7 @@ $(function () {
                     d.created_at = $("#created_at").val();
                 },
             },
-            order: [[6, "desc"]],
+            order: [[7, "desc"]],
             language: {
                 url:
                     $("input[name='datatables_vi']").val() ||
@@ -38,6 +38,7 @@ $(function () {
                 },
                 { data: "full_name", name: "contacts.full_name" },
                 { data: "email", name: "contacts.email" },
+                { data: "phone", name: "contacts.phone" },
                 {
                     data: "subject",
                     name: "contacts.subject",

@@ -75,6 +75,7 @@ class ContactController extends Controller
                 'id' => $contact->id,
                 'full_name' => $contact->full_name,
                 'email' => $contact->email,
+                'phone' => $contact->phone,
                 'subject' => $contact->subject,
                 'message' => $contact->message,
                 'status' => $contact->status,

@@ -65,6 +65,7 @@
                             <th>STT</th>
                             <th>Họ tên</th>
                             <th>Email</th>
+                            <th>Số điện thoại</th>
                             <th>Chủ đề</th>
                             <th>Tin nhắn</th>
                             <th>Trạng thái</th>

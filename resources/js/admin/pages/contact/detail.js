@@ -142,6 +142,16 @@ $(function () {
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Số điện thoại:</label>
+                            <p class="mb-0">
+                                ${
+                                    contact.phone
+                                        ? `<a href="tel:${escapeHtml(contact.phone)}">${escapeHtml(contact.phone)}</a>`
+                                        : '<span class="text-muted">-</span>'
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Chủ đề:</label>
                             <p class="mb-0">${escapeHtml(contact.subject)}</p>
                         </div>

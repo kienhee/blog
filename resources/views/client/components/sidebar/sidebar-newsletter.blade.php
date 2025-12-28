@@ -12,14 +12,16 @@
         công
         nghệ, lập trình và phát triển sự nghiệp.
     </p>
-    <form id="newsletter-form" action="{{ route('client.newsletter.subscribe') }}" method="POST">
+    <form id="newsletter-form" action="{{ route('client.newsletter.subscribe') }}" method="POST" novalidate>
         @csrf
-        <div class="input-group mb-2">
-            <input type="email" class="form-control" id="newsletter-email" name="email"
-                placeholder="Nhập email của bạn..." required />
-            <button type="submit" class="btn btn-primary">
-                Đăng ký
-            </button>
+        <div class="mb-2">
+            <div class="input-group">
+                <input type="email" class="form-control" id="newsletter-email" name="email"
+                    placeholder="Nhập email của bạn..." required />
+                <button type="submit" class="btn btn-primary">
+                    Đăng ký
+                </button>
+            </div>
         </div>
         <div id="newsletter-message"></div>
     </form>

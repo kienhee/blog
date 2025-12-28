@@ -2,6 +2,7 @@
 @section('title', 'Liên hệ')
 @section('content')
     <section id="landingContact" class="section-py bg-body landing-contact">
+        
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-5">
@@ -46,29 +47,44 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="mb-3">Gửi tin nhắn</h4>
-                            <form>
+                            <form id="contactForm" action="{{ route('client.contact.submit') }}" method="POST" novalidate>
+                                @csrf
                                 <div class="row g-4">
                                     <div class="col-md-6">
-                                        <label class="form-label" for="contact-form-fullname">Họ và tên</label>
-                                        <input type="text" class="form-control" id="contact-form-fullname"
-                                            placeholder="Nguyễn Văn A" />
+                                        <label class="form-label" for="contact-form-fullname">Họ và tên <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="contact-form-fullname" name="fullname"
+                                            placeholder="Nguyễn Văn A" required />
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label" for="contact-form-email">Email</label>
-                                        <input type="text" id="contact-form-email" class="form-control"
-                                            placeholder="nguyenvana@gmail.com" />
+                                        <label class="form-label" for="contact-form-email">Email <span class="text-danger">*</span></label>
+                                        <input type="email" id="contact-form-email" name="email" class="form-control"
+                                            placeholder="nguyenvana@gmail.com" required />
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-12">
-                                        <label class="form-label" for="contact-form-phone">Số điện thoại</label>
-                                        <input type="text" id="contact-form-phone" class="form-control"
-                                            placeholder="0123 456 789" />
+                                        <label class="form-label" for="contact-form-phone">Số điện thoại <span class="text-danger">*</span></label>
+                                        <input type="tel" id="contact-form-phone" name="phone" class="form-control"
+                                            placeholder="0123 456 789" required />
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label" for="contact-form-message">Tin nhắn</label>
-                                        <textarea id="contact-form-message" class="form-control" rows="9" placeholder="Viết tin nhắn của bạn..."></textarea>
+                                        <label class="form-label" for="contact-form-subject">Tiêu đề <span class="text-danger">*</span></label>
+                                        <input type="text" id="contact-form-subject" name="subject" class="form-control"
+                                            placeholder="Tiêu đề tin nhắn" required />
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label" for="contact-form-message">Tin nhắn <span class="text-danger">*</span></label>
+                                        <textarea id="contact-form-message" name="message" class="form-control" rows="9" 
+                                            placeholder="Viết tin nhắn của bạn..." required></textarea>
+                                        <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-primary">Gửi tin nhắn</button>
+                                        <button type="submit" class="btn btn-primary" id="contactSubmitBtn">
+                                            <span class="btn-text">Gửi tin nhắn</span>
+                                            <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -79,3 +95,10 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
+    @vite(['resources/js/client/pages/contact.js'])
+@endpush

@@ -1,23 +1,40 @@
 <?php
 
-use App\Http\Controllers\Client\AppController;
 use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\CategoryController;
+use App\Http\Controllers\Client\ContactController;
+use App\Http\Controllers\Client\HashtagController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\PageController;
+use App\Http\Controllers\Client\PostController;
 use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\Client\SavedPostController;
 use Illuminate\Support\Facades\Route;
 
 // Client
 Route::prefix('/')->name('client.')->group(function () {
-    Route::get('/', [AppController::class, 'home'])->name('home');
-    Route::get('/tim-kiem', [AppController::class, 'search'])->name('search');
-    Route::get('/bai-viet', [AppController::class, 'posts'])->name('posts');
-    Route::get('/api/posts-by-category', [AppController::class, 'getPostsByCategory'])->name('api.posts-by-category');
-    Route::get('/bai-viet/{slug}', [AppController::class, 'post'])->name('post');
-    Route::get('/danh-muc/{slug}', [AppController::class, 'category'])->name('category');
-    Route::get('/tag/{slug}', [AppController::class, 'hashtag'])->name('hashtag');
-    Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
-    Route::get('/ve-chung-toi', [AppController::class, 'about'])->name('about');
-    Route::post('/newsletter/subscribe', [AppController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
+    // Home & Search
+    Route::get('/', [HomeController::class, 'home'])->name('home');
+    Route::get('/tim-kiem', [HomeController::class, 'search'])->name('search');
+    Route::get('/bai-viet', [HomeController::class, 'posts'])->name('posts');
+
+    // Posts
+    Route::get('/bai-viet/{slug}', [PostController::class, 'post'])->name('post');
+    Route::get('/api/posts-by-category', [PostController::class, 'getPostsByCategory'])->name('api.posts-by-category');
+
+    // Categories
+    Route::get('/danh-muc/{slug}', [CategoryController::class, 'category'])->name('category');
+
+    // Hashtags
+    Route::get('/tag/{slug}', [HashtagController::class, 'hashtag'])->name('hashtag');
+
+    // Contact
+    Route::get('/lien-he', [ContactController::class, 'contact'])->name('contact');
+    Route::post('/lien-he', [ContactController::class, 'submitContact'])->name('contact.submit');
+
+    // Pages
+    Route::get('/ve-chung-toi', [PageController::class, 'about'])->name('about');
+    Route::post('/newsletter/subscribe', [PageController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 
     // Client Auth Routes
     Route::prefix('auth')->name('auth.')->group(function () {

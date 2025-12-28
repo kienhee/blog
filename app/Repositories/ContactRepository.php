@@ -47,6 +47,7 @@ class ContactRepository extends BaseRepository
             'id',
             'full_name',
             'email',
+            'phone',
             'subject',
             'message',
             'status',
@@ -110,6 +111,9 @@ class ContactRepository extends BaseRepository
             })
             ->addColumn('email', function ($row) {
                 return htmlspecialchars($row->email);
+            })
+            ->addColumn('phone', function ($row) {
+                return htmlspecialchars($row->phone ?? '-');
             })
             ->addColumn('subject', function ($row) {
                 $fullSubject = htmlspecialchars(strip_tags($row->subject));

@@ -60,5 +60,7 @@
 
 @push('scripts')
     <script src="{{ asset_shared_url('vendor/highlight/highlight.min.js') }}"></script>
-    @vite(['resources/js/client/post/index.js'])
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    @vite(['resources/js/client/post/index.js', 'resources/js/client/pages/newsletter.js'])
 @endpush

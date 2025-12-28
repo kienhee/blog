@@ -37,6 +37,8 @@ export default defineConfig({
                 //Contact
                 "resources/js/admin/pages/contact/list.js",
                 "resources/js/admin/pages/contact/detail.js",
+                //Newsletter
+                "resources/js/admin/pages/newsletter/list.js",
                 //Auth
                 "resources/js/admin/pages/auth/index.js",
                 //Profile
@@ -55,7 +57,9 @@ export default defineConfig({
                 "resources/js/client/post/index.js",
                 // Client - Pages
                 "resources/js/client/pages/profile/index.js",
-                "resources/js/client/pages/profile/change-password.js"
+                "resources/js/client/pages/profile/change-password.js",
+                "resources/js/client/pages/contact.js",
+                "resources/js/client/pages/newsletter.js"
             ],
             refresh: true,
         }),

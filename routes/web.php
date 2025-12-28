@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HashTagController;
+use App\Http\Controllers\Admin\NewsletterController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
@@ -87,6 +88,14 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
             ->where(['id' => '[0-9]+', 'status' => '[0-3]'])
             ->name('changeStatus')
             ->middleware('permission:contact.update');
+    });
+    Route::prefix('newsletters')->name('newsletters.')->group(function () {
+        // Read permissions
+        Route::get('/', [NewsletterController::class, 'list'])->name('list')->middleware('permission:newsletter.read');
+        Route::get('/ajax-get-data', [NewsletterController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:newsletter.read');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [NewsletterController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:newsletter.delete');
     });
     Route::prefix('hashtags')->name('hashtags.')->group(function () {
         // Read permissions
