@@ -474,3 +474,9 @@ html.light-style .logo-dark {
 .card-title a {
     display: block;
 }
+
+#profileAvatarImg{
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}

@@ -58,7 +58,7 @@ class RoleController extends Controller
 
             return redirect()->route('admin.roles.list')->with('success', 'Thêm vai trò mới thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Có lỗi xảy ra')->withInput();
         }
     }
 
@@ -102,7 +102,7 @@ class RoleController extends Controller
 
             return back()->with('success', 'Cập nhật vai trò thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Có lỗi xảy ra')->withInput();
         }
     }
 
@@ -134,7 +134,7 @@ class RoleController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vai trò: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vai trò',
             ], 500);
         }
     }

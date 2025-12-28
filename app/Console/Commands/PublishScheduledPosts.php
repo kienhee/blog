@@ -57,7 +57,7 @@ class PublishScheduledPosts extends Command
                         new PostPublishedNotification($post)
                     );
                 } catch (\Exception $e) {
-                    $this->error("Không thể gửi email cho bài viết ID {$post->id}: " . $e->getMessage());
+                    $this->error("Không thể gửi email cho bài viết ID {$post->id}");
                 }
             }
 

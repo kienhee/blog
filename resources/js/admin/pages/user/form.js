@@ -260,8 +260,8 @@ document.addEventListener("DOMContentLoaded", function () {
             trigger: new FormValidation.plugins.Trigger(),
             bootstrap5: new FormValidation.plugins.Bootstrap5({
                 rowSelector: ".mb-3, .col-md-6, .col-12",
-                eleValidClass: "",
-                eleInvalidClass: "",
+                eleInvalidClass: "is-invalid",
+                eleValidClass: "is-valid",
             }),
             autoFocus: new FormValidation.plugins.AutoFocus(),
         },

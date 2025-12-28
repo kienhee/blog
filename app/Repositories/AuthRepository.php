@@ -80,14 +80,12 @@ class AuthRepository
             // Log error để debug
             Log::error('Failed to add password reset email to queue', [
                 'email' => $email,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'success' => false,
                 'message' => 'Không thể gửi email. Vui lòng thử lại sau.',
-                'error' => $e->getMessage(),
             ];
         }
     }

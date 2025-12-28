@@ -115,7 +115,7 @@ class ContactController extends Controller
                 Log::error('Failed to send contact reply email', [
                     'contact_id' => $contact->id,
                     'reply_id' => $reply->id,
-                    'error' => $e->getMessage(),
+                    'error' => 'Có lỗi xảy ra khi gửi email',
                 ]);
             }
 
@@ -159,7 +159,7 @@ class ContactController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra',
             ], 500);
         }
     }

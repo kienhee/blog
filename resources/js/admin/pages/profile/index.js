@@ -1,198 +1,11 @@
 /**
- * Profile Page - Change Password (Optimized)
+ * Admin Profile Page - Profile Update Form Validation
+ * Note: Change Password form is handled by resources/js/common/change-password.js in separate page
  */
 "use strict";
 
 $(function () {
-    const $form = $("#formChangePassword");
-    const $reset = $("#resetBtn");
-    const $submit = $("#submitBtn");
-    const $tabPassword = $("#password-tab");
-    const hasErrors = window.hasPasswordErrors || false;
     const hasProfileErrors = window.hasProfileErrors || false;
-
-    /**
-     * Reset form
-     */
-    $reset.on("click", function (e) {
-        e.preventDefault();
-
-        $form[0].reset();
-        $form.find(".is-invalid").removeClass("is-invalid");
-        $form.find(".invalid-feedback").remove();
-        $form
-            .find('input[type="text"][id*="Password"]')
-            .attr("type", "password");
-        $form
-            .find(".password-toggle-icon")
-            .removeClass("bx-show")
-            .addClass("bx-hide");
-
-        if (window.fvPassword) window.fvPassword.resetForm();
-    });
-
-    /**
-     * Form Validation
-     */
-    if ($form.length) {
-        const fv = FormValidation.formValidation($form[0], {
-            fields: {
-                currentPassword: {
-                    validators: {
-                        notEmpty: {
-                            message: "Vui lòng nhập mật khẩu hiện tại.",
-                        },
-                        stringLength: {
-                            max: 255,
-                            message:
-                                "Mật khẩu hiện tại không được vượt quá 255 ký tự.",
-                        },
-                    },
-                },
-                newPassword: {
-                    validators: {
-                        notEmpty: { message: "Vui lòng nhập mật khẩu mới." },
-                        stringLength: {
-                            min: 6,
-                            max: 255,
-                            message: "Mật khẩu mới phải từ 6 đến 255 ký tự.",
-                        },
-                    },
-                },
-                newPassword_confirmation: {
-                    validators: {
-                        notEmpty: {
-                            message: "Vui lòng xác nhận mật khẩu mới.",
-                        },
-                        stringLength: {
-                            max: 255,
-                            message:
-                                "Mật khẩu xác nhận không được vượt quá 255 ký tự.",
-                        },
-                        identical: {
-                            compare: () =>
-                                $form.find('[name="newPassword"]').val(),
-                            message: "Mật khẩu xác nhận không khớp.",
-                        },
-                    },
-                },
-            },
-            plugins: {
-                trigger: new FormValidation.plugins.Trigger(),
-                bootstrap5: new FormValidation.plugins.Bootstrap5({
-                    rowSelector: ".mb-3",
-                    eleInvalidClass: "",
-                    eleValidClass: "",
-                }),
-                autoFocus: new FormValidation.plugins.AutoFocus(),
-                submitButton: new FormValidation.plugins.SubmitButton(),
-            },
-            init: (instance) => {
-                instance.on("plugins.message.placed", (e) => {
-                    if (
-                        e.element.parentElement?.classList.contains(
-                            "input-group"
-                        )
-                    ) {
-                        e.element.parentElement.insertAdjacentElement(
-                            "afterend",
-                            e.messageElement
-                        );
-                    }
-                });
-            },
-        });
-
-        // On valid submit
-        fv.on("core.form.valid", () => {
-            // clear old errors
-            $form.find(".is-invalid").removeClass("is-invalid");
-            $form.find(".invalid-feedback").remove();
-
-            $submit.prop("disabled", true);
-            $submit.find(".spinner-border").removeClass("d-none");
-
-            $.ajax({
-                url: $form.attr("action"),
-                method: "POST",
-                data: $form.serialize(),
-                success: function (res) {
-                    if (res?.status) {
-                        toastr.success(
-                            res.message || "Đổi mật khẩu thành công",
-                            "Thông báo"
-                        );
-                        $form[0].reset();
-                        if (window.fvPassword) window.fvPassword.resetForm();
-                    } else {
-                        toastr.error(
-                            res?.message || "Không thể đổi mật khẩu",
-                            "Thông báo"
-                        );
-                    }
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                        const errors = xhr.responseJSON.errors;
-                        Object.keys(errors).forEach((field) => {
-                            const messages = errors[field];
-                            const $input = $form.find(`[name="${field}"]`);
-                            if ($input.length) {
-                                $input.addClass("is-invalid");
-                                const $feedback = $(
-                                    '<div class="invalid-feedback d-block"></div>'
-                                ).text(messages[0]);
-                                $input.after($feedback);
-                            }
-                        });
-                    }
-                    toastr.error(
-                        xhr.responseJSON?.message ||
-                            "Có lỗi xảy ra khi đổi mật khẩu",
-                        "Thông báo"
-                    );
-                },
-                complete: function () {
-                    $submit.prop("disabled", false);
-                    $submit.find(".spinner-border").addClass("d-none");
-                },
-            });
-        });
-
-        // Store instance
-        window.fvPassword = fv;
-    }
-
-    /**
-     * Tab navigation (auto-open password tab if needed)
-     */
-    const openPasswordTab = () => {
-        const $btn = $('[data-bs-target="#password-tab"]');
-        if ($btn.length) {
-            new bootstrap.Tab($btn[0]).show();
-
-            if (hasErrors) {
-                setTimeout(() => {
-                    $("html, body").animate(
-                        { scrollTop: $form.offset().top - 100 },
-                        300
-                    );
-                    $form.find(".is-invalid:first").focus();
-                }, 300);
-            }
-        }
-    };
-
-    if (window.location.hash === "#password-tab" || hasErrors)
-        openPasswordTab();
-
-    $('[data-bs-target="#password-tab"]').on("click", () => {
-        history.pushState(null, "", "#password-tab");
-    });
-
-    $('[data-bs-target="#profile-tab"]').on("click", () => {
-        history.pushState(null, "", window.location.pathname);
-    });
 
     /**
      * Auto open edit profile modal when form has errors
@@ -206,24 +19,164 @@ $(function () {
     }
 
     // ================================
-    // AJAX submit for profile update
+    // AJAX submit for profile update with FormValidation
     // ================================
     const $profileForm = $("#profileForm");
     const $profileSubmit = $("#profileSubmitBtn");
     const $profileSpinner = $profileSubmit.find(".spinner-border");
     const $birthday = $("#birthday");
+    const $emailInput = $("#email");
 
-    if ($profileForm.length) {
+    if ($profileForm.length && typeof FormValidation !== "undefined") {
+        // Form Validation for Profile Update - Chỉ validate các field bắt buộc
+        const fvProfile = FormValidation.formValidation($profileForm[0], {
+            fields: {
+                full_name: {
+                    validators: {
+                        notEmpty: {
+                            message: "Vui lòng nhập họ tên.",
+                        },
+                        stringLength: {
+                            min: 2,
+                            max: 150,
+                            message: "Họ tên phải từ 2 đến 150 ký tự.",
+                        },
+                    },
+                },
+                email: {
+                    validators: {
+                        callback: {
+                            message: "Vui lòng nhập email.",
+                            callback: function (value, validator, $field) {
+                                // Email luôn bị disabled, skip validation
+                                if ($emailInput.length && $emailInput.is(":disabled")) {
+                                    return true;
+                                }
+                                return true;
+                            },
+                        },
+                    },
+                },
+                phone: {
+                    validators: {
+                        notEmpty: {
+                            message: "Vui lòng nhập số điện thoại.",
+                        },
+                        stringLength: {
+                            max: 20,
+                            message: "Số điện thoại không được vượt quá 20 ký tự.",
+                        },
+                        regexp: {
+                            regexp: /^[0-9]+$/,
+                            message: "Số điện thoại chỉ được chứa số.",
+                        },
+                    },
+                },
+                gender: {
+                    validators: {
+                        notEmpty: {
+                            message: "Vui lòng chọn giới tính.",
+                        },
+                        callback: {
+                            message: "Giới tính không hợp lệ.",
+                            callback: function (item) {
+                                // Kiểm tra empty: null, undefined, hoặc chuỗi rỗng
+                                if (item === null || item === undefined || item === "") {
+                                    return false; // bắt buộc
+                                }
+                                // Convert to string để so sánh (xử lý cả số 0)
+                                const strValue = String(item.value);
+                                return ["0", "1", "2"].includes(strValue);
+                            },
+                        },
+                    },
+                },
+                birthday: {
+                    validators: {
+                        notEmpty: {
+                            message: "Vui lòng nhập ngày sinh.",
+                        },
+                        date: {
+                            format: "DD/MM/YYYY",
+                            message: "Ngày sinh không hợp lệ. Vui lòng nhập định dạng dd/mm/yyyy.",
+                        },
+                        callback: {
+                            message: "Ngày sinh không hợp lệ.",
+                            callback: function (item) {
+                                // Kiểm tra empty: null, undefined, hoặc chuỗi rỗng
+                                if (item === null || item === undefined || item === "") {
+                                    return false; // bắt buộc
+                                }
+                                // Validate format dd/mm/yyyy
+                                const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                                if (!dateRegex.test(item.value)) {
+                                    return false;
+                                }
+                                const [, day, month, year] = item.value.match(dateRegex);
+                                const date = new Date(year, month - 1, day);
+                                return (
+                                    date.getFullYear() == year &&
+                                    date.getMonth() == month - 1 &&
+                                    date.getDate() == day
+                                );
+                            },
+                        },
+                    },
+                },
+            },
+            plugins: {
+                trigger: new FormValidation.plugins.Trigger(),
+                bootstrap5: new FormValidation.plugins.Bootstrap5({
+                    rowSelector:
+                        ".row > .col-md-6, .row > .col-12, .row > .col-lg-4, .row > .col-lg-8, .col-md-6",
+                    eleInvalidClass: "is-invalid",
+                    eleValidClass: "is-valid",
+                }),
+                autoFocus: new FormValidation.plugins.AutoFocus(),
+                submitButton: new FormValidation.plugins.SubmitButton(),
+            },
+            init: (instance) => {
+                instance.on("plugins.message.placed", (e) => {
+                    if (
+                        e.element.parentElement?.classList.contains("input-group")
+                    ) {
+                        e.element.parentElement.insertAdjacentElement(
+                            "afterend",
+                            e.messageElement
+                        );
+                    }
+                });
+
+                // Reset validation state khi modal mở để tránh hiển thị lỗi từ lần trước
+                const modal = document.getElementById("editProfileModal");
+                if (modal) {
+                    modal.addEventListener("show.bs.modal", () => {
+                        // Reset tất cả validation state
+                        instance.resetForm();
+                        $profileForm.find(".is-invalid").removeClass("is-invalid");
+                        $profileForm.find(".is-valid").removeClass("is-valid");
+                        $profileForm.find(".invalid-feedback").remove();
+                    });
+                }
+            },
+        });
+
+        // Ngăn chặn form submit trực tiếp, chỉ cho phép submit khi validation pass
         $profileForm.on("submit", function (e) {
             e.preventDefault();
+            // Validation sẽ được trigger bởi SubmitButton plugin
+            // Nếu validation pass, event "core.form.valid" sẽ được trigger
+        });
 
-            // clear errors
+        // On valid submit - chỉ được trigger khi validation pass
+        fvProfile.on("core.form.valid", () => {
+            // clear old errors
             $profileForm.find(".is-invalid").removeClass("is-invalid");
             $profileForm.find(".invalid-feedback").remove();
 
             // Chuẩn hóa ngày sinh về Y-m-d trước khi submit
             const birthdayVal = $birthday.val();
-            if (birthdayVal) {
+            if (birthdayVal && birthdayVal.includes("/")) {
                 const parts = birthdayVal.split("/");
                 if (parts.length === 3) {
                     const [d, m, y] = parts;
@@ -245,8 +198,7 @@ $(function () {
                         // Update header info
                         const user = res.user || {};
                         const displayName = user.full_name || user.email || "";
-                        if (displayName)
-                            $("#profileDisplayName").text(displayName);
+                        if (displayName) $("#profileDisplayName").text(displayName);
                         if (user.email) $("#profileEmail").text(user.email);
                         if (user.phone !== undefined)
                             $("#profilePhone").text(user.phone || "");
@@ -260,6 +212,7 @@ $(function () {
                             res.message || "Cập nhật thông tin thành công",
                             "Thông báo"
                         );
+
                     } else {
                         toastr.error(
                             res?.message || "Không thể cập nhật thông tin",
@@ -272,9 +225,7 @@ $(function () {
                         const errors = xhr.responseJSON.errors;
                         Object.keys(errors).forEach((field) => {
                             const messages = errors[field];
-                            const $input = $profileForm.find(
-                                `[name="${field}"]`
-                            );
+                            const $input = $profileForm.find(`[name="${field}"]`);
                             if ($input.length) {
                                 $input.addClass("is-invalid");
                                 const $feedback = $(
@@ -302,6 +253,9 @@ $(function () {
                 },
             });
         });
+
+        // Store instance
+        window.fvProfile = fvProfile;
     }
 
     // ================================
@@ -361,3 +315,4 @@ $(function () {
         });
     }
 });
+

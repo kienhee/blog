@@ -80,7 +80,7 @@ class CategoryController extends Controller
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -116,7 +116,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+                'message' => 'Có lỗi xảy ra'
             ], 500);
         }
     }
@@ -151,7 +151,7 @@ class CategoryController extends Controller
 
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -171,7 +171,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra',
             ], 500);
         }
     }
@@ -216,17 +216,10 @@ class CategoryController extends Controller
 
             return response()->json($result);
         } catch (\Exception $e) {
-            $statusCode = 500;
-            if (str_contains($e->getMessage(), 'Không thể xóa')) {
-                $statusCode = 403;
-            } elseif (str_contains($e->getMessage(), 'không tồn tại')) {
-                $statusCode = 404;
-            }
-
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage(),
-            ], $statusCode);
+                'message' => 'Có lỗi xảy ra',
+            ], 500);
         }
     }
 
@@ -250,7 +243,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục danh mục: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục danh mục',
             ], 500);
         }
     }
@@ -275,7 +268,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn danh mục: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn danh mục',
             ], 500);
         }
     }
@@ -301,7 +294,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa',
             ], 500);
         }
     }
@@ -327,7 +320,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục',
             ], 500);
         }
     }
@@ -353,7 +346,7 @@ class CategoryController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn',
             ], 500);
         }
     }

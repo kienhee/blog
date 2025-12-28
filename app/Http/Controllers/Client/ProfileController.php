@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Client\Profile\ChangePasswordRequest;
+use App\Http\Requests\Common\ChangePasswordRequest;
 use App\Http\Requests\Client\Profile\UpdateProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -89,32 +89,18 @@ class ProfileController extends Controller
 
         // Kiểm tra mật khẩu hiện tại
         if (!Hash::check($validated['currentPassword'], $user->password)) {
-            $error = ['currentPassword' => ['Mật khẩu hiện tại không chính xác.']];
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Mật khẩu hiện tại không chính xác.',
-                    'errors' => $error,
-                ], 422);
-            }
-
-            return redirect()->route('client.profile.changePassword')
-                ->withErrors($error)->withInput();
+            return redirect()
+                ->route('client.profile.changePassword')
+                ->withErrors(['currentPassword' => 'Mật khẩu hiện tại không chính xác.'])
+                ->withInput();
         }
 
         // Cập nhật mật khẩu mới
         $user->password = Hash::make($validated['newPassword']);
         $user->save();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Đổi mật khẩu thành công!',
-            ]);
-        }
-
-        return redirect()->route('client.profile.changePassword')
+        return redirect()
+            ->route('client.profile.changePassword')
             ->with('success', 'Đổi mật khẩu thành công!');
     }
 }

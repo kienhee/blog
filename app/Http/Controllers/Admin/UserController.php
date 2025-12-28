@@ -73,7 +73,7 @@ class UserController extends Controller
 
             return back()->with('success', 'Thêm người dùng mới thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -124,7 +124,7 @@ class UserController extends Controller
 
             return back()->with('success', 'Cập nhật người dùng thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -148,7 +148,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa người dùng: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa người dùng',
             ], 500);
         }
     }
@@ -173,7 +173,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục người dùng: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục người dùng',
             ], 500);
         }
     }
@@ -198,7 +198,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn người dùng: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn người dùng',
             ], 500);
         }
     }
@@ -224,7 +224,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục',
             ], 500);
         }
     }
@@ -250,7 +250,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa',
             ], 500);
         }
     }
@@ -276,7 +276,7 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn',
             ], 500);
         }
     }

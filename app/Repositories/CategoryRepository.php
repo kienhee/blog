@@ -535,7 +535,6 @@ class CategoryRepository extends BaseRepository
             Log::warning("Không thể tạo danh mục '{$name}' với ID {$fixedId}. Tạo với ID tự động.", [
                 'fixed_id' => $fixedId,
                 'name' => $name,
-                'error' => $e->getMessage(),
             ]);
 
             return $this->model::create([

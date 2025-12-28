@@ -7,4 +7,5 @@
 <script src="{{ asset_admin_url('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
 <script src="{{ asset_admin_url('assets/vendor/js/menu.js') }}"></script>
 <script src="{{ asset_admin_url('assets/js/main.js') }}"></script>
+@vite(['resources/js/admin/common/ui/toastr-config.js'])
 @stack('scripts')

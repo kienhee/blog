@@ -126,8 +126,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
                 plugins: {
                     trigger: new FormValidation.plugins.Trigger(),
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
-                        eleValidClass: "",
                         rowSelector: ".mb-3",
+                        eleInvalidClass: "is-invalid",
+                        eleValidClass: "is-valid",
                     }),
                     submitButton: new FormValidation.plugins.SubmitButton(),
 

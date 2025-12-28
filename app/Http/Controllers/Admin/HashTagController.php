@@ -53,7 +53,7 @@ class HashTagController extends Controller
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -86,7 +86,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra',
             ], 500);
         }
     }
@@ -111,7 +111,7 @@ class HashTagController extends Controller
 
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -135,7 +135,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa hashtag: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa hashtag',
             ], 500);
         }
     }
@@ -160,7 +160,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục hashtag: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục hashtag',
             ], 500);
         }
     }
@@ -185,7 +185,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn hashtag: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn hashtag',
             ], 500);
         }
     }
@@ -211,7 +211,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục',
             ], 500);
         }
     }
@@ -237,7 +237,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa',
             ], 500);
         }
     }
@@ -263,7 +263,7 @@ class HashTagController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn',
             ], 500);
         }
     }

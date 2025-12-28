@@ -106,7 +106,8 @@ $(function () {
                 trigger: new FormValidation.plugins.Trigger(),
                 bootstrap5: new FormValidation.plugins.Bootstrap5({
                     rowSelector: ".mb-3",
-                    eleValidClass: "",
+                    eleInvalidClass: "is-invalid",
+                    eleValidClass: "is-valid",
                 }),
                 submitButton: new FormValidation.plugins.SubmitButton(),
                 autoFocus: new FormValidation.plugins.AutoFocus(),

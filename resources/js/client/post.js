@@ -277,12 +277,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
                 
-                // Show success notification - reload page to show flash message
-                const message = data.message || (data.saved ? 'Đã lưu bài viết thành công' : 'Đã bỏ lưu bài viết');
-                // Store message in session storage to show after reload
-                sessionStorage.setItem('success_message', message);
-                // Reload page to show flash message
-                window.location.reload();
+                // Show success notification using toastr
+                const message = data.message || (data.saved ? 'Đã lưu bài viết thành công.' : 'Đã bỏ lưu bài viết.');
+                showSuccess(message);
             } else {
                 // Invalid response, revert
                 revertButtonState(saveBtn, icon, originalState);
@@ -345,6 +342,21 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         btn.setAttribute('title', originalState.title);
+    }
+    
+    /**
+     * Show success message
+     */
+    function showSuccess(message) {
+        if (typeof toastr !== 'undefined') {
+            toastr.success(message, 'Thành công', {
+                timeOut: 5000,
+                positionClass: 'toast-top-right'
+            });
+        } else {
+            console.log(message);
+            alert(message);
+        }
     }
     
     /**

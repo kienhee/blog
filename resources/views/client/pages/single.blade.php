@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="{{ asset_shared_url('css/article-content.css') }}">
     <!-- Highlight.js Theme CSS -->
     <link rel="stylesheet" href="{{ asset_shared_url('vendor/highlight/styles/atom-one-dark.min.css') }}">
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
 @endpush
 
 @section('content')
@@ -60,5 +62,8 @@
 
 @push('scripts')
     <script src="{{ asset_shared_url('vendor/highlight/highlight.min.js') }}"></script>
+    
+    <!-- Toastr JS -->
+    <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
     @vite(['resources/js/client/post.js'])
 @endpush

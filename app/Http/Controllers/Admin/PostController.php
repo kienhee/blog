@@ -104,7 +104,7 @@ class PostController extends Controller
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -190,7 +190,7 @@ class PostController extends Controller
 
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra');
         }
     }
 
@@ -215,7 +215,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa bài viết: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa bài viết',
             ], 500);
         }
     }
@@ -240,7 +240,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục bài viết: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục bài viết',
             ], 500);
         }
     }
@@ -265,7 +265,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn bài viết: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn bài viết',
             ], 500);
         }
     }
@@ -291,7 +291,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa',
             ], 500);
         }
     }
@@ -317,7 +317,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi khôi phục: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi khôi phục',
             ], 500);
         }
     }
@@ -343,7 +343,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi xóa vĩnh viễn',
             ], 500);
         }
     }
@@ -389,7 +389,7 @@ class PostController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi chuyển danh mục: '.$e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi chuyển danh mục',
             ], 500);
         }
     }

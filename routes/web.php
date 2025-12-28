@@ -183,9 +183,10 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
         Route::post('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:user.delete');
 
         // Trang cá nhân & đổi mật khẩu (không cần permission, user có thể tự cập nhật profile của mình)
-        Route::get('/profile', [AdminProfileController::class, 'profile'])->name('profile');
-        Route::put('/profile', [AdminProfileController::class, 'updateProfile'])->name('updateProfile');
-        Route::post('/change-password', [AdminProfileController::class, 'changePassword'])->name('changePassword');
+        Route::get('/information', [AdminProfileController::class, 'information'])->name('information');
+        Route::put('/information', [AdminProfileController::class, 'updateInformation'])->name('updateInformation');
+        Route::get('/change-password', [AdminProfileController::class, 'showChangePassword'])->name('changePassword');
+        Route::post('/change-password', [AdminProfileController::class, 'changePassword'])->name('changePassword.post');
     });
     Route::prefix('roles')->name('roles.')->group(function () {
         // Roles management - sử dụng role permissions riêng

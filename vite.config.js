@@ -41,6 +41,7 @@ export default defineConfig({
                 "resources/js/admin/pages/auth/index.js",
                 //Profile
                 "resources/js/admin/pages/profile/index.js",
+                "resources/js/admin/pages/profile/change-password.js",
                 //User
                 "resources/js/admin/pages/user/list.js",
                 "resources/js/admin/pages/user/form.js",
@@ -50,6 +51,7 @@ export default defineConfig({
                 "resources/scss/client/client.scss",
                 "resources/js/client/navbar.js",
                 "resources/js/client/post.js",
+                "resources/js/client/pages/profile/index.js"
             ],
             refresh: true,
         }),
