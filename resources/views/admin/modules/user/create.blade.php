@@ -86,7 +86,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label" for="phone">Số điện thoại</label>
                                     <input type="text" id="phone" name="phone" class="form-control"
-                                        value="{{ old('phone') }}" placeholder="Nhập số điện thoại" maxlength="20"
+                                        value="{{ old('phone') }}" placeholder="Nhập số điện thoại" minlength="10" maxlength="10"
                                         inputmode="numeric" pattern="[0-9]*">
                                 </div>
                                 <div class="col-md-6">

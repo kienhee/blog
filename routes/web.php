@@ -1,66 +1,19 @@
 <?php
 
-use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HashTagController;
 use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Client\AppController;
-use App\Http\Controllers\Client\AuthController;
-use App\Http\Controllers\Client\ProfileController;
-use App\Http\Controllers\Client\SavedPostController;
+
 use Illuminate\Support\Facades\Route;
 
-// Client
-Route::prefix('/')->name('client.')->group(function () {
-    Route::get('/', [AppController::class, 'home'])->name('home');
-    Route::get('/tim-kiem', [AppController::class, 'search'])->name('search');
-    Route::get('/bai-viet', [AppController::class, 'posts'])->name('posts');
-    Route::get('/api/posts-by-category', [AppController::class, 'getPostsByCategory'])->name('api.posts-by-category');
-    Route::get('/bai-viet/{slug}', [AppController::class, 'post'])->name('post');
-    Route::get('/danh-muc/{slug}', [AppController::class, 'category'])->name('category');
-    Route::get('/tag/{slug}', [AppController::class, 'hashtag'])->name('hashtag');
-    Route::get('/lien-he', [AppController::class, 'contact'])->name('contact');
-    Route::get('/ve-chung-toi', [AppController::class, 'about'])->name('about');
-    Route::post('/newsletter/subscribe', [AppController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
-
-    // Client Auth Routes
-    Route::prefix('auth')->name('auth.')->group(function () {
-        Route::get('/dang-nhap', [AuthController::class, 'login'])->name('login');
-        Route::post('/dang-nhap', [AuthController::class, 'loginHandle'])->name('loginHandle');
-        Route::get('/dang-ky', [AuthController::class, 'register'])->name('register');
-        Route::post('/dang-ky', [AuthController::class, 'registerHandle'])->name('registerHandle');
-        Route::post('/dang-xuat', [AuthController::class, 'logout'])->name('logout');
-        Route::get('/quen-mat-khau', [AuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
-        Route::post('/quen-mat-khau', [AuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
-        Route::get('/dat-lai-mat-khau', [AuthController::class, 'showResetPasswordForm'])->name('reset-password');
-        Route::post('/dat-lai-mat-khau', [AuthController::class, 'updatePassword'])->name('reset-password.update');
-    });
-
-    // Client Profile Routes (require auth)
-    Route::middleware('auth')->group(function () {
-        Route::prefix('profile')->name('profile.')->group(function () {
-            Route::get('/', [ProfileController::class, 'profile'])->name('index');
-            Route::put('/', [ProfileController::class, 'updateProfile'])->name('update');
-            Route::get('/bai-viet-da-luu', [ProfileController::class, 'savedPosts'])->name('savedPosts');
-            Route::get('/doi-mat-khau', [ProfileController::class, 'showChangePassword'])->name('changePassword');
-            Route::post('/doi-mat-khau', [ProfileController::class, 'changePassword'])->name('changePassword.post');
-        });
-
-        // Saved Posts
-        Route::prefix('saved-posts')->name('saved-posts.')->group(function () {
-            Route::post('/{postId}/toggle', [SavedPostController::class, 'toggle'])->name('toggle');
-        });
-    });
-
-    // Saved posts check route (accessible even when not logged in)
-    Route::get('/saved-posts/{postId}/check', [SavedPostController::class, 'check'])->name('saved-posts.check');
-});
+include 'client.php';
 // Admin
 Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin.')->group(function () {
     Route::get('/', function () {
@@ -183,10 +136,10 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
         Route::post('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:user.delete');
 
         // Trang cá nhân & đổi mật khẩu (không cần permission, user có thể tự cập nhật profile của mình)
-        Route::get('/information', [AdminProfileController::class, 'information'])->name('information');
-        Route::put('/information', [AdminProfileController::class, 'updateInformation'])->name('updateInformation');
-        Route::get('/change-password', [AdminProfileController::class, 'showChangePassword'])->name('changePassword');
-        Route::post('/change-password', [AdminProfileController::class, 'changePassword'])->name('changePassword.post');
+        Route::get('/information', [ProfileController::class, 'information'])->name('information');
+        Route::put('/information', [ProfileController::class, 'updateInformation'])->name('updateInformation');
+        Route::get('/change-password', [ProfileController::class, 'showChangePassword'])->name('changePassword');
+        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('changePassword.post');
     });
     Route::prefix('roles')->name('roles.')->group(function () {
         // Roles management - sử dụng role permissions riêng
@@ -220,13 +173,13 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
 });
 // Admin Authentication routes
 Route::prefix('auth')->name('auth.')->group(function () {
-    Route::get('/login', [AdminAuthController::class, 'login'])->name('login');
-    Route::post('/loginHandle', [AdminAuthController::class, 'loginHandle'])->name('loginHandle');
-    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
-    Route::get('/forgot-password', [AdminAuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
-    Route::post('/forgot-password', [AdminAuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
-    Route::get('/reset-password', [AdminAuthController::class, 'showResetPasswordForm'])->name('reset-password');
-    Route::post('/reset-password', [AdminAuthController::class, 'updatePassword'])->name('reset-password.update');
+    Route::get('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/loginHandle', [AuthController::class, 'loginHandle'])->name('loginHandle');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot-password');
+    Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])->name('forgot-password.send');
+    Route::get('/reset-password', [AuthController::class, 'showResetPasswordForm'])->name('reset-password');
+    Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('reset-password.update');
 });
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {

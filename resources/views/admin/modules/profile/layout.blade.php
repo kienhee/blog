@@ -15,10 +15,10 @@
     @include('admin.components.showMessage')
     <!-- Profile Content -->
     <div class="row">
-        <div class="col-xl-4 col-lg-5 order-1 order-md-0">
+        <div class="col-xl-4 col-lg-5">
             @include('admin.modules.profile.partials.sidebar')
         </div>
-        <div class="col-xl-8 col-lg-7 order-0 order-md-1">
+        <div class="col-xl-8 col-lg-7">
             <!-- Navbar pills -->
             @include('admin.modules.profile.partials.navbar')
             <!--/ Navbar pills -->

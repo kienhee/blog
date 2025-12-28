@@ -373,7 +373,7 @@
                         </li>
                         {{-- Quản lý tài khoản trên giao diện client, chỉ cho phép đổi thông tin cá nhân và mật khẩu --}}
                         <li>
-                            <a class="dropdown-item" href="{{ route('client.profile.index') }}">
+                            <a class="dropdown-item" href="{{ route('client.profile.information') }}">
                                 <i class="bx bx-user me-2"></i>
                                 <span class="align-middle">Thông tin cá nhân</span>
                             </a>

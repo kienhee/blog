@@ -22,18 +22,6 @@
                 <span>{{ $user->phone ?? '—' }}</span>
             </li>
             <li class="d-flex align-items-center mb-3">
-                <i class="bx bx-shield"></i><span class="fw-medium mx-2">Vai trò:</span>
-                <span>
-                    @if ($user->roles->count() > 0)
-                        @foreach ($user->roles as $role)
-                            <span class="badge bg-label-primary me-1">{{ ucfirst($role->name) }}</span>
-                        @endforeach
-                    @else
-                        <span class="text-muted">—</span>
-                    @endif
-                </span>
-            </li>
-            <li class="d-flex align-items-center mb-3">
                 <i class='bx bx-user-circle'></i><span class="fw-medium mx-2">Giới tính:</span>
                 @php
                     $genderMap = [0 => 'Nam', 1 => 'Nữ', 2 => 'Khác'];
@@ -58,12 +46,12 @@
                 <h5 class="modal-title" id="editProfileLabel">Chỉnh sửa thông tin</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="profileForm" action="{{ route('admin.users.updateInformation') }}" method="POST">
+            <form id="profileForm" action="{{ route('client.profile.updateInformation') }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <div class="row g-4">
-                        <div class="col-lg-4">
+                        {{-- <div class="col-lg-4">
                             <div class="border rounded p-3 h-100">
                                 <label class="form-label fw-semibold mb-2">Ảnh đại diện</label>
                                 <div id="avatar_preview" class="border rounded mb-3"
@@ -91,9 +79,9 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label" for="full_name">Họ tên <span
@@ -166,7 +154,7 @@
                             </div>
                         </div>
 
-                        <div class="col-12">
+                        {{-- <div class="col-12">
                             <div class="border rounded p-3">
                                 <label class="form-label fw-semibold mb-2">Mạng xã hội</label>
                                 <div class="row g-3">
@@ -208,7 +196,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="modal-footer">

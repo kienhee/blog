@@ -62,15 +62,6 @@ $(function () {
         }
     };
 
-    /**
-     * Reset validation state của form
-     */
-    const resetFormValidation = () => {
-        $profileForm.find(".is-invalid").removeClass("is-invalid");
-        $profileForm.find(".is-valid").removeClass("is-valid");
-        $profileForm.find(".invalid-feedback").remove();
-    };
-
     // ================================
     // Auto open modal when form has errors
     // ================================
@@ -86,7 +77,7 @@ $(function () {
         
         // Xử lý input và paste với logic chung
         const handleNumericInput = (value) => {
-            const numericOnly = filterNumericOnly(value);
+            const numericOnly = filterNumericOnly(value).substring(0, 10);
             $input.val(numericOnly);
             revalidatePhone();
         };
@@ -115,193 +106,96 @@ $(function () {
     // ================================
     if ($profileForm.length && typeof FormValidation !== "undefined") {
         // Validation rules
-    const validationRules = {
-        full_name: {
-            validators: {
-                notEmpty: { message: "Vui lòng nhập họ tên." },
-                stringLength: {
-                    min: 2,
-                    max: 150,
-                    message: "Họ tên phải từ 2 đến 150 ký tự.",
-                },
-            },
-        },
-        email: {
-            validators: {
-                callback: {
-                    message: "Vui lòng nhập email.",
-                    callback: () => true, // Email disabled, always valid
-                },
-            },
-        },
-        phone: {
-            validators: {
-                notEmpty: { message: "Vui lòng nhập số điện thoại." },
-                stringLength: {
-                    max: 20,
-                    message: "Số điện thoại không được vượt quá 20 ký tự.",
-                },
-                regexp: {
-                    regexp: /^[0-9]+$/,
-                    message: "Số điện thoại chỉ được chứa số.",
-                },
-            },
-        },
-        gender: {
-            validators: {
-                notEmpty: { message: "Vui lòng chọn giới tính." },
-                callback: {
-                    message: "Giới tính không hợp lệ.",
-                    callback: (item) => {
-                        if (item == null || item === "") return false;
-                        return ["0", "1", "2"].includes(String(item.value));
+        const validationRules = {
+            full_name: {
+                validators: {
+                    notEmpty: { message: "Vui lòng nhập họ tên." },
+                    stringLength: {
+                        min: 2,
+                        max: 150,
+                        message: "Họ tên phải từ 2 đến 150 ký tự.",
                     },
                 },
             },
-        },
-        birthday: {
-            validators: {
-                notEmpty: { message: "Vui lòng nhập ngày sinh." },
-                date: {
-                    format: "DD/MM/YYYY",
-                    message: "Ngày sinh không hợp lệ. Vui lòng nhập định dạng dd/mm/yyyy.",
-                },
-                callback: {
-                    message: "Ngày sinh không hợp lệ.",
-                    callback: (item) => {
-                        if (item == null || item === "") return false;
-                        const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-                        if (!dateRegex.test(item.value)) return false;
-                        
-                        const [, day, month, year] = item.value.match(dateRegex);
-                        const date = new Date(year, month - 1, day);
-                        return (
-                            date.getFullYear() == year &&
-                            date.getMonth() == month - 1 &&
-                            date.getDate() == day
-                        );
+            email: {
+                validators: {
+                    callback: {
+                        message: "Vui lòng nhập email.",
+                        callback: () => true, // Email disabled, always valid
                     },
                 },
             },
-        },
-    };
-
-    const fvProfile = FormValidation.formValidation($profileForm[0], {
-        fields: validationRules,
-        plugins: {
-            trigger: new FormValidation.plugins.Trigger({
-                // Trigger validation khi blur và khi submit
-                event: {
-                    valid: "blur",
-                    invalid: "blur",
+            phone: {
+                validators: {
+                    notEmpty: { message: "Vui lòng nhập số điện thoại." },
+                    stringLength: {
+                        min: 10,
+                        max: 10,
+                        message: "Số điện thoại phải có đúng 10 số.",
+                    },
+                    regexp: {
+                        regexp: /^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059)[0-9]{7}$/,
+                        message: "Số điện thoại không hợp lệ.",
+                    },
                 },
-            }),
-            bootstrap5: new FormValidation.plugins.Bootstrap5({
-                rowSelector: ".col-md-6, .col-12, .col-lg-4, .col-lg-8",
-                eleInvalidClass: "is-invalid",
-                eleValidClass: "is-valid",
-            }),
-            autoFocus: new FormValidation.plugins.AutoFocus(),
-            submitButton: new FormValidation.plugins.SubmitButton(),
-        },
-        init: (instance) => {
-            // Xử lý message placement
-            instance.on("plugins.message.placed", (e) => {
-                const { element, messageElement } = e;
-                
-                // Đảm bảo message element có class đúng
-                if (messageElement) {
-                    messageElement.classList.add("invalid-feedback", "d-block");
-                }
-                
-                // Nếu input nằm trong input-group thì render message ra ngoài
-                if (element.parentElement?.classList.contains("input-group")) {
-                    element.parentElement.insertAdjacentElement(
-                        "afterend",
-                        messageElement
-                    );
-                } else {
-                    // Đảm bảo message được đặt sau input/select
-                    const $element = $(element);
-                    const $existingFeedback = $element.siblings(".invalid-feedback");
-                    if ($existingFeedback.length) {
-                        $existingFeedback.replaceWith(messageElement);
-                    } else {
-                        $element.after(messageElement);
-                    }
-                }
-            });
+            },
+            gender: {
+                validators: {
+                    notEmpty: { message: "Vui lòng chọn giới tính." },
+                    callback: {
+                        message: "Giới tính không hợp lệ.",
+                        callback: (item) => {
+                            if (item == null || item === "") return false;
+                            return ["0", "1", "2"].includes(String(item.value));
+                        },
+                    },
+                },
+            },
+            birthday: {
+                validators: {
+                    notEmpty: { message: "Vui lòng nhập ngày sinh." },
+                    date: {
+                        format: "DD/MM/YYYY",
+                        message: "Vui lòng nhập định dạng dd/mm/yyyy.",
+                    },
+                    callback: {
+                        message: "Ngày sinh không hợp lệ.",
+                        callback: (item) => {
+                            if (item == null || item === "") return false;
+                            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                            if (!dateRegex.test(item.value)) return false;
+                            
+                            const [, day, month, year] = item.value.match(dateRegex);
+                            const date = new Date(year, month - 1, day);
+                            return (
+                                date.getFullYear() == year &&
+                                date.getMonth() == month - 1 &&
+                                date.getDate() == day
+                            );
+                        },
+                    },
+                },
+            },
+        };
 
-            // Xử lý khi field invalid - đảm bảo message hiển thị
-            instance.on("core.field.invalid", (e) => {
-                const { element, validators } = e;
-                if (element) {
-                    element.classList.add("is-invalid");
-                    element.classList.remove("is-valid");
-                    
-                    // Đảm bảo message được hiển thị
-                    setTimeout(() => {
-                        const $element = $(element);
-                        const $message = $element.siblings(".invalid-feedback");
-                        if ($message.length) {
-                            $message.addClass("d-block").show();
-                        }
-                    }, 0);
-                }
-            });
-
-            instance.on("core.field.valid", (e) => {
-                const { element } = e;
-                if (element) {
-                    element.classList.remove("is-invalid");
-                    element.classList.add("is-valid");
-                }
-            });
-
-            // Reset validation khi modal mở
-            if (modalEl) {
-                modalEl.addEventListener("show.bs.modal", () => {
-                    instance.resetForm();
-                    resetFormValidation();
-                });
-            }
-        },
+        const fvProfile = FormValidation.formValidation($profileForm[0], {
+            fields: validationRules,
+            plugins: {
+                trigger: new FormValidation.plugins.Trigger(),
+                bootstrap5: new FormValidation.plugins.Bootstrap5({
+                    rowSelector: ".col-md-6, .col-12, .col-lg-4, .col-lg-8",
+                    eleInvalidClass: "is-invalid",
+                    eleValidClass: "is-valid",
+                }),
+                autoFocus: new FormValidation.plugins.AutoFocus(),
+                submitButton: new FormValidation.plugins.SubmitButton(),
+            },
         });
 
         // ================================
-        // Form Submit Handler
-        // ================================
-        $profileForm.on("submit", function (e) {
-            e.preventDefault();
-            // Validate tất cả fields và hiển thị lỗi
-            fvProfile.validate().then((status) => {
-                // Đảm bảo tất cả invalid fields đều hiển thị message
-                if (status !== "Valid") {
-                    // Force hiển thị messages cho các fields invalid
-                    setTimeout(() => {
-                        $profileForm.find(".is-invalid").each(function () {
-                            const $input = $(this);
-                            let $message = $input.next(".invalid-feedback");
-                            
-                            // Nếu không có message, tìm trong parent
-                            if (!$message.length) {
-                                $message = $input.parent().find(".invalid-feedback");
-                            }
-                            
-                            // Đảm bảo message hiển thị
-                            if ($message.length) {
-                                $message.addClass("d-block").css("display", "block");
-                            }
-                        });
-                    }, 100);
-                }
-            });
-        });
-
         // Handle valid form submission
+        // ================================
         fvProfile.on("core.form.valid", () => {
-            resetFormValidation();
-
             // Format birthday to Y-m-d before submit
             const birthdayVal = $birthday.val();
             if (birthdayVal) {
@@ -378,6 +272,15 @@ $(function () {
             });
         });
 
+        // ================================
+        // Reset validation when modal hidden
+        // ================================
+        if (modalEl) {
+            modalEl.addEventListener("hidden.bs.modal", () => {
+                fvProfile.resetForm();
+            });
+        }
+
         // Store instance globally for reuse
         window.fvProfile = fvProfile;
     }
@@ -438,4 +341,3 @@ $(function () {
         });
     }
 });
-

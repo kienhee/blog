@@ -88,7 +88,7 @@
                                     <label class="form-label" for="phone">Số điện thoại</label>
                                     <input type="text" id="phone" name="phone" class="form-control"
                                         value="{{ old('phone', $user->phone) }}" placeholder="Nhập số điện thoại"
-                                        maxlength="20" inputmode="numeric" pattern="[0-9]*">
+                                        minlength="10" maxlength="10" inputmode="numeric" pattern="[0-9]*">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label" for="gender">Giới tính</label>

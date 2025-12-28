@@ -74,6 +74,13 @@ class ProfileController extends Controller
 
         // Kiểm tra mật khẩu hiện tại
         if (!Hash::check($validated['currentPassword'], $user->password)) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Mật khẩu hiện tại không chính xác.',
+                    'errors' => ['currentPassword' => ['Mật khẩu hiện tại không chính xác.']],
+                ], 422);
+            }
             return redirect()
                 ->route('admin.users.changePassword')
                 ->withErrors(['currentPassword' => 'Mật khẩu hiện tại không chính xác.'])
@@ -83,6 +90,13 @@ class ProfileController extends Controller
         // Cập nhật mật khẩu mới
         $user->password = Hash::make($validated['newPassword']);
         $user->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Đổi mật khẩu thành công!',
+            ]);
+        }
 
         return redirect()
             ->route('admin.users.changePassword')

@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Common\ChangePasswordRequest;
-use App\Http\Requests\Client\Profile\UpdateProfileRequest;
+use App\Http\Requests\Admin\Profile\ChangePasswordRequest;
+use App\Http\Requests\Admin\User\UpdateProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    public function profile()
+    public function information()
     {
-        $user = Auth::user()->load('roles');
-        return view('client.pages.profile.index', compact('user'));
+        $user = Auth::user();
+        return view('client.pages.profile.tabs.information', compact('user'));
     }
 
     public function savedPosts()
@@ -30,29 +30,32 @@ class ProfileController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('client.pages.profile.saved-posts.index', compact('savedPosts'));
+        return view('client.pages.profile.tabs.saved-posts', compact('savedPosts'));
     }
 
     public function showChangePassword()
     {
-        return view('client.pages.profile.change-password.index');
+        return view('client.pages.profile.tabs.change-password');
     }
 
-    public function updateProfile(UpdateProfileRequest $request)
+    public function updateInformation(UpdateProfileRequest $request)
     {
         $user = Auth::user();
         $data = $request->validated();
 
-        // Kiểm tra email đã verified thì không cho phép thay đổi
-        if ($user->email_verified_at && isset($data['email']) && $data['email'] !== $user->email) {
+        // Không cho phép thay đổi email
+        if (isset($data['email']) && $data['email'] !== $user->email) {
             if ($request->ajax()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Email đã được xác thực không thể thay đổi',
+                    'message' => 'Email không thể thay đổi',
                 ], 422);
             }
-            return back()->with('error', 'Email đã được xác thực không thể thay đổi');
+            return back()->with('error', 'Email không thể thay đổi');
         }
+
+        // Đảm bảo email luôn là email hiện tại
+        $data['email'] = $user->email;
 
         $user->fill($data);
         $user->save();
@@ -78,7 +81,7 @@ class ProfileController extends Controller
         }
 
         return redirect()
-            ->route('client.profile.index')
+            ->route('client.profile.information')
             ->with('success', 'Cập nhật thông tin thành công!');
     }
 
@@ -89,6 +92,13 @@ class ProfileController extends Controller
 
         // Kiểm tra mật khẩu hiện tại
         if (!Hash::check($validated['currentPassword'], $user->password)) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Mật khẩu hiện tại không chính xác.',
+                    'errors' => ['currentPassword' => ['Mật khẩu hiện tại không chính xác.']],
+                ], 422);
+            }
             return redirect()
                 ->route('client.profile.changePassword')
                 ->withErrors(['currentPassword' => 'Mật khẩu hiện tại không chính xác.'])
@@ -98,6 +108,13 @@ class ProfileController extends Controller
         // Cập nhật mật khẩu mới
         $user->password = Hash::make($validated['newPassword']);
         $user->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Đổi mật khẩu thành công!',
+            ]);
+        }
 
         return redirect()
             ->route('client.profile.changePassword')

@@ -1,26 +1,34 @@
 @extends('client.layouts.master')
-@section('title', 'Thông tin cá nhân')
-
+@php
+    $user = auth()->user();
+@endphp
 @push('styles')
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/animate-css/animate.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-profile.css') }}" />
 @endpush
-
 @section('content')
-    @php
-        ob_start();
-    @endphp
-    <div class="row">
-        @include('client.pages.profile.tabs.profile')
+    <!-- Header -->
+    @include('client.pages.profile.partials.header')
+    <!--/ Header -->
+    @include('admin.components.showMessage')
+    <!-- Profile Content -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-xl-4 col-lg-5">
+                @include('client.pages.profile.partials.sidebar')
+            </div>
+            <div class="col-xl-8 col-lg-7">
+                <!-- Navbar pills -->
+                @include('client.pages.profile.partials.navbar')
+                <!--/ Navbar pills -->
+                @yield('profile-content')
+            </div>
+        </div>
     </div>
-    @php
-        $profileContent = ob_get_clean();
-    @endphp
-    @include('client.pages.profile.partials.header', ['profileContent' => $profileContent])
+    <!--/ Profile Content -->
 @endsection
-
 @push('scripts')
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
@@ -43,24 +51,4 @@
                 $errors->has('linkedin_url'));
     </script>
     @vite(['resources/js/admin/common/uploads/upload-image-alone.js', 'resources/js/admin/common/uploads/upload-avatar.js', 'resources/js/client/pages/profile/index.js'])
-    <script>
-        // Handle success message from sessionStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const successMessage = sessionStorage.getItem('success_message');
-            if (successMessage) {
-                const notice = document.getElementById('success-notice');
-                const noticeMessage = document.getElementById('success-notice-message');
-                if (notice && noticeMessage) {
-                    noticeMessage.textContent = successMessage;
-                    notice.classList.remove('d-none');
-                    // Auto-hide after 5 seconds
-                    setTimeout(function() {
-                        notice.classList.add('d-none');
-                    }, 5000);
-                }
-                // Clear sessionStorage
-                sessionStorage.removeItem('success_message');
-            }
-        });
-    </script>
 @endpush

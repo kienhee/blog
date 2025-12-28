@@ -4,73 +4,62 @@
 "use strict";
 
 $(function () {
+    // ================================
+    // Constants & Selectors
+    // ================================
     const $form = $("#formChangePassword");
-    const $reset = $("#resetBtn");
-    const $submit = $("#submitBtn");
-    const hasErrors = window.hasPasswordErrors || false;
+    const $submitBtn = $("#submitBtn");
+    const $resetBtn = $("#resetBtn");
+    const $spinner = $submitBtn.find(".spinner-border");
 
-    /**
-     * Reset form
-     */
-    if ($reset.length) {
-        $reset.on("click", function (e) {
-            e.preventDefault();
-
-            $form[0].reset();
-            $form.find(".is-invalid").removeClass("is-invalid");
-            $form.find(".invalid-feedback").remove();
-
-            if (window.fvPassword) window.fvPassword.resetForm();
-        });
-    }
-
-    /**
-     * Form Validation for Change Password
-     */
-    if ($form.length) {
-        const fv = FormValidation.formValidation($form[0], {
-            fields: {
-                currentPassword: {
-                    validators: {
-                        notEmpty: {
-                            message: "Vui lòng nhập mật khẩu hiện tại.",
-                        },
-                        stringLength: {
-                            min: 6,
-                            max: 255,
-                            message: "Mật khẩu mới phải từ 6 đến 255 ký tự.",
-                        },
+    // ================================
+    // Form Validation Setup
+    // ================================
+    if ($form.length && typeof FormValidation !== "undefined") {
+        const validationRules = {
+            currentPassword: {
+                validators: {
+                    notEmpty: {
+                        message: "Vui lòng nhập mật khẩu hiện tại.",
                     },
-                },
-                newPassword: {
-                    validators: {
-                        notEmpty: {
-                            message: "Vui lòng nhập mật khẩu mới.",
-                        },
-                        stringLength: {
-                            min: 6,
-                            max: 255,
-                            message: "Mật khẩu mới phải từ 6 đến 255 ký tự.",
-                        },
-                    },
-                },
-                newPassword_confirmation: {
-                    validators: {
-                        notEmpty: {
-                            message: "Vui lòng xác nhận mật khẩu mới.",
-                        },
-                        stringLength: {
-                            max: 255,
-                            message:
-                                "Mật khẩu xác nhận không được vượt quá 255 ký tự.",
-                        },
-                        identical: {
-                            compare: () => $form.find('[name="newPassword"]').val(),
-                            message: "Mật khẩu xác nhận không khớp.",
-                        },
+                    stringLength: {
+                        min: 6,
+                        max: 255,
+                        message: "Mật khẩu hiện tại phải từ 6 đến 255 ký tự.",
                     },
                 },
             },
+            newPassword: {
+                validators: {
+                    notEmpty: {
+                        message: "Vui lòng nhập mật khẩu mới.",
+                    },
+                    stringLength: {
+                        min: 6,
+                        max: 255,
+                        message: "Mật khẩu mới phải từ 6 đến 255 ký tự.",
+                    },
+                },
+            },
+            newPassword_confirmation: {
+                validators: {
+                    notEmpty: {
+                        message: "Vui lòng xác nhận mật khẩu mới.",
+                    },
+                    stringLength: {
+                        max: 255,
+                        message: "Mật khẩu xác nhận không được vượt quá 255 ký tự.",
+                    },
+                    identical: {
+                        compare: () => $form.find('[name="newPassword"]').val(),
+                        message: "Mật khẩu xác nhận không khớp.",
+                    },
+                },
+            },
+        };
+
+        const fvPassword = FormValidation.formValidation($form[0], {
+            fields: validationRules,
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),
                 bootstrap5: new FormValidation.plugins.Bootstrap5({
@@ -81,35 +70,15 @@ $(function () {
                 autoFocus: new FormValidation.plugins.AutoFocus(),
                 submitButton: new FormValidation.plugins.SubmitButton(),
             },
-            init: (instance) => {
-                instance.on("plugins.message.placed", (e) => {
-                    if (
-                        e.element.parentElement?.classList.contains("input-group")
-                    ) {
-                        e.element.parentElement.insertAdjacentElement(
-                            "afterend",
-                            e.messageElement
-                        );
-                    }
-                });
-            },
         });
 
-        // Ngăn chặn form submit trực tiếp, chỉ cho phép submit khi validation pass
-        $form.on("submit", function (e) {
-            e.preventDefault();
-            // Validation sẽ được trigger bởi SubmitButton plugin
-            // Nếu validation pass, event "core.form.valid" sẽ được trigger
-        });
-
-        // On valid submit - chỉ được trigger khi validation pass
-        fv.on("core.form.valid", () => {
-            // clear old errors
-            $form.find(".is-invalid").removeClass("is-invalid");
-            $form.find(".invalid-feedback").remove();
-
-            $submit.prop("disabled", true);
-            $submit.find(".spinner-border").removeClass("d-none");
+        // ================================
+        // Handle valid form submission
+        // ================================
+        fvPassword.on("core.form.valid", () => {
+            // Disable submit button and show spinner
+            $submitBtn.prop("disabled", true);
+            $spinner.removeClass("d-none");
 
             $.ajax({
                 url: $form.attr("action"),
@@ -119,122 +88,98 @@ $(function () {
                     "X-Requested-With": "XMLHttpRequest",
                     Accept: "application/json",
                 },
-                success: function (res) {
+                success: (res) => {
                     if (res?.status) {
+                        // Hiển thị thông báo thành công ở field currentPassword
+                        const $currentPasswordInput = $form.find('[name="currentPassword"]');
+                        if ($currentPasswordInput.length) {
+                            $currentPasswordInput.removeClass("is-invalid");
+                            $currentPasswordInput.next(".invalid-feedback").remove();
+                            $currentPasswordInput.addClass("is-valid");
+                            $currentPasswordInput.after(
+                                $(`<div class="valid-feedback d-block"></div>`).text(
+                                    res.message || "Đổi mật khẩu thành công!"
+                                )
+                            );
+                        }
+
                         toastr.success(
                             res.message || "Đổi mật khẩu thành công!",
-                            "Thành công",
-                            {
-                                timeOut: 5000,
-                                positionClass: "toast-top-right",
-                            }
+                            "Thông báo"
                         );
-                        // Reset form after success
+                        $form[0].reset();
+                        fvPassword.resetForm();
                         setTimeout(() => {
-                            $form[0].reset();
-                            if (window.fvPassword) window.fvPassword.resetForm();
-                        }, 1000);
+                            // Xóa valid feedback
+                            $form.find(".valid-feedback").remove();
+                            $form.find(".is-valid").removeClass("is-valid");
+                        }, 3000);
                     } else {
                         toastr.error(
                             res?.message || "Không thể đổi mật khẩu",
-                            "Lỗi",
-                            {
-                                timeOut: 5000,
-                                positionClass: "toast-top-right",
-                            }
+                            "Thông báo"
                         );
                     }
                 },
-                error: function (xhr) {
+                error: (xhr) => {
+                    // Display server validation errors
                     if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                        const errors = xhr.responseJSON.errors;
-                        Object.keys(errors).forEach((field) => {
-                            const messages = errors[field];
-                            // Đảm bảo messages là array
-                            const messageArray = Array.isArray(messages) ? messages : [messages];
+                        Object.entries(xhr.responseJSON.errors).forEach(([field, messages]) => {
                             const $input = $form.find(`[name="${field}"]`);
-                            if ($input.length && messageArray.length > 0) {
-                                // Xóa tất cả feedback cũ (cả từ FormValidation và manual)
-                                $input.next('.invalid-feedback').remove();
-                                $input.siblings('.invalid-feedback').remove();
-                                $input.parent().next('.invalid-feedback').remove();
-                                
-                                // Xóa class invalid cũ
-                                $input.removeClass("is-invalid");
-                                
-                                // Thêm class invalid
+                            if ($input.length && messages[0]) {
                                 $input.addClass("is-invalid");
-                                
-                                // Thêm feedback mới
-                                const $feedback = $(
-                                    '<div class="invalid-feedback d-block"></div>'
-                                ).text(messageArray[0]);
-                                
-                                // Tìm vị trí phù hợp để chèn feedback
-                                if ($input.parent().hasClass('input-group')) {
-                                    $input.parent().after($feedback);
-                                } else {
-                                    $input.after($feedback);
-                                }
-                                
-                                // Trigger validation lại từ FormValidation plugin để cập nhật state
-                                if (window.fvPassword && typeof window.fvPassword.validateField === 'function') {
-                                    window.fvPassword.validateField($input[0]).catch(function(err) {
-                                        console.error('Validation error:', err);
-                                    });
-                                }
+                                // Remove existing feedback
+                                $input.next(".invalid-feedback").remove();
+                                $input.after(
+                                    $(`<div class="invalid-feedback d-block"></div>`).text(messages[0])
+                                );
+                                // Revalidate field to update FormValidation state
+                                fvPassword.revalidateField(field);
                             }
                         });
                     }
                     toastr.error(
-                        xhr.responseJSON?.message ||
-                            "Có lỗi xảy ra khi đổi mật khẩu",
-                        "Lỗi",
-                        {
-                            timeOut: 5000,
-                            positionClass: "toast-top-right",
-                        }
+                        xhr.responseJSON?.message || "Có lỗi xảy ra khi đổi mật khẩu",
+                        "Thông báo"
                     );
                 },
-                complete: function () {
-                    $submit.prop("disabled", false);
-                    $submit.find(".spinner-border").addClass("d-none");
+                complete: () => {
+                    $submitBtn.prop("disabled", false);
+                    $spinner.addClass("d-none");
                 },
             });
         });
 
-        // Store instance
-        window.fvPassword = fv;
-
-        // Trigger validation khi input thay đổi (để hiển thị lỗi required khi xóa data)
-        $form.find('input').on('input blur', function() {
+        // ================================
+        // Clear server errors on input
+        // ================================
+        $form.find("input").on("input", function () {
             const $input = $(this);
-            if (window.fvPassword && typeof window.fvPassword.validateField === 'function') {
-                // Validate field và cập nhật UI
-                window.fvPassword.validateField(this).then(function(result) {
-                    if (result && result.valid) {
-                        $input.removeClass("is-invalid");
-                        // Xóa feedback nếu field valid
-                        $input.next('.invalid-feedback').remove();
-                        $input.siblings('.invalid-feedback').remove();
-                    } else if (result && !result.valid) {
-                        $input.addClass("is-invalid");
-                    }
-                }).catch(function(err) {
-                    console.error('Validation error:', err);
-                });
+            // Xóa server validation errors khi user bắt đầu nhập
+            if ($input.hasClass("is-invalid")) {
+                const $feedback = $input.next(".invalid-feedback");
+                if ($feedback.length && $feedback.hasClass("d-block")) {
+                    // Chỉ xóa nếu là server error (có class d-block)
+                    $feedback.remove();
+                    $input.removeClass("is-invalid");
+                    // Revalidate field để cập nhật state
+                    fvPassword.revalidateField($input[0]);
+                }
             }
         });
 
-        // Auto focus on first error field if there are errors
-        if (hasErrors) {
-            setTimeout(() => {
-                $("html, body").animate(
-                    { scrollTop: $form.offset().top - 100 },
-                    300
-                );
-                $form.find(".is-invalid:first").focus();
-            }, 300);
+        // ================================
+        // Reset button handler
+        // ================================
+        if ($resetBtn.length) {
+            $resetBtn.on("click", function (e) {
+                e.preventDefault();
+                $form[0].reset();
+                fvPassword.resetForm();
+            });
         }
+
+        // Store instance globally for reuse
+        window.fvPassword = fvPassword;
     }
 });

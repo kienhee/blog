@@ -49,7 +49,7 @@
                                 <div class="mb-3">
                                     <label for="phone" class="form-label">Số điện thoại</label>
                                     <input type="text" class="form-control" id="phone" name="phone"
-                                        placeholder="Nhập số điện thoại (tùy chọn)" value="{{ old('phone') }}">
+                                        placeholder="Nhập số điện thoại (tùy chọn)" value="{{ old('phone') }}" minlength="10" maxlength="10">
                                 </div>
                                 <div class="mb-3 form-password-toggle">
                                     <label class="form-label" for="password">Mật khẩu <span

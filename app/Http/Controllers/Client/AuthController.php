@@ -86,7 +86,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'full_name' => ['required', 'string', 'min:2', 'max:150'],
             'email' => ['required', 'email', 'max:254', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'phone' => ['nullable', 'string', 'size:10', 'regex:/^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059)[0-9]{7}$/'],
             'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
         ], [
             'full_name.required' => 'Vui lòng nhập họ và tên',
@@ -96,8 +96,8 @@ class AuthController extends Controller
             'email.email' => 'Email không hợp lệ',
             'email.max' => 'Email không được vượt quá :max ký tự',
             'email.unique' => 'Email đã tồn tại trong hệ thống',
-            'phone.max' => 'Số điện thoại không được vượt quá :max ký tự',
-            'phone.regex' => 'Số điện thoại chỉ được chứa số',
+            'phone.size' => 'Số điện thoại phải có đúng 10 số',
+            'phone.regex' => 'Số điện thoại không hợp lệ. Vui lòng nhập đúng đầu số của các nhà mạng Việt Nam',
             'password.required' => 'Vui lòng nhập mật khẩu',
             'password.min' => 'Mật khẩu phải có ít nhất :min ký tự',
             'password.max' => 'Mật khẩu không được vượt quá :max ký tự',

@@ -23,17 +23,6 @@
                                 class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
                                 <li class="list-inline-item fw-medium"><i class="bx bx-envelope"></i> <span
                                         id="profileEmail">{{ $user->email }}</span></li>
-                                @if ($user->phone)
-                                    <li class="list-inline-item fw-medium"><i class="bx bx-phone"></i> <span
-                                            id="profilePhone">{{ $user->phone }}</span></li>
-                                @endif
-                                @if ($user->roles->count() > 0)
-                                    <li class="list-inline-item fw-medium"><i class="bx bx-shield"></i>
-                                        @foreach ($user->roles as $role)
-                                            <span class="badge bg-label-primary">{{ $role->name }}</span>
-                                        @endforeach
-                                    </li>
-                                @endif
                             </ul>
                         </div>
 

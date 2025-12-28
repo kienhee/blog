@@ -52,12 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
         phone: {
             validators: {
                 stringLength: {
-                    max: 20,
-                    message: "Số điện thoại không được vượt quá 20 ký tự",
+                    min: 10,
+                    max: 10,
+                    message: "Số điện thoại phải có đúng 10 số",
                 },
                 regexp: {
-                    regexp: /^[0-9]*$/,
-                    message: "Số điện thoại chỉ được chứa số",
+                    regexp: /^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059)[0-9]{7}$/,
+                    message: "Số điện thoại không hợp lệ. Vui lòng nhập đúng đầu số của các nhà mạng Việt Nam",
                 },
             },
         },
@@ -430,12 +431,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.fvUserForm = fv;
 
-    // Only allow numbers in phone input
+    // Only allow numbers in phone input (max 10 digits)
     const phoneInput = document.getElementById("phone");
     if (phoneInput) {
         phoneInput.addEventListener("input", function (e) {
-            // Remove any non-numeric characters
-            this.value = this.value.replace(/[^0-9]/g, "");
+            // Remove any non-numeric characters and limit to 10 digits
+            this.value = this.value.replace(/[^0-9]/g, "").substring(0, 10);
         });
 
         // Prevent typing non-numeric characters
