@@ -8,7 +8,7 @@
             <!-- Search Header -->
             <div class="mb-5">
                 <h1 class="mb-3">Tìm kiếm</h1>
-                
+                <hr>      
                 <!-- Search Form -->
                 <form action="{{ route('client.search') }}" method="GET" class="mb-4">
                     <div class="input-group input-group-lg">

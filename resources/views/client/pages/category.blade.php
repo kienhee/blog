@@ -16,6 +16,7 @@
                         {{ $category->description }}
                     </p>
                 @endif
+                <hr>  
             </header>
 
             {{-- Posts Grid --}}
