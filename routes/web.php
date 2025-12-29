@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HashTagController;
@@ -96,6 +97,30 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
 
         // Delete permissions
         Route::delete('/destroy/{id}', [NewsletterController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:newsletter.delete');
+    });
+    Route::prefix('comments')->name('comments.')->group(function () {
+        // Read permissions
+        Route::get('/', [CommentController::class, 'list'])->name('list')->middleware('permission:comment.read');
+        Route::get('/ajax-get-data', [CommentController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:comment.read');
+        Route::get('/ajax-get-trashed-data', [CommentController::class, 'ajaxGetTrashedData'])->name('ajaxGetTrashedData')->middleware('permission:comment.read');
+        Route::get('/count-pending', [CommentController::class, 'countPending'])->name('countPending')->middleware('permission:comment.read');
+        Route::get('/{id}', [CommentController::class, 'show'])->name('show')->where('id', '[0-9]+')->middleware('permission:comment.read');
+
+        // Update permissions
+        Route::post('/{id}/reply', [CommentController::class, 'reply'])->name('reply')->where('id', '[0-9]+')->middleware('permission:comment.update');
+        Route::put('/change-status/{id}/{status}', [CommentController::class, 'changeStatus'])
+            ->where(['id' => '[0-9]+', 'status' => '[a-z]+'])
+            ->name('changeStatus')
+            ->middleware('permission:comment.update');
+        Route::post('/bulk-change-status', [CommentController::class, 'bulkChangeStatus'])->name('bulkChangeStatus')->middleware('permission:comment.update');
+        Route::post('/restore/{id}', [CommentController::class, 'restore'])->name('restore')->where('id', '[0-9]+')->middleware('permission:comment.update');
+        Route::post('/bulk-restore', [CommentController::class, 'bulkRestore'])->name('bulkRestore')->middleware('permission:comment.update');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [CommentController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:comment.delete');
+        Route::delete('/bulk-delete', [CommentController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:comment.delete');
+        Route::delete('/force-delete/{id}', [CommentController::class, 'forceDelete'])->name('forceDelete')->where('id', '[0-9]+')->middleware('permission:comment.delete');
+        Route::delete('/bulk-force-delete', [CommentController::class, 'bulkForceDelete'])->name('bulkForceDelete')->middleware('permission:comment.delete');
     });
     Route::prefix('hashtags')->name('hashtags.')->group(function () {
         // Read permissions

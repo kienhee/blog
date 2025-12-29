@@ -23,11 +23,13 @@ function updateBadgeCount(badgeId, url) {
                 const count = parseInt(response.count);
                 badgeElement.textContent = count;
 
-                // Chỉ hiển thị badge nếu count > 1 (CSS sẽ xử lý hiển thị/ẩn)
-                if (count > 1) {
+                // Chỉ hiển thị badge nếu count > 0 (CSS sẽ xử lý hiển thị/ẩn)
+                if (count > 0) {
                     badgeElement.classList.add('badge-heartbeat');
+                    badgeElement.style.display = '';
                 } else {
                     badgeElement.classList.remove('badge-heartbeat');
+                    badgeElement.style.display = 'none';
                 }
             } else {
                 console.error('Invalid response format:', response);

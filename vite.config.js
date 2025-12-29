@@ -37,6 +37,9 @@ export default defineConfig({
                 //Contact
                 "resources/js/admin/pages/contact/list.js",
                 "resources/js/admin/pages/contact/detail.js",
+                //Comment
+                "resources/js/admin/pages/comment/list.js",
+                "resources/js/admin/pages/comment/detail.js",
                 //Newsletter
                 "resources/js/admin/pages/newsletter/list.js",
                 //Auth

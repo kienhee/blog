@@ -8,6 +8,7 @@
     { "name": "Hashtag - Danh sách", "icon": "bx bx-purchase-tag-alt", "url": "/admin/hashtags" },
     { "name": "Hashtag - Thêm mới", "icon": "bx bx-plus-circle", "url": "/admin/hashtags/create" },
     { "name": "Liên hệ - Danh sách", "icon": "bx bx-envelope", "url": "/admin/contacts" },
+    { "name": "Bình luận - Danh sách", "icon": "bx bx-message-dots", "url": "/admin/comments" },
     { "name": "Người dùng - Danh sách", "icon": "bx bx-group", "url": "/admin/users" },
     { "name": "Người dùng - Thêm mới", "icon": "bx bx-user-plus", "url": "/admin/users/create" },
     { "name": "Thùng rác - Bài viết", "icon": "bx bx-trash", "url": "/admin/posts#trash_tab" },

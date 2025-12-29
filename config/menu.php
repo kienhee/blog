@@ -67,6 +67,13 @@ return [
         'url' => 'admin.newsletters.list',
         'permission' => 'newsletter.read',
     ],
+    [
+        'title' => 'Quản lý bình luận',
+        'icon' => 'bx-message-dots',
+        'url' => 'admin.comments.list',
+        'permission' => 'comment.read',
+        'badgeId' => 'admin_comments_pending',
+    ],
     // [
     //     'title' => 'Module Người dùng',
     //     'divider' => true,

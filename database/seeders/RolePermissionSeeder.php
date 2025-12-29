@@ -75,6 +75,12 @@ class RolePermissionSeeder extends Seeder
             ['id' => 30, 'name' => 'newsletter.update', 'title' => 'Sửa newsletter'],
             ['id' => 31, 'name' => 'newsletter.delete', 'title' => 'Xóa newsletter'],
             ['id' => 32, 'name' => 'newsletter.create', 'title' => 'Thêm newsletter'],
+
+            // Comment module
+            ['id' => 33, 'name' => 'comment.read', 'title' => 'Xem bình luận'],
+            ['id' => 34, 'name' => 'comment.update', 'title' => 'Sửa bình luận'],
+            ['id' => 35, 'name' => 'comment.delete', 'title' => 'Xóa bình luận'],
+            ['id' => 36, 'name' => 'comment.create', 'title' => 'Thêm bình luận'],
         ];
 
         $permissions = [];
