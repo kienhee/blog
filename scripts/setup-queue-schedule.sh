@@ -1,101 +1,94 @@
 #!/bin/bash
-
-# Script tự động setup Queue và Scheduled Tasks trên VPS Ubuntu
-# Usage: sudo ./setup-queue-schedule.sh
+# Laravel Queue + Scheduler Setup Script (PRODUCTION SAFE)
 
 set -e
 
-# Colors for output
-RED='\033[0;31m'
+# ===== CONFIG =====
+PROJECT_PATH=$(pwd)
+PHP_BIN=$(which php)
+APP_USER=www-data
+APP_GROUP=www-data
+
+# ===== COLORS =====
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+RED='\033[0;31m'
+NC='\033[0m'
 
-# Get project path
-PROJECT_PATH=$(pwd)
+echo -e "${GREEN}🚀 Laravel Queue & Scheduler Setup${NC}"
 echo -e "${GREEN}Project path: $PROJECT_PATH${NC}"
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-    echo -e "${RED}Please run as root (use sudo)${NC}"
+# ===== CHECK ROOT =====
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}❌ Please run as root: sudo ./setup-queue-schedule.sh${NC}"
     exit 1
 fi
 
-# 1. Install Supervisor and Cron
-echo -e "${YELLOW}Installing Supervisor and Cron...${NC}"
+# ===== INSTALL SERVICES =====
+echo -e "${YELLOW}📦 Installing Supervisor & Cron...${NC}"
 apt update
 apt install supervisor cron -y
 
-# Ensure cron service is running
-systemctl enable cron
-systemctl start cron
+systemctl enable supervisor cron
+systemctl start supervisor cron
 
-# 2. Create Supervisor config
-echo -e "${YELLOW}Creating Supervisor config...${NC}"
-cat > /etc/supervisor/conf.d/blog-queue-worker.conf <<EOF
+# ===== FIX PERMISSIONS =====
+echo -e "${YELLOW}🔐 Fixing permissions...${NC}"
+mkdir -p $PROJECT_PATH/storage/logs
+mkdir -p $PROJECT_PATH/bootstrap/cache
+
+chown -R $APP_USER:$APP_GROUP $PROJECT_PATH/storage $PROJECT_PATH/bootstrap/cache
+find $PROJECT_PATH/storage $PROJECT_PATH/bootstrap/cache -type d -exec chmod 775 {} \;
+find $PROJECT_PATH/storage $PROJECT_PATH/bootstrap/cache -type f -exec chmod 664 {} \;
+
+# ===== SUPERVISOR CONFIG =====
+echo -e "${YELLOW}⚙️ Creating Supervisor config...${NC}"
+
+SUPERVISOR_CONF="/etc/supervisor/conf.d/blog-queue-worker.conf"
+
+cat > $SUPERVISOR_CONF <<EOF
 [program:blog-queue-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php $PROJECT_PATH/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+command=$PHP_BIN $PROJECT_PATH/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+user=$APP_USER
+numprocs=2
 autostart=true
 autorestart=true
 stopasgroup=true
 killasgroup=true
-user=www-data
-numprocs=2
 redirect_stderr=true
 stdout_logfile=$PROJECT_PATH/storage/logs/queue-worker.log
 stopwaitsecs=3600
 EOF
 
-# 3. Setup cron job
-echo -e "${YELLOW}Setting up cron job...${NC}"
-
-# Check if crontab command exists
-if ! command -v crontab &> /dev/null; then
-    echo -e "${RED}Error: crontab command not found. Installing cron...${NC}"
-    apt install cron -y
-    systemctl enable cron
-    systemctl start cron
-fi
-
-CRON_JOB="* * * * * cd $PROJECT_PATH && php artisan schedule:run >> $PROJECT_PATH/storage/logs/scheduler.log 2>&1"
-
-# Check if cron job already exists
-if crontab -l 2>/dev/null | grep -q "schedule:run"; then
-    echo -e "${YELLOW}Cron job already exists, skipping...${NC}"
-else
-    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-    echo -e "${GREEN}Cron job added successfully${NC}"
-fi
-
-# 4. Ensure storage/logs directory exists and has correct permissions
-echo -e "${YELLOW}Setting up storage/logs directory...${NC}"
-mkdir -p "$PROJECT_PATH/storage/logs"
-chown -R www-data:www-data "$PROJECT_PATH/storage"
-chmod -R 775 "$PROJECT_PATH/storage"
-
-# 5. Reload Supervisor
-echo -e "${YELLOW}Reloading Supervisor...${NC}"
+# ===== RELOAD SUPERVISOR =====
+echo -e "${YELLOW}🔄 Reloading Supervisor...${NC}"
 supervisorctl reread
 supervisorctl update
+supervisorctl restart blog-queue-worker:* || supervisorctl start blog-queue-worker:*
 
-# 6. Start queue worker
-echo -e "${YELLOW}Starting queue worker...${NC}"
-supervisorctl start blog-queue-worker:*
+# ===== SETUP CRON (WWW-DATA) =====
+echo -e "${YELLOW}⏱ Setting up Laravel Scheduler (www-data)...${NC}"
 
-# 7. Check status
-echo -e "${GREEN}Setup completed!${NC}"
-echo -e "${YELLOW}Checking status...${NC}"
-supervisorctl status
+CRON_JOB="* * * * * cd $PROJECT_PATH && $PHP_BIN artisan schedule:run >> $PROJECT_PATH/storage/logs/scheduler.log 2>&1"
+
+sudo -u $APP_USER crontab -l 2>/dev/null | grep -q "schedule:run" || \
+( sudo -u $APP_USER crontab -l 2>/dev/null; echo "$CRON_JOB" ) | sudo -u $APP_USER crontab -
+
+# ===== FINAL CHECK =====
 echo ""
-echo -e "${GREEN}Cron jobs:${NC}"
-crontab -l | grep schedule:run
+echo -e "${GREEN}✅ SETUP COMPLETED SUCCESSFULLY${NC}"
+echo ""
+echo -e "${YELLOW}Supervisor status:${NC}"
+supervisorctl status blog-queue-worker:*
+echo ""
+echo -e "${YELLOW}Scheduler cron (www-data):${NC}"
+sudo -u $APP_USER crontab -l | grep schedule:run
 
 echo ""
-echo -e "${GREEN}✅ Setup completed successfully!${NC}"
-echo -e "${YELLOW}Useful commands:${NC}"
-echo "  - Check queue worker: sudo supervisorctl status blog-queue-worker:*"
-echo "  - Restart queue worker: sudo supervisorctl restart blog-queue-worker:*"
-echo "  - View queue logs: tail -f $PROJECT_PATH/storage/logs/queue-worker.log"
-echo "  - View scheduler logs: tail -f $PROJECT_PATH/storage/logs/scheduler.log"
-
+echo -e "${GREEN}📌 Useful commands:${NC}"
+echo "  Queue status:        sudo supervisorctl status blog-queue-worker:*"
+echo "  Restart queue:       sudo supervisorctl restart blog-queue-worker:*"
+echo "  Queue logs:          tail -f storage/logs/queue-worker.log"
+echo "  Scheduler logs:      tail -f storage/logs/scheduler.log"
+echo "  Test scheduler:      sudo -u www-data php artisan schedule:run"
