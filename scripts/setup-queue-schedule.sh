@@ -21,10 +21,14 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# 1. Install Supervisor
-echo -e "${YELLOW}Installing Supervisor...${NC}"
+# 1. Install Supervisor and Cron
+echo -e "${YELLOW}Installing Supervisor and Cron...${NC}"
 apt update
-apt install supervisor -y
+apt install supervisor cron -y
+
+# Ensure cron service is running
+systemctl enable cron
+systemctl start cron
 
 # 2. Create Supervisor config
 echo -e "${YELLOW}Creating Supervisor config...${NC}"
@@ -45,6 +49,15 @@ EOF
 
 # 3. Setup cron job
 echo -e "${YELLOW}Setting up cron job...${NC}"
+
+# Check if crontab command exists
+if ! command -v crontab &> /dev/null; then
+    echo -e "${RED}Error: crontab command not found. Installing cron...${NC}"
+    apt install cron -y
+    systemctl enable cron
+    systemctl start cron
+fi
+
 CRON_JOB="* * * * * cd $PROJECT_PATH && php artisan schedule:run >> $PROJECT_PATH/storage/logs/scheduler.log 2>&1"
 
 # Check if cron job already exists
