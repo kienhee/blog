@@ -397,6 +397,9 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  li:first-child   {
+    margin-top: 1rem;
+  }
 }
 
 .toc-item {
@@ -533,6 +536,11 @@
   margin-top: $spacing-xl;
   padding-top: $spacing-xl;
   border-top: 2px solid $border-color;
+
+  @include respond-to(md) {
+    margin-top: $spacing-lg;
+    padding-top: $spacing-lg;
+  }
 }
 
 .comments-title {
@@ -540,6 +548,103 @@
   font-weight: 600;
   margin-bottom: $spacing-lg;
   color: $text-dark;
+
+  @include respond-to(md) {
+    font-size: 1.25em;
+  }
+}
+
+// Comment Items
+.comment-item {
+  .card-body {
+    @include respond-to(md) {
+      padding: 1rem;
+    }
+  }
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+  
+  @include respond-to(md) {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+}
+
+.comment-avatar-main {
+  @include respond-to(md) {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+}
+
+.comment-author-name {
+  font-size: 0.95em;
+  
+  @include respond-to(md) {
+    font-size: 0.9em;
+  }
+}
+
+.comment-time {
+  @include respond-to(md) {
+    font-size: 0.75em !important;
+  }
+}
+
+.comment-content {
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.6;
+  font-size: 0.95em;
+  
+  @include respond-to(md) {
+    font-size: 0.9em;
+  }
+}
+
+// Reply Form Container
+.reply-form-container {
+  @include respond-to(md) {
+    margin-left: 0 !important;
+    margin-top: 1rem !important;
+  }
+}
+
+// Replies List
+.replies-list {
+  @include respond-to(md) {
+    margin-left: 0 !important;
+    padding-left: 0.75rem;
+    border-left: 2px solid $border-color;
+  }
+}
+
+// Comment Form
+.comment-form {
+  .form-control {
+    @include respond-to(md) {
+      font-size: 0.9em;
+    }
+  }
+  
+  button {
+    @include respond-to(md) {
+      font-size: 0.85em;
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+// Reply Button
+.reply-btn {
+  @include respond-to(md) {
+    font-size: 0.8em;
+    padding: 0.375rem 0.75rem;
+  }
 }
 
 // Dark Mode Styles

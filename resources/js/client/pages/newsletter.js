@@ -1,5 +1,5 @@
 /**
- * Newsletter Subscription Form Validation
+ * Newsletter Subscription Form Validation with Bot Detection
  */
 "use strict";
 
@@ -11,6 +11,49 @@ $(function () {
     const $emailInput = $("#newsletter-email");
     const $submitBtn = $form.find('button[type="submit"]');
     const $messageDiv = $("#newsletter-message");
+
+    // ================================
+    // Bot Detection - Track User Behavior
+    // ================================
+    let maxScrollPercentage = 0;
+    let pageLoadTime = Date.now();
+    let scrollTrackingEnabled = false;
+
+    // Track scroll percentage
+    function trackScroll() {
+        if (!scrollTrackingEnabled) return;
+        
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Calculate scroll percentage
+        const scrollableHeight = documentHeight - windowHeight;
+        const currentScrollPercentage = scrollableHeight > 0 
+            ? Math.round((scrollTop / scrollableHeight) * 100) 
+            : 0;
+        
+        // Update max scroll percentage
+        if (currentScrollPercentage > maxScrollPercentage) {
+            maxScrollPercentage = currentScrollPercentage;
+        }
+    }
+
+    // Enable scroll tracking when page loads
+    $(document).ready(function() {
+        scrollTrackingEnabled = true;
+        
+        // Track scroll events
+        $(window).on('scroll', trackScroll);
+        
+        // Track initial scroll position
+        trackScroll();
+    });
+
+    // Get time on page in seconds
+    function getTimeOnPage() {
+        return Math.floor((Date.now() - pageLoadTime) / 1000);
+    }
 
     // ================================
     // Form Validation Setup
@@ -62,9 +105,15 @@ $(function () {
             // Clear previous messages
             $messageDiv.removeClass("alert alert-success alert-danger").html("");
 
+            // Get behavior data
+            const timeOnPage = getTimeOnPage();
+            const scrollPercentage = maxScrollPercentage;
+
             // Get form data
             const formData = {
                 email: $emailInput.val().trim(),
+                scroll_percentage: scrollPercentage,
+                time_on_page: timeOnPage,
                 _token: $('meta[name="csrf-token"]').attr("content"),
             };
 
@@ -85,6 +134,10 @@ $(function () {
                         fvNewsletter.resetForm(true);
                         // Clear error state
                         $emailInput.removeClass("is-invalid");
+                        
+                        // Reset tracking (optional - for multiple submissions)
+                        maxScrollPercentage = 0;
+                        pageLoadTime = Date.now();
                     } else {
                         // Show error message
                         $messageDiv
@@ -166,12 +219,18 @@ $(function () {
             // Clear previous messages
             $messageDiv.removeClass("alert alert-success alert-danger").html("");
 
+            // Get behavior data
+            const timeOnPage = getTimeOnPage();
+            const scrollPercentage = maxScrollPercentage;
+
             // Submit via AJAX
             $.ajax({
                 url: $form.attr("action"),
                 method: "POST",
                 data: {
                     email: email,
+                    scroll_percentage: scrollPercentage,
+                    time_on_page: timeOnPage,
                     _token: $('meta[name="csrf-token"]').attr("content"),
                 },
                 success: function (response) {
@@ -180,6 +239,10 @@ $(function () {
                             .addClass("alert alert-success")
                             .html('<i class="bx bx-check-circle me-2"></i>' + response.message);
                         $form[0].reset();
+                        
+                        // Reset tracking
+                        maxScrollPercentage = 0;
+                        pageLoadTime = Date.now();
                     } else {
                         $messageDiv
                             .addClass("alert alert-danger")
@@ -217,4 +280,3 @@ $(function () {
         }
     });
 });
-

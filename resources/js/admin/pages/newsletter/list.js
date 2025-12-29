@@ -18,9 +18,10 @@ $(function () {
                 data: function (d) {
                     d.email = $("#email").val();
                     d.status = $("#status").val();
+                    d.is_human = $("#is_human").val();
                 },
             },
-            order: [[4, "desc"]],
+            order: [[7, "desc"]],
             language: {
                 url:
                     $("input[name='datatables_vi']").val() ||
@@ -35,6 +36,24 @@ $(function () {
                 },
                 { data: "email", name: "newsletters.email" },
                 { data: "status", name: "newsletters.status", searchable: false },
+                {
+                    data: "is_human",
+                    name: "newsletters.is_human",
+                    searchable: false,
+                    orderable: false,
+                },
+                {
+                    data: "spam_score",
+                    name: "newsletters.spam_score",
+                    searchable: false,
+                    orderable: true,
+                },
+                {
+                    data: "behavior",
+                    name: "behavior",
+                    searchable: false,
+                    orderable: false,
+                },
                 {
                     data: "subscribed_at",
                     name: "newsletters.subscribed_at",
@@ -55,7 +74,7 @@ $(function () {
         });
 
         // Filter
-        $("#email, #status").on("change input", function () {
+        $("#email, #status, #is_human").on("change input", function () {
             table.draw();
         });
 
@@ -63,6 +82,7 @@ $(function () {
         $("#clearFilter").on("click", function () {
             $("#email").val("");
             $("#status").val("");
+            $("#is_human").val("");
             table.draw();
         });
     }

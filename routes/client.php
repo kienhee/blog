@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Client\AuthController;
 use App\Http\Controllers\Client\CategoryController;
+use App\Http\Controllers\Client\CommentController;
 use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\HashtagController;
 use App\Http\Controllers\Client\HomeController;
@@ -62,6 +63,11 @@ Route::prefix('/')->name('client.')->group(function () {
         // Saved Posts
         Route::prefix('saved-posts')->name('saved-posts.')->group(function () {
             Route::post('/{postId}/toggle', [SavedPostController::class, 'toggle'])->name('toggle');
+        });
+
+        // Comments (require auth)
+        Route::prefix('comments')->name('comments.')->group(function () {
+            Route::post('/', [CommentController::class, 'store'])->name('store');
         });
     });
 

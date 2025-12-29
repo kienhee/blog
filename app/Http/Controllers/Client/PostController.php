@@ -82,11 +82,30 @@ class PostController extends Controller
 
         // Kiểm tra xem bài viết đã được lưu chưa (nếu user đã đăng nhập)
         $isSaved = false;
-        if (Auth::check()) {
+        if (Auth::check() && $postModel) {
             $isSaved = \App\Models\SavedPost::where('user_id', auth()->id())
-                ->where('post_id', $post->id)
+                ->where('post_id', $postModel->id)
                 ->exists();
         }
+
+        // Load comments nếu bài viết cho phép comment
+        $comments = collect();
+        $commentsCount = 0;
+        if ($postModel && $postModel->allow_comment) {
+            // Load top-level comments (parent_id is null) với replies
+            $comments = $postModel->comments()
+                ->whereNull('parent_id')
+                ->with(['user', 'replies.user'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            // Đếm tổng số comments (bao gồm cả replies)
+            $commentsCount = $postModel->comments()->count();
+        }
+
+        // Thêm comments và commentsCount vào post object để dùng trong view
+        $post->comments = $comments;
+        $post->comments_count = $commentsCount;
 
         return view('client.pages.single', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags', 'isSaved'));
     }

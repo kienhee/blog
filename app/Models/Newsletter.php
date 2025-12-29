@@ -17,10 +17,18 @@ class Newsletter extends Model
         'status',
         'subscribed_at',
         'unsubscribed_at',
+        'scroll_percentage',
+        'time_on_page',
+        'is_human',
+        'spam_score',
     ];
 
     protected $casts = [
         'subscribed_at' => 'datetime',
         'unsubscribed_at' => 'datetime',
+        'scroll_percentage' => 'decimal:2',
+        'time_on_page' => 'integer',
+        'is_human' => 'boolean',
+        'spam_score' => 'integer',
     ];
 }

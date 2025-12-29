@@ -24,7 +24,7 @@
                         <label for="email" class="form-label mb-1">Email</label>
                         <input type="text" id="email" class="form-control" placeholder="Nhập email" />
                     </div>
-                    <div class="col-md-3 mb-2">
+                    <div class="col-md-2 mb-2">
                         <label for="status" class="form-label mb-1">Trạng thái</label>
                         <select id="status" class="form-select text-capitalize">
                             <option value="">Tất cả</option>
@@ -34,7 +34,15 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3 mb-2">
+                    <div class="col-md-2 mb-2">
+                        <label for="is_human" class="form-label mb-1">Loại</label>
+                        <select id="is_human" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="1">Người thật</option>
+                            <option value="0">Bot/Spam</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2 d-flex align-items-end">
                         <button class="btn btn-primary" id="clearFilter">Đặt lại</button>
                     </div>
                 </div>
@@ -46,6 +54,9 @@
                             <th>STT</th>
                             <th>Email</th>
                             <th>Trạng thái</th>
+                            <th>Loại</th>
+                            <th>Spam Score</th>
+                            <th>Hành vi</th>
                             <th>Ngày đăng ký</th>
                             <th>Ngày tạo</th>
                             <th>Hành động</th>

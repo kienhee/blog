@@ -117,6 +117,46 @@ class HashTagRepository extends BaseRepository
     }
 
     /**
+     * Get all active hashtags ordered by name
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllActiveHashtags()
+    {
+        return $this->model->whereNull('deleted_at')
+                           ->orderBy('name', 'asc')
+                           ->get();
+    }
+
+    /**
+     * Get top hashtags with most posts (only published and not deleted posts)
+     *
+     * @param int $limit
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getTopHashtagsByPostCount($limit = 10)
+    {
+        return $this->model
+            ->select('hash_tags.*')
+            ->selectRaw('COUNT(DISTINCT CASE 
+                WHEN posts.status = "published" 
+                    AND posts.deleted_at IS NULL 
+                    AND (posts.scheduled_at IS NULL OR posts.scheduled_at <= NOW())
+                THEN post_hashtags.post_id 
+                ELSE NULL 
+            END) as post_count')
+            ->leftJoin('post_hashtags', 'hash_tags.id', '=', 'post_hashtags.hashtag_id')
+            ->leftJoin('posts', 'post_hashtags.post_id', '=', 'posts.id')
+            ->whereNull('hash_tags.deleted_at')
+            ->groupBy('hash_tags.id')
+            ->havingRaw('post_count > 0')
+            ->orderBy('post_count', 'desc')
+            ->orderBy('hash_tags.name', 'asc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * Get trashed data for DataTables
      */
     public function gridTrashedData()
