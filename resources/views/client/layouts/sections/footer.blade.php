@@ -45,14 +45,6 @@
                                 {{ $footerSettings['email'] }}
                             </p>
                         @endif
-
-                        @if(!empty($footerSettings['facebook']))
-                            <a href="{{ $footerSettings['facebook'] }}" 
-                               target="_blank" 
-                               class="footer-link me-3">
-                                <i class="bx bxl-facebook-circle fs-4"></i>
-                            </a>
-                        @endif
                     @else
                         {{-- Fallback values nếu không có settings --}}
                         <p class="footer-text mb-2">
