@@ -20,7 +20,7 @@
             $logoUrl = url($logoUrl);
         }
       @endphp
-      <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" style="height: 40px; width: auto; display: inline-block;" />
+      <img src="{{ $logoUrl }}" alt="{{ env('APP_URL') }}" style="height: 40px; width: auto; display: inline-block;" />
     </div>
 
     <!-- Body -->
