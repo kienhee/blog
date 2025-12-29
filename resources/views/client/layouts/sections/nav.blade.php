@@ -372,6 +372,14 @@
                             <div class="dropdown-divider"></div>
                         </li>
                         {{-- Quản lý tài khoản trên giao diện client, chỉ cho phép đổi thông tin cá nhân và mật khẩu --}}
+                        @if (!$user->hasRole('guest'))
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.index') }}">
+                                    <i class="bx bx-home me-2"></i>
+                                    <span class="align-middle">Trang quản trị</span>
+                                </a>
+                            </li>
+                        @endif
                         <li>
                             <a class="dropdown-item" href="{{ route('client.profile.information') }}">
                                 <i class="bx bx-user me-2"></i>

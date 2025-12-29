@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contact\ReplyRequest;
 use App\Mail\ContactReplyMail;
-use App\Models\Contact;
 use App\Models\ContactReply;
 use App\Repositories\ContactRepository;
 use Illuminate\Http\Request;

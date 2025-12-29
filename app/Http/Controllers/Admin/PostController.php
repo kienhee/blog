@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Post\StoreRequest;
 use App\Http\Requests\Admin\Post\UpdateRequest;
+use App\Models\Category;
 use App\Models\Post;
 use App\Repositories\CategoryRepository;
 use App\Repositories\HashTagRepository;
@@ -371,7 +372,7 @@ class PostController extends Controller
                 ], 400);
             }
 
-            $category = \App\Models\Category::find($categoryId);
+            $category = Category::find($categoryId);
             if (! $category) {
                 return response()->json([
                     'status' => false,

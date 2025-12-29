@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\HashTag\StoreRequest;
 use App\Http\Requests\Admin\HashTag\UpdateRequest;
+use App\Models\HashTag;
 use App\Repositories\HashTagRepository;
 use Illuminate\Http\Request;
 
@@ -143,7 +144,7 @@ class HashTagController extends Controller
     public function restore($id)
     {
         try {
-            $hashtag = \App\Models\HashTag::withTrashed()->find($id);
+            $hashtag = HashTag::withTrashed()->find($id);
             if (! $hashtag || ! $hashtag->trashed()) {
                 return response()->json([
                     'status' => false,
@@ -168,7 +169,7 @@ class HashTagController extends Controller
     public function forceDelete($id)
     {
         try {
-            $hashtag = \App\Models\HashTag::withTrashed()->find($id);
+            $hashtag = HashTag::withTrashed()->find($id);
             if (! $hashtag || ! $hashtag->trashed()) {
                 return response()->json([
                     'status' => false,
@@ -270,7 +271,7 @@ class HashTagController extends Controller
 
     public function search(Request $request)
     {
-        $query = \App\Models\HashTag::query();
+        $query = HashTag::query();
 
         // Tìm kiếm theo tên nếu có
         if ($request->has('q')) {

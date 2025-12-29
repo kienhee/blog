@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\StoreRequest;
 use App\Http\Requests\Admin\Category\UpdateOrderRequest;
 use App\Http\Requests\Admin\Category\UpdateRequest;
+use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 
@@ -226,7 +227,7 @@ class CategoryController extends Controller
     public function restore($id)
     {
         try {
-            $category = \App\Models\Category::withTrashed()->find($id);
+            $category = Category::withTrashed()->find($id);
             if (!$category || !$category->trashed()) {
                 return response()->json([
                     'status' => false,
@@ -251,7 +252,7 @@ class CategoryController extends Controller
     public function forceDelete($id)
     {
         try {
-            $category = \App\Models\Category::withTrashed()->find($id);
+            $category = Category::withTrashed()->find($id);
             if (!$category || !$category->trashed()) {
                 return response()->json([
                     'status' => false,
