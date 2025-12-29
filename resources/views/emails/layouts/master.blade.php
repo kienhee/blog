@@ -12,8 +12,15 @@
   <div style="max-width:620px; margin:0 auto; background:#FFFFFF; border-radius:8px; box-shadow:0 6px 18px rgba(18,24,32,0.06); border:1px solid #E6E9EE; overflow:hidden;">
 
     <!-- Header -->
-    <div style="padding:20px 24px; background:linear-gradient(90deg,#FF6A3D,#E0552A); color:#fff; display:flex; align-items:center; gap:14px;">
-      <div style="font-size:18px; font-weight:700;">{{ config('app.name') }}</div>
+    <div style="padding:20px 24px; background:linear-gradient(90deg,#FF6A3D,#E0552A); color:#fff; text-align:center;">
+      @php
+        $logoUrl = asset('resources/admin/assets/img/logo.png');
+        // Đảm bảo URL là absolute
+        if (!filter_var($logoUrl, FILTER_VALIDATE_URL)) {
+            $logoUrl = url($logoUrl);
+        }
+      @endphp
+      <img src="{{ $logoUrl }}" alt="{{ config('app.name') }}" style="height: 40px; width: auto; display: inline-block;" />
     </div>
 
     <!-- Body -->
