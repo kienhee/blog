@@ -6,12 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Newsletter;
 use App\Repositories\NewsletterRepository;
 use Illuminate\Http\Request;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class PageController extends Controller
 {
     public function about()
     {
-        return view('client.pages.about');
+        // SEO Data for about page
+        $seoModel = new SEOData(
+            title: 'Về chúng tôi',
+            description: 'Tìm hiểu về chúng tôi và sứ mệnh chia sẻ kiến thức, kinh nghiệm về lập trình và công nghệ đến cộng đồng.',
+            url: route('client.about', [], false),
+            type: 'website',
+        );
+
+        return view('client.pages.about', compact('seoModel'));
     }
 
     /**

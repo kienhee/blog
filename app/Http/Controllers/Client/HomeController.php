@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
 use Illuminate\Http\Request;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class HomeController extends Controller
 {
@@ -91,7 +92,15 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
-        return view('client.pages.home', compact('latestPosts', 'featuredPost', 'recentPosts', 'sidebarPosts', 'categories'));
+        // SEO Data for homepage
+        $seoModel = new SEOData(
+            title: config('seo.title.homepage_title') ?? config('app.name'),
+            description: 'Khám phá các bài viết mới nhất về lập trình, công nghệ và cuộc sống. Chia sẻ kiến thức và kinh nghiệm từ cộng đồng.',
+            url: route('client.home', [], false),
+            type: 'website',
+        );
+
+        return view('client.pages.home', compact('latestPosts', 'featuredPost', 'recentPosts', 'sidebarPosts', 'categories', 'seoModel'));
     }
 
     public function search(Request $request)
@@ -117,7 +126,18 @@ class HomeController extends Controller
             $posts = $query->paginate(12)->withQueryString();
         }
 
-        return view('client.pages.search', compact('posts', 'searchQuery'));
+        // SEO Data for search page
+        $seoModel = new SEOData(
+            title: $searchQuery ? "Tìm kiếm: {$searchQuery}" : 'Tìm kiếm',
+            description: $searchQuery 
+                ? "Kết quả tìm kiếm cho từ khóa: {$searchQuery}. Tìm thấy {$posts->total()} bài viết liên quan."
+                : 'Tìm kiếm bài viết trong blog',
+            url: route('client.search', [], false) . ($searchQuery ? '?q=' . urlencode($searchQuery) : ''),
+            type: 'website',
+            robots: 'noindex, follow', // Don't index search results
+        );
+
+        return view('client.pages.search', compact('posts', 'searchQuery', 'seoModel'));
     }
 
     public function posts(Request $request)
@@ -143,6 +163,14 @@ class HomeController extends Controller
 
         $posts = $query->paginate(12);
 
-        return view('client.pages.posts', compact('posts'));
+        // SEO Data for posts listing page
+        $seoModel = new SEOData(
+            title: 'Tất cả bài viết',
+            description: 'Xem tất cả các bài viết mới nhất về lập trình, công nghệ và cuộc sống. Khám phá nội dung đa dạng từ cộng đồng.',
+            url: route('client.posts', [], false),
+            type: 'website',
+        );
+
+        return view('client.pages.posts', compact('posts', 'seoModel'));
     }
 }

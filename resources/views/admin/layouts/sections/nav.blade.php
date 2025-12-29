@@ -24,7 +24,7 @@
         <ul class="navbar-nav flex-row align-items-center ms-auto">
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('client.home') }}" target="_blank">
-                    <i class="fa-solid fa-house fs-4"></i>
+                    <i class='bx bx-home fs-4'></i>
                 </a>
             </li>
             <!-- Language -->

@@ -29,12 +29,12 @@
             </span>
         @endif
 
-        @if (isset($viewCount))
+        {{-- @if (isset($viewCount))
             <span class="meta-item">
                 <i class="bx bx-show"></i>
                 {{ number_format($viewCount) }} lượt xem
             </span>
-        @endif
+        @endif --}}
         @if (isset($post->category_name))
             <span class="meta-item">
                 <i class="bx bx-folder"></i>

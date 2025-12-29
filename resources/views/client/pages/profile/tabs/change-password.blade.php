@@ -1,5 +1,5 @@
 @extends('client.pages.profile.layout')
-@section('title', 'Đổi mật khẩu')
+
 @push('styles')
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-profile.css') }}" />
 @endpush

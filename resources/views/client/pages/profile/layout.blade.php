@@ -1,7 +1,9 @@
 @extends('client.layouts.master')
+
 @php
     $user = auth()->user();
 @endphp
+
 @push('styles')
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-profile.css') }}" />

@@ -60,6 +60,10 @@ class PostController extends Controller
         // Tính thời gian đọc (ước tính 200 từ/phút)
         $readingTime = calculateReadingTime($post->content ?? '');
 
+        // Lấy bài viết trước và sau
+        $prevPost = $this->getPrevPost($post);
+        $nextPost = $this->getNextPost($post);
+
         // Lấy bài viết liên quan (cùng category hoặc hashtags)
         $relatedPosts = $this->getRelatedPosts($post);
 
@@ -107,7 +111,63 @@ class PostController extends Controller
         $post->comments = $comments;
         $post->comments_count = $commentsCount;
 
-        return view('client.pages.single', compact('post', 'viewCount', 'readingTime', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags', 'isSaved'));
+        // Pass model for SEO
+        $seoModel = $postModel;
+
+        // Build breadcrumbs for schema
+        $breadcrumbs = [
+            ['name' => 'Trang chủ', 'url' => route('client.home')],
+        ];
+        
+        if ($postModel && $postModel->category) {
+            $breadcrumbs[] = [
+                'name' => $postModel->category->name,
+                'url' => route('client.category', ['slug' => $postModel->category->slug])
+            ];
+        }
+        
+        $breadcrumbs[] = [
+            'name' => $post->title,
+            'url' => route('client.post', ['slug' => $post->slug])
+        ];
+
+        return view('client.pages.single', compact('post', 'postModel', 'seoModel', 'viewCount', 'readingTime', 'prevPost', 'nextPost', 'relatedPosts', 'allCategories', 'hashtags', 'allHashtags', 'isSaved', 'breadcrumbs'));
+    }
+
+    /**
+     * Lấy bài viết trước (mới hơn)
+     */
+    private function getPrevPost($currentPost)
+    {
+        return $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where('posts.id', '!=', $currentPost->id)
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->where('posts.created_at', '>', $currentPost->created_at)
+            ->orderBy('posts.created_at', 'asc')
+            ->first();
+    }
+
+    /**
+     * Lấy bài viết sau (cũ hơn)
+     */
+    private function getNextPost($currentPost)
+    {
+        return $this->postRepository->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where('posts.id', '!=', $currentPost->id)
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->where('posts.created_at', '<', $currentPost->created_at)
+            ->orderBy('posts.created_at', 'desc')
+            ->first();
     }
 
     /**

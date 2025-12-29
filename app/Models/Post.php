@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Post extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasSEO;
 
     public $timestamps = true;
 
@@ -73,4 +75,73 @@ class Post extends Model
 
     const STATUS_PUBLISHED = 'published';
 
+    /**
+     * Get dynamic SEO data for the post
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        // Load relationships if not already loaded
+        if (!$this->relationLoaded('user')) {
+            $this->load('user');
+        }
+        if (!$this->relationLoaded('category')) {
+            $this->load('category');
+        }
+
+        // Generate description from content if not available
+        $description = $this->description;
+        if (!$description && $this->content) {
+            $description = strip_tags($this->content);
+            $description = preg_replace('/\s+/', ' ', $description); // Remove extra whitespace
+            $description = trim($description);
+            $description = mb_substr($description, 0, 160);
+            if (mb_strlen($description) >= 160) {
+                $description .= '...';
+            }
+        }
+
+        // Build full URL for image
+        $imageUrl = null;
+        if ($this->thumbnail) {
+            $imageUrl = $this->thumbnail;
+            if (!str_starts_with($imageUrl, 'http')) {
+                $imageUrl = asset($imageUrl);
+            }
+        }
+
+        // Build canonical URL
+        $canonicalUrl = route('client.post', ['slug' => $this->slug], false);
+        if (!str_starts_with($canonicalUrl, 'http')) {
+            $canonicalUrl = url($canonicalUrl);
+        }
+
+        // Load hashtags if not loaded
+        if (!$this->relationLoaded('hashtags')) {
+            $this->load('hashtags');
+        }
+
+        // Build keywords from hashtags and category
+        $keywords = [];
+        if ($this->hashtags->isNotEmpty()) {
+            $keywords = $this->hashtags->pluck('name')->toArray();
+        }
+        if ($this->category) {
+            $keywords[] = $this->category->name;
+        }
+        $keywordsString = !empty($keywords) ? implode(', ', $keywords) : null;
+
+        return new SEOData(
+            title: $this->title,
+            description: $description,
+            image: $imageUrl,
+            author: $this->user?->full_name ?? null,
+            url: $canonicalUrl,
+            published_time: $this->created_at,
+            modified_time: $this->updated_at,
+            type: 'article', // Article type for better SEO
+            section: $this->category?->name, // Category as section
+            tags: $this->hashtags->pluck('name')->toArray(), // Hashtags as tags
+            // Note: keywords can be added via custom meta tags if needed
+        );
+    }
 }

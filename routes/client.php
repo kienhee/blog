@@ -34,7 +34,7 @@ Route::prefix('/')->name('client.')->group(function () {
     Route::post('/lien-he', [ContactController::class, 'submitContact'])->name('contact.submit');
 
     // Pages
-    Route::get('/ve-chung-toi', [PageController::class, 'about'])->name('about');
+    Route::get('/tac-gia', [PageController::class, 'about'])->name('about');
     Route::post('/newsletter/subscribe', [PageController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 
     // Client Auth Routes

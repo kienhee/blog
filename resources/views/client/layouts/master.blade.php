@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html lang="en" class="light-style layout-navbar-fixed layout-wide" dir="ltr" data-theme="theme-default"
+<html lang="vi" class="light-style layout-navbar-fixed layout-wide" dir="ltr" data-theme="theme-default"
     data-assets-path="/resources/admin/assets/" data-template="front-pages">
 
 <head>
@@ -8,9 +8,16 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>@yield('title') | {{ env('APP_NAME') }} </title>
+    {{-- SEO Meta Tags --}}
+    @if (isset($seoModel) && $seoModel)
+        {!! seo()->for($seoModel) !!}
+    @else
+        {!! seo()->render() !!}
+    @endif
 
-    <meta name="description" content="" />
+    {{-- Meta Keywords --}}
+    @include('client.components.seo.meta-keywords')
+
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     @include('client.layouts.sections.styles')

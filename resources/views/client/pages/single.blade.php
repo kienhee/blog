@@ -1,5 +1,11 @@
 @extends('client.layouts.master')
+
 @section('title', $post->title ?? 'Bài viết')
+
+{{-- SEO Structured Data --}}
+@include('client.components.seo.breadcrumbs-schema')
+@include('client.components.seo.article-schema')
+
 @push('styles')
     <!-- Unified CSS for Article Content -->
     <link rel="stylesheet" href="{{ asset_shared_url('css/article-content.css') }}">
@@ -31,6 +37,9 @@
 
                     {{-- Author Section --}}
                     @include('client.components.post.post-author')
+
+                    {{-- Previous and Next Posts --}}
+                    @include('client.components.post.post-prev-next')
 
                     {{-- Related Posts --}}
                     @include('client.components.post.related-posts')

@@ -42,6 +42,15 @@ class CategoryController extends Controller
             ->orderBy('posts.created_at', 'desc')
             ->paginate(12);
 
-        return view('client.pages.category', compact('category', 'posts'));
+        // Pass model for SEO
+        $seoModel = $category;
+
+        // Build breadcrumbs for schema
+        $breadcrumbs = [
+            ['name' => 'Trang chủ', 'url' => route('client.home')],
+            ['name' => $category->name, 'url' => route('client.category', ['slug' => $category->slug])],
+        ];
+
+        return view('client.pages.category', compact('category', 'posts', 'seoModel', 'breadcrumbs'));
     }
 }

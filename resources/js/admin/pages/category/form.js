@@ -38,6 +38,14 @@ $(function () {
                         },
                     },
                 },
+                description: {
+                    validators: {
+                        stringLength: {
+                            max: 255,
+                            message: "Mô tả không được vượt quá 255 ký tự",
+                        },
+                    },
+                },
             },
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),

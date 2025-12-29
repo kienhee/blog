@@ -1,5 +1,4 @@
 @extends('client.pages.profile.layout')
-@section('title', 'Thông tin cá nhân')
 
 @section('profile-content')
     <div class="card mb-4">

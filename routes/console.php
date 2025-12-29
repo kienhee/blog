@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Đăng bài theo lịch - chạy mỗi phút
 Schedule::command('posts:publish-scheduled')->everyMinute();
+
+// Tạo sitemap client hàng ngày
+Schedule::command('sitemap:generate')->daily();

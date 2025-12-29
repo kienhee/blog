@@ -48,7 +48,7 @@
                                 <label class="form-label" for="inputSlug">Tên danh mục <span class="text-danger">*</span>
                                     <span class="text-muted">(Nên dưới 60 ký tự để tối ưu SEO)</span></label>
                                 <input type="text" class="form-control" id="inputSlug" placeholder="Nhập tên danh mục..."
-                                    name="name" value="{{ old('name', $data->name) }}" maxlength="60" required />
+                                    name="name" value="{{ old('name', $data->name) }}" required />
                             </div>
 
                             {{-- Slug --}}
@@ -62,8 +62,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="description">Mô tả <span class="text-muted">(Optional - Nên
                                         dưới 150 ký tự để tối ưu SEO)</span></label>
-                                <textarea id="description" name="description" class="form-control" rows="4" placeholder="Nhập mô tả danh mục..."
-                                    maxlength="150">{{ old('description', $data->description) }}</textarea>
+                                <textarea id="description" name="description" class="form-control" rows="4" placeholder="Nhập mô tả danh mục...">{{ old('description', $data->description) }}</textarea>
                             </div>
                         </div>
                     </div>

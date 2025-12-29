@@ -1,4 +1,5 @@
 @extends('client.layouts.master')
+
 @section('title', 'Trang chủ')
 
 @section('content')
@@ -47,6 +48,7 @@
                     <div class="text-center mb-4">
                         <h2 class="mb-2">Bài viết mới nhất</h2>
                     </div>
+
                     <div class="row g-4">
                         @foreach ($latestPosts->take(6) as $post)
                             <div class="col-md-6 col-lg-4">
@@ -60,8 +62,11 @@
                             </div>
                         @endforeach
                     </div>
+
                     <div class="text-center mt-4">
-                        <a href="{{ route('client.posts') }}" class="btn btn-outline-primary">Xem thêm</a>
+                        <a href="{{ route('client.posts') }}" class="btn btn-outline-primary">
+                            Xem thêm
+                        </a>
                     </div>
                 </div>
             </section>
@@ -138,8 +143,10 @@
                         {{-- Tab Content --}}
                         <div class="tab-content" id="categoryTabContent">
                             {{-- All Posts Tab --}}
-                            <div class="tab-pane fade show active" id="content-all" role="tabpanel"
-                                aria-labelledby="tab-all">
+                            <div class="tab-pane fade show active" 
+                                 id="content-all" 
+                                 role="tabpanel"
+                                 aria-labelledby="tab-all">
                                 {{-- Posts Grid --}}
                                 @if (isset($recentPosts) && $recentPosts->count() > 0)
                                     <div class="row g-4" id="posts-grid-all">
@@ -161,8 +168,10 @@
                             {{-- Category Tabs Content --}}
                             @if (isset($categories) && $categories->count() > 0)
                                 @foreach ($categories as $category)
-                                    <div class="tab-pane fade" id="content-{{ $category->id }}" role="tabpanel"
-                                        aria-labelledby="tab-{{ $category->id }}">
+                                    <div class="tab-pane fade" 
+                                         id="content-{{ $category->id }}" 
+                                         role="tabpanel"
+                                         aria-labelledby="tab-{{ $category->id }}">
                                         <div id="posts-grid-{{ $category->id }}" class="posts-grid-loading">
                                             <div class="text-center py-5">
                                                 <div class="spinner-border text-primary" role="status">
@@ -175,8 +184,6 @@
                                 @endforeach
                             @endif
                         </div>
-
-
                     </div>
                     {{-- Sidebar --}}
                     <div class="col-lg-4">
@@ -194,8 +201,9 @@
                                                         @if ($post->thumbnail)
                                                             <a href="{{ route('client.post', $post->slug) }}">
                                                                 <img src="{{ $post->thumbnail }}"
-                                                                    alt="{{ $post->title }}" class="img-fluid rounded"
-                                                                    style="height: 80px; width: 100%; object-fit: cover;">
+                                                                     alt="{{ $post->title }}" 
+                                                                     class="img-fluid rounded"
+                                                                     style="height: 80px; width: 100%; object-fit: cover;">
                                                             </a>
                                                         @endif
                                                     </div>
@@ -207,7 +215,7 @@
                                                         </div>
                                                         <h6 class="mb-0">
                                                             <a href="{{ route('client.post', $post->slug) }}"
-                                                                class="text-heading text-decoration-none small">
+                                                               class="text-heading text-decoration-none small">
                                                                 {{ \Illuminate\Support\Str::limit($post->title, 60) }}
                                                             </a>
                                                         </h6>
@@ -224,8 +232,8 @@
         </section>
 
     </div>
-
 @endsection
+
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {

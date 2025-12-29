@@ -1,4 +1,5 @@
 @extends('client.layouts.master')
+
 @section('title', '#' . ($hashtag->name ?? 'Tag'))
 
 @section('content')
@@ -14,4 +15,3 @@
         </div>
     </section>
 @endsection
-

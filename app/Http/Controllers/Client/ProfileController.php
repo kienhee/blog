@@ -7,13 +7,19 @@ use App\Http\Requests\Admin\Profile\ChangePasswordRequest;
 use App\Http\Requests\Admin\User\UpdateProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ProfileController extends Controller
 {
     public function information()
     {
         $user = Auth::user();
-        return view('client.pages.profile.tabs.information', compact('user'));
+        $seoModel = new SEOData(
+            title: 'Thông tin cá nhân',
+            description: 'Quản lý thông tin cá nhân, cập nhật profile và liên kết mạng xã hội.',
+            robots: 'noindex, follow' // Profile pages should not be indexed
+        );
+        return view('client.pages.profile.tabs.information', compact('user', 'seoModel'));
     }
 
     public function savedPosts()
@@ -30,12 +36,23 @@ class ProfileController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('client.pages.profile.tabs.saved-posts', compact('savedPosts'));
+        $seoModel = new SEOData(
+            title: 'Bài viết đã lưu',
+            description: 'Xem lại các bài viết bạn đã lưu để đọc sau.',
+            robots: 'noindex, follow' // Profile pages should not be indexed
+        );
+
+        return view('client.pages.profile.tabs.saved-posts', compact('savedPosts', 'seoModel'));
     }
 
     public function showChangePassword()
     {
-        return view('client.pages.profile.tabs.change-password');
+        $seoModel = new SEOData(
+            title: 'Đổi mật khẩu',
+            description: 'Thay đổi mật khẩu tài khoản của bạn.',
+            robots: 'noindex, nofollow' // Password change page should not be indexed
+        );
+        return view('client.pages.profile.tabs.change-password', compact('seoModel'));
     }
 
     public function updateInformation(UpdateProfileRequest $request)

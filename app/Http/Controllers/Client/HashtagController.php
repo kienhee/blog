@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use Illuminate\Support\Facades\DB;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class HashtagController extends Controller
 {
@@ -45,6 +46,14 @@ class HashtagController extends Controller
             ->orderBy('posts.created_at', 'desc')
             ->paginate(12);
 
-        return view('client.pages.hashtag', compact('hashtag', 'posts'));
+        // SEO Data for hashtag page
+        $seoModel = new SEOData(
+            title: "Tag: {$hashtag->name}",
+            description: "Khám phá tất cả bài viết về {$hashtag->name}. Tìm thấy {$posts->total()} bài viết liên quan đến chủ đề này.",
+            url: route('client.hashtag', ['slug' => $hashtag->slug], false),
+            type: 'website',
+        );
+
+        return view('client.pages.hashtag', compact('hashtag', 'posts', 'seoModel'));
     }
 }

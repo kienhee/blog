@@ -7,12 +7,22 @@ use App\Jobs\SendContactNotificationEmail;
 use App\Models\Contact;
 use App\Repositories\ContactRepository;
 use Illuminate\Http\Request;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ContactController extends Controller
 {
     public function contact()
     {
-        return view('client.pages.contact');
+        // SEO Data for contact page
+        $seoModel = new SEOData(
+            title: 'Liên hệ',
+            description: 'Liên hệ với chúng tôi để được hỗ trợ, đặt câu hỏi hoặc chia sẻ ý kiến của bạn. Chúng tôi luôn sẵn sàng lắng nghe!',
+            url: route('client.contact', [], false),
+            type: 'website',
+            robots: 'noindex, follow', // Don't index contact page
+        );
+
+        return view('client.pages.contact', compact('seoModel'));
     }
 
     /**
