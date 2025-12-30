@@ -6,7 +6,7 @@
     <h2 style="margin:0 0 12px; color:#1F2937; font-size:20px; font-weight:700;">Chào mừng {{ $full_name }} 🎉</h2>
 
     <p style="margin:0 0 12px; color:#6B7280; font-size:15px; line-height:1.5;">
-        Cảm ơn bạn đã kết nối với hệ thống <strong>{{ env('APP_NAME') }}</strong>.
+        Cảm ơn bạn đã kết nối với hệ thống.
     </p>
 
     <p style="margin:0 0 10px; color:#6B7280; font-size:15px; line-height:1.5;">Dưới đây là một số thông tin kỹ thuật:</p>
