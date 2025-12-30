@@ -20,7 +20,7 @@
     </p>
 
     <p style="margin:0 0 20px; text-align:center;">
-        <a href="{{ url('/posts/' . $post->slug) }}"
+        <a href="{{ route('client.post', $post->slug) }}"
             style="display:inline-block; padding:12px 20px; border-radius:8px; text-decoration:none; background:#FF6A3D; color:#fff; font-weight:700;">
             Xem bài viết
         </a>
