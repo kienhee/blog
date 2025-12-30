@@ -1,12 +1,35 @@
 # Hướng dẫn Deploy Laravel với Cloudflare Full Strict SSL (PHP 8.4 + Node.js 22)
 
+### Đổi mật khẩu root
+
+```bash
+sudo passwd
+```
+
+### Tạo user mới
+
+```bash
+sudo adduser developer
+```
+
+### Cấp quyền sudo cho user mới
+
+```bash
+sudo usermod -aG sudo developer
+```
+
+### Chuyển sang user mới
+
+```bash
+su - developer
+```
 ## 1. Cập nhật hệ thống
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-## 2. Cài đặt PHP 8.4 và các extension cần thiết
+## 2. Cài đặt PHP 8.4 và git
 
 ```bash
 # Thêm repository PHP
@@ -21,6 +44,41 @@ php8.4-bcmath php8.4-intl php8.4-redis -y
 
 # Kiểm tra version
 php -v
+
+# Cài đặt Git
+sudo apt install git -y
+
+# Kiểm tra version
+git --version
+
+# Cấu hình Git identity
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+
+git config --global user.name "Kienhee"
+git config --global user.email "kienhee.it@gmail.com"
+
+
+# Xem cấu hình vừa nhập
+git config --global --list
+
+# Tạo SSH key pair
+ssh-keygen -t ed25519 -C "your-email@example.com"
+
+# Nhấn Enter để dùng location mặc định (~/.ssh/id_ed25519)
+# Nhấn Enter để không dùng passphrase (hoặc đặt passphrase nếu muốn bảo mật hơn)
+
+# Start SSH agent
+eval "$(ssh-agent -s)"
+
+# Add SSH key vào agent
+ssh-add ~/.ssh/id_ed25519
+
+# Hiển thị public key để copy
+cat ~/.ssh/id_ed25519.pub
+
+# Test kết nối với GitHub
+ssh -T git@github.com
 ```
 
 ## 3. Cài đặt Nginx
@@ -130,6 +188,9 @@ sudo chmod 644 /etc/ssl/cloudflare/cert.pem
 # Tạo thư mục cho project
 sudo mkdir -p /var/www/laravel
 cd /var/www/laravel
+
+# Chuyển quyền sở hữu thư mục cho user developer
+sudo chown -R developer:developer /var/www/blog
 
 # Clone hoặc upload code vào đây
 # git clone your-repo .
@@ -367,37 +428,36 @@ sudo systemctl restart nginx
 
 ## 11. Cấu hình Laravel để nhận Real IP từ Cloudflare
 
-Sửa file `app/Http/Middleware/TrustProxies.php`:
+Mở file `bootstrap/app.php` và thêm cấu hình:
 
 ```php
 <?php
 
-namespace App\Http\Middleware;
-
-use Illuminate\Http\Middleware\TrustProxies as Middleware;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
-class TrustProxies extends Middleware
-{
-    /**
-     * The trusted proxies for this application.
-     *
-     * @var array<int, string>|string|null
-     */
-    protected $proxies = '*'; // Trust all proxies (Cloudflare)
-
-    /**
-     * The headers that should be used to detect proxies.
-     *
-     * @var int
-     */
-    protected $headers =
-        Request::HEADER_X_FORWARDED_FOR |
-        Request::HEADER_X_FORWARDED_HOST |
-        Request::HEADER_X_FORWARDED_PORT |
-        Request::HEADER_X_FORWARDED_PROTO |
-        Request::HEADER_X_FORWARDED_AWS_ELB;
-}
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        // Trust Cloudflare proxies
+        $middleware->trustProxies(
+            at: '*',
+            headers: Request::HEADER_X_FORWARDED_FOR |
+                     Request::HEADER_X_FORWARDED_HOST |
+                     Request::HEADER_X_FORWARDED_PORT |
+                     Request::HEADER_X_FORWARDED_PROTO |
+                     Request::HEADER_X_FORWARDED_AWS_ELB
+        );
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();
 ```
 
 ## 12. Cài đặt Supervisor cho Queue Workers

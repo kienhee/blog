@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 include 'client.php';
@@ -219,3 +219,14 @@ Route::prefix('auth')->name('auth.')->group(function () {
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
 });
+
+if (config('app.env') === 'local') {
+Route::get('/check-ip', function (Request $request) {
+    return response()->json([
+        'real_ip' => $request->ip(),
+        'all_ips' => $request->ips(),
+        'cf_connecting_ip' => $request->header('CF-Connecting-IP'),
+        'x_forwarded_for' => $request->header('X-Forwarded-For'),
+    ]);
+});
+}
