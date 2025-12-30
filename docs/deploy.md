@@ -23,6 +23,24 @@ sudo usermod -aG sudo developer
 ```bash
 su - developer
 ```
+
+### Định nghĩa biến môi trường (Quan trọng)
+
+```bash
+# Đặt đường dẫn project (thay đổi nếu khác)
+export PROJECT_DIR="/var/www/blog"
+export PROJECT_USER="developer"
+
+# Hoặc nếu dùng path khác:
+# export PROJECT_DIR="/var/www/laravel"
+
+# Kiểm tra
+echo "Project directory: $PROJECT_DIR"
+echo "Project user: $PROJECT_USER"
+```
+
+**Lưu ý**: Các lệnh sau sẽ dùng biến `$PROJECT_DIR`. Nếu bạn đóng terminal, cần chạy lại lệnh `export` trên.
+
 ## 1. Cập nhật hệ thống
 
 ```bash
@@ -184,19 +202,49 @@ sudo chmod 644 /etc/ssl/cloudflare/cert.pem
 
 ## 9. Chuẩn bị project Laravel
 
+### ⚠️ QUAN TRỌNG: Đọc kỹ phần này để tránh lỗi quyền
+
+**Nguyên tắc:**
+- **Tất cả lệnh `composer`, `npm`, `php artisan` phải chạy bằng user `developer` (KHÔNG dùng sudo)**
+- Chỉ dùng `sudo` cho các lệnh hệ thống (mkdir, chown, chmod, usermod)
+- Sau khi đổi group, **PHẢI logout và login lại** để group có hiệu lực
+
+### Phần A: Setup ban đầu (Chạy với sudo)
+
 ```bash
+# Đảm bảo đã set biến PROJECT_DIR (xem phần đầu file)
+# Nếu chưa: export PROJECT_DIR="/var/www/blog"
+
 # Tạo thư mục cho project
-sudo mkdir -p /var/www/laravel
-cd /var/www/laravel
+sudo mkdir -p $PROJECT_DIR
 
-# Chuyển quyền sở hữu thư mục cho user developer
-sudo chown -R developer:developer /var/www/blog
+# Chuyển quyền sở hữu cho user developer (developer:developer để user có thể tạo file)
+sudo chown -R $PROJECT_USER:$PROJECT_USER $PROJECT_DIR
 
-# Clone hoặc upload code vào đây
-# git clone your-repo .
+# Set quyền cơ bản
+sudo chmod -R 755 $PROJECT_DIR
+```
 
-# Cài dependencies
+### Phần B: Clone và cài đặt code (Chạy với user developer, KHÔNG sudo)
+
+```bash
+# Chuyển vào thư mục project
+cd $PROJECT_DIR
+
+# Clone code từ repository (thay đổi URL nếu cần)
+git clone your-repo-url .
+
+# Hoặc nếu đã có code, upload vào thư mục này
+
+# ⚠️ QUAN TRỌNG: Tất cả lệnh sau chạy bằng user developer (KHÔNG sudo)
+# Cài dependencies PHP
 composer install --optimize-autoloader --no-dev
+
+# Cài dependencies Node.js
+npm install
+
+# Build assets
+npm run build
 
 # Copy file .env
 cp .env.example .env
@@ -205,7 +253,7 @@ cp .env.example .env
 nano .env
 ```
 
-Cấu hình `.env`:
+**Cấu hình `.env`:**
 ```env
 APP_NAME=Laravel
 APP_ENV=production
@@ -232,22 +280,85 @@ php artisan key:generate
 # Chạy migration
 php artisan migrate --force
 
-# Build assets nếu có
-npm install
-npm run build
+# Clear cache
+php artisan optimize:clear
+```
 
-# Set permissions
-sudo chown -R www-data:www-data /var/www/laravel
-sudo chmod -R 755 /var/www/laravel
-sudo chmod -R 775 /var/www/laravel/storage
-sudo chmod -R 775 /var/www/laravel/bootstrap/cache
+### Phần C: Phân quyền cho webserver (Chạy với sudo)
+
+```bash
+# Chuyển quyền sở hữu cho developer:www-data (webserver cần ghi vào storage)
+sudo chown -R $PROJECT_USER:www-data $PROJECT_DIR
+
+# Set quyền cho storage và cache (webserver cần ghi)
+sudo chown -R www-data:www-data $PROJECT_DIR/storage
+sudo chown -R www-data:www-data $PROJECT_DIR/bootstrap/cache
+sudo chmod -R 775 $PROJECT_DIR/storage
+sudo chmod -R 775 $PROJECT_DIR/bootstrap/cache
+
+# Giữ group cho file mới (SGID) - file mới tạo sẽ tự động thuộc group www-data
+sudo find $PROJECT_DIR/storage $PROJECT_DIR/bootstrap/cache -type d -exec chmod g+s {} \;
+
+# Thêm user developer vào group www-data để có thể ghi vào storage
+sudo usermod -a -G www-data $PROJECT_USER
+
+# ⚠️ QUAN TRỌNG: Logout và login lại để group có hiệu lực
+# Hoặc chạy: newgrp www-data
+exit
+# Login lại
+su - developer
+
+# Kiểm tra quyền
+cd $PROJECT_DIR
+ls -la storage
+ls -la bootstrap/cache
+
+# ✅ KẾT QUẢ ĐÚNG PHẢI LÀ:
+# drwxrwsr-x www-data www-data storage
+# drwxrwsr-x www-data www-data bootstrap/cache
+# (rws = read, write, setgid - group có thể ghi)
+
+# Restart Nginx
+sudo systemctl restart nginx
+```
+
+### Troubleshooting: Nếu gặp lỗi quyền
+
+```bash
+# Kiểm tra quyền hiện tại
+ls -la $PROJECT_DIR
+ls -la $PROJECT_DIR/storage
+ls -la $PROJECT_DIR/bootstrap/cache
+
+# Kiểm tra user và group
+whoami
+groups
+
+# Nếu thiếu group www-data, logout/login lại
+exit
+su - developer
+groups  # Phải thấy www-data trong danh sách
+
+# Fix quyền nếu bị sai
+cd $PROJECT_DIR
+sudo chown -R $PROJECT_USER:www-data $PROJECT_DIR
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+sudo find storage bootstrap/cache -type d -exec chmod g+s {} \;
+
+# Kiểm tra lại
+ls -la storage
+ls -la bootstrap/cache
 ```
 
 ## 10. Cấu hình Nginx với SSL
 
 ```bash
+# Đảm bảo đã set biến PROJECT_DIR
+# Nếu chưa: export PROJECT_DIR="/var/www/blog"
+
 # Tạo file config
-sudo nano /etc/nginx/sites-available/laravel
+sudo nano /etc/nginx/sites-available/blog
 ```
 
 ### Nếu dùng Let's Encrypt:
@@ -264,7 +375,7 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name your-domain.com www.your-domain.com;
-    root /var/www/laravel/public;
+    root /var/www/blog/public;
 
     # SSL Configuration - Let's Encrypt (Certbot tự động thêm)
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
@@ -345,7 +456,7 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name your-domain.com www.your-domain.com;
-    root /var/www/laravel/public;
+    root /var/www/blog/public;
 
     # SSL Configuration - Cloudflare Origin Certificate
     ssl_certificate /etc/ssl/cloudflare/cert.pem;
@@ -414,7 +525,7 @@ server {
 
 ```bash
 # Enable site
-sudo ln -s /etc/nginx/sites-available/laravel /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/blog /etc/nginx/sites-enabled/
 
 # Remove default site
 sudo rm /etc/nginx/sites-enabled/default
@@ -475,7 +586,7 @@ Nội dung file:
 ```ini
 [program:laravel-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/laravel/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+command=php /var/www/blog/artisan queue:work --sleep=3 --tries=3 --max-time=3600
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -483,7 +594,7 @@ killasgroup=true
 user=www-data
 numprocs=2
 redirect_stderr=true
-stdout_logfile=/var/www/laravel/storage/logs/worker.log
+stdout_logfile=/var/www/blog/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
@@ -507,7 +618,7 @@ sudo crontab -e -u www-data
 Thêm dòng sau:
 
 ```cron
-* * * * * cd /var/www/laravel && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /var/www/blog && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ## 14. Cấu hình Cloudflare Dashboard
@@ -538,13 +649,30 @@ Thêm dòng sau:
 ## 15. Firewall
 
 ```bash
-# Enable UFW
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
+#B1: Kiểm tra status firewall
+sudo ufw status
+#=> Nếu hiển thị là Status: inactive. Thực hiện B2
+
+#B2: Bật firewall
 sudo ufw enable
 
-# Kiểm tra status
-sudo ufw status
+#B3: Cho phép có thể ssh
+sudo ufw allow ssh
+
+#B4: Cho phép Nginx qua firewall
+sudo ufw allow 'Nginx Full'
+
+#Mong muốn kết quả: sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+Nginx Full                 ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+Nginx Full (v6)            ALLOW       Anywhere (v6)             
+
+
 ```
 
 ## 16. Các lệnh hữu ích
@@ -567,7 +695,7 @@ php artisan route:cache
 php artisan view:cache
 
 # Xem log Supervisor
-sudo tail -f /var/www/laravel/storage/logs/worker.log
+sudo tail -f /var/www/blog/storage/logs/worker.log
 
 # Xem log Nginx
 sudo tail -f /var/log/nginx/error.log
@@ -585,10 +713,94 @@ curl -I https://your-domain.com
 4. ✅ Kiểm tra Real IP trong Laravel logs
 5. ✅ Test redirect HTTP → HTTPS
 6. ✅ Cloudflare SSL Mode: Full (strict) ✓
+7. ✅ Kiểm tra quyền storage/cache: `ls -la storage bootstrap/cache`
 
 **Lưu ý quan trọng với Cloudflare Full Strict:**
 - Origin server (VPS của bạn) PHẢI có SSL certificate hợp lệ
 - Cloudflare sẽ verify certificate này
 - Nếu certificate không hợp lệ → Error 526 (Invalid SSL Certificate)
+
+## 18. Troubleshooting Lỗi Quyền
+
+### Lỗi: "Permission denied" khi Laravel ghi file
+
+```bash
+# Kiểm tra quyền
+ls -la $PROJECT_DIR/storage
+ls -la $PROJECT_DIR/bootstrap/cache
+
+# Fix quyền
+cd $PROJECT_DIR
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+sudo find storage bootstrap/cache -type d -exec chmod g+s {} \;
+
+# Kiểm tra user có trong group www-data không
+groups
+# Nếu không thấy www-data, logout/login lại
+```
+
+### Lỗi: "The stream or file could not be opened" khi chạy artisan
+
+```bash
+# Kiểm tra quyền storage/logs
+ls -la $PROJECT_DIR/storage/logs
+
+# Fix
+sudo chown -R www-data:www-data $PROJECT_DIR/storage
+sudo chmod -R 775 $PROJECT_DIR/storage
+```
+
+### Lỗi: "composer: command not found" hoặc "npm: command not found"
+
+```bash
+# Kiểm tra đang chạy bằng user nào
+whoami
+# Phải là 'developer', không phải 'root'
+
+# Nếu đang là root, chuyển sang developer
+su - developer
+```
+
+### Script kiểm tra quyền tự động
+
+```bash
+#!/bin/bash
+PROJECT_DIR="/var/www/blog"
+
+echo "=== Kiểm Tra Quyền ==="
+echo ""
+
+echo "1. Quyền thư mục project:"
+ls -ld $PROJECT_DIR
+
+echo ""
+echo "2. Quyền storage:"
+ls -ld $PROJECT_DIR/storage
+ls -ld $PROJECT_DIR/storage/logs
+
+echo ""
+echo "3. Quyền bootstrap/cache:"
+ls -ld $PROJECT_DIR/bootstrap/cache
+
+echo ""
+echo "4. User hiện tại:"
+whoami
+
+echo ""
+echo "5. Groups của user:"
+groups
+
+echo ""
+echo "6. Kiểm tra có thể ghi vào storage:"
+touch $PROJECT_DIR/storage/test.txt 2>&1 && echo "✅ Có thể ghi" && rm $PROJECT_DIR/storage/test.txt || echo "❌ Không thể ghi"
+
+echo ""
+echo "=== Hoàn tất ==="
+```
+
+Lưu script trên vào file `check-permissions.sh`, chạy: `chmod +x check-permissions.sh && ./check-permissions.sh`
+
+---
 
 Xong! Laravel của bạn đã chạy an toàn với Cloudflare Full Strict SSL mode!
