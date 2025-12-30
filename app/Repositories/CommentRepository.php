@@ -508,5 +508,22 @@ class CommentRepository extends BaseRepository
             return $count;
         }
     }
+
+    /**
+     * Tạo comment mới (cho client)
+     *
+     * @param array $data
+     * @return Comment|null
+     */
+    public function createComment(array $data)
+    {
+        return $this->model->create([
+            'post_id' => $data['post_id'],
+            'user_id' => $data['user_id'],
+            'content' => $data['content'],
+            'status' => Comment::STATUS_APPROVED,
+            'parent_id' => $data['parent_id'] ?? null,
+        ]);
+    }
 }
 

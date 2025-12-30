@@ -494,4 +494,113 @@ class PostRepository extends BaseRepository
     {
         return PostHashtag::deleteByPostId($postId);
     }
+
+    /**
+     * Lấy bài viết trước (mới hơn)
+     *
+     * @param object $currentPost
+     * @return object|null
+     */
+    public function getPrevPost($currentPost)
+    {
+        return $this->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where('posts.id', '!=', $currentPost->id)
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->where('posts.created_at', '>', $currentPost->created_at)
+            ->orderBy('posts.created_at', 'asc')
+            ->first();
+    }
+
+    /**
+     * Lấy bài viết sau (cũ hơn)
+     *
+     * @param object $currentPost
+     * @return object|null
+     */
+    public function getNextPost($currentPost)
+    {
+        return $this->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where('posts.id', '!=', $currentPost->id)
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->where('posts.created_at', '<', $currentPost->created_at)
+            ->orderBy('posts.created_at', 'desc')
+            ->first();
+    }
+
+    /**
+     * Lấy bài viết liên quan
+     *
+     * @param object $currentPost
+     * @param int $limit
+     * @return \Illuminate\Support\Collection
+     */
+    public function getRelatedPosts($currentPost, $limit = 4)
+    {
+        $query = $this->gridData()
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where('posts.id', '!=', $currentPost->id)
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->orderBy('posts.created_at', 'desc')
+            ->limit($limit);
+
+        // Ưu tiên cùng category
+        if (isset($currentPost->category_id) && $currentPost->category_id) {
+            $query->where('posts.category_id', $currentPost->category_id);
+        }
+
+        $relatedPosts = $query->get();
+
+        // Nếu không đủ, lấy thêm bài mới nhất
+        if ($relatedPosts->count() < $limit) {
+            $additionalPosts = $this->gridData()
+                ->where('posts.status', 'published')
+                ->whereNull('posts.deleted_at')
+                ->where('posts.id', '!=', $currentPost->id)
+                ->whereNotIn('posts.id', $relatedPosts->pluck('id')->toArray())
+                ->where(function ($q) {
+                    $q->whereNull('posts.scheduled_at')
+                        ->orWhere('posts.scheduled_at', '<=', now());
+                })
+                ->orderBy('posts.created_at', 'desc')
+                ->limit($limit - $relatedPosts->count())
+                ->get();
+
+            $relatedPosts = $relatedPosts->merge($additionalPosts);
+        }
+
+        return $relatedPosts->take($limit);
+    }
+
+    /**
+     * Lấy bài viết theo slug (cho client)
+     *
+     * @param string $slug
+     * @return object|null
+     */
+    public function getPostBySlug($slug)
+    {
+        return $this->gridData()
+            ->where('posts.slug', $slug)
+            ->where('posts.status', 'published')
+            ->whereNull('posts.deleted_at')
+            ->where(function ($q) {
+                $q->whereNull('posts.scheduled_at')
+                    ->orWhere('posts.scheduled_at', '<=', now());
+            })
+            ->first();
+    }
 }

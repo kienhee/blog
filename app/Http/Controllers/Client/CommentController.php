@@ -4,20 +4,26 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Comment\StoreRequest;
-use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use App\Repositories\CommentRepository;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    protected $commentRepository;
+
+    public function __construct(CommentRepository $commentRepository)
+    {
+        $this->commentRepository = $commentRepository;
+    }
+
     /**
      * Store a newly created comment.
      */
     public function store(StoreRequest $request)
     {
         try {
-            $post = Post::find($request->post_id);
+            $post = Post::find($request->validated()['post_id']);
 
             if (!$post) {
                 return response()->json([
@@ -26,7 +32,6 @@ class CommentController extends Controller
                 ], 404);
             }
 
-            // Kiểm tra xem bài viết có cho phép comment không
             if (!$post->allow_comment) {
                 return response()->json([
                     'status' => false,
@@ -34,17 +39,13 @@ class CommentController extends Controller
                 ], 403);
             }
 
-            // Tạo comment với status pending (có thể cần phê duyệt)
-            // Hoặc approved nếu muốn hiển thị ngay
-            $comment = Comment::create([
-                'post_id' => $request->post_id,
+            $comment = $this->commentRepository->createComment([
+                'post_id' => $request->validated()['post_id'],
                 'user_id' => Auth::id(),
-                'content' => $request->content,
-                'status' => Comment::STATUS_APPROVED, // Hoặc STATUS_PENDING nếu cần phê duyệt
-                'parent_id' => $request->parent_id ?? null,
+                'content' => $request->validated()['content'],
+                'parent_id' => $request->validated()['parent_id'] ?? null,
             ]);
 
-            // Load user relationship
             $comment->load('user');
 
             return response()->json([

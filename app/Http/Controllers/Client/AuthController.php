@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Client\Auth\LoginRequest;
+use App\Http\Requests\Client\Auth\RegisterRequest;
+use App\Http\Requests\Client\Auth\ResetPasswordRequest;
 use App\Repositories\AuthRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
@@ -12,59 +16,38 @@ use Spatie\Permission\Models\Role;
 class AuthController extends Controller
 {
     protected $authRepository;
+    protected $userRepository;
 
-    public function __construct(AuthRepository $authRepository)
+    public function __construct(AuthRepository $authRepository, UserRepository $userRepository)
     {
         $this->authRepository = $authRepository;
+        $this->userRepository = $userRepository;
     }
 
     public function login(Request $request)
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            $user->load('roles');
-            
-            // Kiểm tra role và redirect tương ứng
-            if ($user->hasRole('guest')) {
-                return redirect()->route('client.home');
-            } else {
-                return redirect()->route('admin.dashboard.analytics');
-            }
+            return $this->redirectByRole(Auth::user());
         }
 
         return view('client.pages.auth.login');
     }
 
-    public function loginHandle(Request $request)
+    public function loginHandle(LoginRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'string'],
-            'password' => ['required'],
-        ], [
-            'email.required' => 'Vui lòng nhập email hoặc số điện thoại',
-            'password.required' => 'Vui lòng nhập mật khẩu',
-        ]);
+        $credentials = [
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+        ];
 
-        $remember = $request->has('remember');
-        $email = $request->input('email');
-
-        // Đăng nhập bằng email
-        $credentials = ['email' => $email, 'password' => $request->input('password')];
-
-        if (Auth::attempt($credentials, $remember)) {
+        if (Auth::attempt($credentials, $request->has('remember'))) {
             $request->session()->regenerate();
-            
             $user = Auth::user();
             $user->load('roles');
-            
-            // Kiểm tra role và redirect tương ứng
-            if ($user->hasRole('guest')) {
-                // Role guest -> redirect về client
-                return redirect()->intended(route('client.home'))->with('success', 'Đăng nhập thành công!');
-            } else {
-                // Các role khác (superadmin, editor, ...) -> redirect về admin
-                return redirect()->intended(route('admin.dashboard.analytics'))->with('success', 'Đăng nhập thành công!');
-            }
+
+            return redirect()
+                ->intended($this->getRedirectUrlByRole($user))
+                ->with('success', 'Đăng nhập thành công!');
         }
 
         return back()->withErrors([
@@ -81,36 +64,14 @@ class AuthController extends Controller
         return view('client.pages.auth.register');
     }
 
-    public function registerHandle(Request $request)
+    public function registerHandle(RegisterRequest $request)
     {
-        $validated = $request->validate([
-            'full_name' => ['required', 'string', 'min:2', 'max:150'],
-            'email' => ['required', 'email', 'max:254', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'size:10', 'regex:/^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059)[0-9]{7}$/'],
-            'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
-        ], [
-            'full_name.required' => 'Vui lòng nhập họ và tên',
-            'full_name.min' => 'Họ và tên phải có ít nhất :min ký tự',
-            'full_name.max' => 'Họ và tên không được vượt quá :max ký tự',
-            'email.required' => 'Vui lòng nhập email',
-            'email.email' => 'Email không hợp lệ',
-            'email.max' => 'Email không được vượt quá :max ký tự',
-            'email.unique' => 'Email đã tồn tại trong hệ thống',
-            'phone.size' => 'Số điện thoại phải có đúng 10 số',
-            'phone.regex' => 'Số điện thoại không hợp lệ. Vui lòng nhập đúng đầu số của các nhà mạng Việt Nam',
-            'password.required' => 'Vui lòng nhập mật khẩu',
-            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự',
-            'password.max' => 'Mật khẩu không được vượt quá :max ký tự',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp',
-        ]);
-
         try {
-            $userRepository = app(UserRepository::class);
-            $user = $userRepository->createUser([
-                'full_name' => $validated['full_name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'] ?? null,
-                'password' => $validated['password'],
+            $user = $this->userRepository->createUser([
+                'full_name' => $request->validated()['full_name'],
+                'email' => $request->validated()['email'],
+                'phone' => $request->validated()['phone'] ?? null,
+                'password' => $request->validated()['password'],
             ]);
 
             // Gán role guest cho user mới đăng ký
@@ -120,16 +81,26 @@ class AuthController extends Controller
             }
 
             // Tự động đăng nhập sau khi đăng ký
-            $credentials = ['email' => $validated['email'], 'password' => $validated['password']];
+            $credentials = [
+                'email' => $request->validated()['email'],
+                'password' => $request->validated()['password'],
+            ];
+
             if (Auth::attempt($credentials)) {
                 $request->session()->regenerate();
 
-                return redirect()->route('client.home')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với '.env('APP_NAME', 'Blog'));
+                return redirect()
+                    ->route('client.home')
+                    ->with('success', 'Đăng ký thành công! Chào mừng bạn đến với '.env('APP_NAME', 'Blog'));
             }
 
-            return redirect()->route('client.auth.login')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
+            return redirect()
+                ->route('client.auth.login')
+                ->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
         } catch (\Exception $e) {
-            return back()->withErrors(['email' => 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.'])->withInput();
+            return back()
+                ->withErrors(['email' => 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.'])
+                ->withInput();
         }
     }
 
@@ -139,7 +110,9 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('client.home')->with('success', 'Đăng xuất thành công!');
+        return redirect()
+            ->route('client.home')
+            ->with('success', 'Đăng xuất thành công!');
     }
 
     public function showForgotPasswordForm()
@@ -147,17 +120,9 @@ class AuthController extends Controller
         return view('client.pages.auth.forgot-password');
     }
 
-    public function sendPasswordResetLink(Request $request)
+    public function sendPasswordResetLink(ForgotPasswordRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
-        ], [
-            'email.required' => 'Vui lòng nhập email của bạn.',
-            'email.email' => 'Email không đúng định dạng.',
-            'email.exists' => 'Email này không tồn tại trong hệ thống.',
-        ]);
-
-        $result = $this->authRepository->sendPasswordResetEmail($request->email);
+        $result = $this->authRepository->sendPasswordResetEmail($request->validated()['email']);
 
         if ($result['success']) {
             return back()->with('status', $result['message']);
@@ -174,7 +139,8 @@ class AuthController extends Controller
         $tokenValidation = $this->authRepository->validateResetToken($token, $email);
 
         if (! $tokenValidation['valid']) {
-            return redirect()->route('client.auth.forgot-password')
+            return redirect()
+                ->route('client.auth.forgot-password')
                 ->withErrors(['email' => $tokenValidation['message']]);
         }
 
@@ -184,28 +150,46 @@ class AuthController extends Controller
         ]);
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'password' => ['required', 'min:6', 'confirmed'],
-        ], [
-            'password.required' => 'Vui lòng nhập mật khẩu mới.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
-        ]);
-
         $result = $this->authRepository->resetPassword(
-            $request->input('token'),
-            $request->input('email'),
-            $request->input('password')
+            $request->validated()['token'],
+            $request->validated()['email'],
+            $request->validated()['password']
         );
 
         if ($result['success']) {
-            return redirect()->route('client.auth.login')
+            return redirect()
+                ->route('client.auth.login')
                 ->with('status', $result['message']);
         }
 
-        return redirect()->route('client.auth.forgot-password')
+        return redirect()
+            ->route('client.auth.forgot-password')
             ->withErrors(['email' => $result['message']]);
+    }
+
+    /**
+     * Redirect theo role của user
+     */
+    private function redirectByRole($user)
+    {
+        if ($user->hasRole('guest')) {
+            return redirect()->route('client.home');
+        }
+
+        return redirect()->route('admin.dashboard.analytics');
+    }
+
+    /**
+     * Lấy URL redirect theo role
+     */
+    private function getRedirectUrlByRole($user)
+    {
+        if ($user->hasRole('guest')) {
+            return route('client.home');
+        }
+
+        return route('admin.dashboard.analytics');
     }
 }

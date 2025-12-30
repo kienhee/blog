@@ -167,5 +167,117 @@ class NewsletterRepository extends BaseRepository
             ->rawColumns(['status', 'subscribed_at', 'created_at', 'is_human', 'spam_score', 'behavior', 'action'])
             ->make(true);
     }
+
+    /**
+     * Tính toán spam score dựa trên hành vi người dùng
+     *
+     * @param float $scrollPercentage Phần trăm scroll (0-100)
+     * @param int $timeOnPage Thời gian ở trên trang (giây)
+     * @return int Spam score (0-100, càng cao càng spam)
+     */
+    public function calculateSpamScore($scrollPercentage, $timeOnPage)
+    {
+        $score = 0;
+
+        // Kiểm tra scroll percentage
+        if ($scrollPercentage < 30) {
+            $score += 80; // Hầu như chắc chắn là bot
+        } elseif ($scrollPercentage < 50) {
+            $score += 60; // Rất có khả năng là bot
+        } elseif ($scrollPercentage < 70) {
+            $score += 40; // Bot thường không scroll xuống
+        }
+
+        // Kiểm tra thời gian ở trên trang
+        if ($timeOnPage < 5) {
+            $score += 50;
+        } elseif ($timeOnPage < 10) {
+            $score += 30;
+        } elseif ($timeOnPage < 20) {
+            $score += 15;
+        }
+
+        // Nếu cả scroll < 30% và time < 5 giây thì gần như chắc chắn là bot
+        if ($scrollPercentage < 30 && $timeOnPage < 5) {
+            $score = 100;
+        }
+
+        // Nếu scroll >= 70% và time >= 20 giây thì giảm score (hành vi bình thường)
+        if ($scrollPercentage >= 70 && $timeOnPage >= 20) {
+            $score = max(0, $score - 30);
+        }
+
+        return min(100, max(0, $score));
+    }
+
+    /**
+     * Đăng ký newsletter với spam detection
+     *
+     * @param string $email
+     * @param float $scrollPercentage
+     * @param int $timeOnPage
+     * @return array
+     */
+    public function subscribe($email, $scrollPercentage = 0, $timeOnPage = 0)
+    {
+        $spamScore = $this->calculateSpamScore($scrollPercentage, $timeOnPage);
+        $isHuman = $spamScore < 50;
+        $status = $isHuman ? self::STATUS_ACTIVE : self::STATUS_INACTIVE;
+
+        $existingNewsletter = $this->model->where('email', $email)->first();
+
+        if ($existingNewsletter) {
+            if ($existingNewsletter->status === self::STATUS_ACTIVE) {
+                return [
+                    'success' => false,
+                    'message' => 'Email này đã được đăng ký trước đó.',
+                ];
+            }
+
+            if ($isHuman) {
+                $existingNewsletter->update([
+                    'status' => self::STATUS_ACTIVE,
+                    'subscribed_at' => now(),
+                    'unsubscribed_at' => null,
+                    'scroll_percentage' => $scrollPercentage,
+                    'time_on_page' => $timeOnPage,
+                    'is_human' => $isHuman,
+                    'spam_score' => $spamScore,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'Cảm ơn bạn đã đăng ký lại nhận tin tức!',
+                ];
+            } else {
+                $existingNewsletter->update([
+                    'scroll_percentage' => $scrollPercentage,
+                    'time_on_page' => $timeOnPage,
+                    'is_human' => $isHuman,
+                    'spam_score' => $spamScore,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'Cảm ơn bạn đã đăng ký nhận tin tức!',
+                ];
+            }
+        }
+
+        $this->model->create([
+            'email' => $email,
+            'status' => $status,
+            'subscribed_at' => $isHuman ? now() : null,
+            'scroll_percentage' => $scrollPercentage,
+            'time_on_page' => $timeOnPage,
+            'is_human' => $isHuman,
+            'spam_score' => $spamScore,
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Cảm ơn bạn đã đăng ký nhận tin tức!',
+        ];
+    }
 }
 
