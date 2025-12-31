@@ -123,11 +123,11 @@ return [
         'permission' => 'contact.read',
         // 'badgeId' => 'admin_contacts_list',
     ],
-    [
-        'title' => 'Media',
-        'icon' => 'bx-image',
-        'url' => 'admin.media',
-    ],
+    // [
+    //     'title' => 'Media',
+    //     'icon' => 'bx-image',
+    //     'url' => 'admin.media',
+    // ],
     [
         'title' => 'Cài đặt',
         'icon' => 'bx-cog',
