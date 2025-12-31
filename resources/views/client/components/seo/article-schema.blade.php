@@ -18,7 +18,7 @@
                 'name' => config('app.name'),
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => asset('favicon.ico')
+                    'url' => asset_shared_url('images/favicon.png')
                 ]
             ],
             'mainEntityOfPage' => [
@@ -33,8 +33,8 @@
             $articleSchema['image'] = [
                 '@type' => 'ImageObject',
                 'url' => asset($postModel->thumbnail),
-                'width' => 1200,
-                'height' => 630
+                'width' => 1920,
+                'height' => 1080
             ];
         }
         
