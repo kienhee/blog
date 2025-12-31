@@ -45,10 +45,10 @@ class CategoryController extends Controller
         // Pass model for SEO
         $seoModel = $category;
 
-        // Build breadcrumbs for schema
+        // Build breadcrumbs with absolute URLs for structured data
         $breadcrumbs = [
-            ['name' => 'Trang chủ', 'url' => route('client.home')],
-            ['name' => $category->name, 'url' => route('client.category', ['slug' => $category->slug])],
+            ['name' => 'Trang chủ', 'url' => route('client.home', [], true)],
+            ['name' => $category->name, 'url' => route('client.category', ['slug' => $category->slug], true)],
         ];
 
         return view('client.pages.category', compact('category', 'posts', 'seoModel', 'breadcrumbs'));

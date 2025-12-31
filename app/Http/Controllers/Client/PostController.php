@@ -98,21 +98,21 @@ class PostController extends Controller
         // Pass model for SEO
         $seoModel = $postModel;
 
-        // Build breadcrumbs
+        // Build breadcrumbs with absolute URLs for structured data
         $breadcrumbs = [
-            ['name' => 'Trang chủ', 'url' => route('client.home')],
+            ['name' => 'Trang chủ', 'url' => route('client.home', [], true)],
         ];
         
         if ($postModel && $postModel->category) {
             $breadcrumbs[] = [
                 'name' => $postModel->category->name,
-                'url' => route('client.category', ['slug' => $postModel->category->slug])
+                'url' => route('client.category', ['slug' => $postModel->category->slug], true)
             ];
         }
         
         $breadcrumbs[] = [
             'name' => $post->title,
-            'url' => route('client.post', ['slug' => $post->slug])
+            'url' => route('client.post', ['slug' => $post->slug], true)
         ];
 
         return view('client.pages.single', compact(

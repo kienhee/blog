@@ -2,6 +2,9 @@
 
 @section('title', 'Trang chủ')
 
+{{-- Organization Schema for homepage --}}
+@include('client.components.seo.organization-schema')
+
 @section('content')
     <div data-bs-spy="scroll" class="scrollspy-example">
         <!-- Hero Search: Start -->

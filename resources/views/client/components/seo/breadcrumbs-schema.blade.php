@@ -21,6 +21,6 @@
 
 @if (!empty($breadcrumbs))
     <script type="application/ld+json">
-        {!! json_encode($breadcrumbList, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+        {!! json_encode($breadcrumbList, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
     </script>
 @endif

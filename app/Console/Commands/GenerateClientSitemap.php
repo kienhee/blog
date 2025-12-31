@@ -46,8 +46,10 @@ class GenerateClientSitemap extends Command
             ];
 
             foreach ($staticPages as $page) {
+                // Use absolute URL for sitemap
+                $url = route($page['route'], [], true);
                 $sitemap->add(
-                    Url::create(route($page['route']))
+                    Url::create($url)
                         ->setPriority($page['priority'])
                         ->setChangeFrequency($page['changefreq'])
                 );
@@ -63,7 +65,9 @@ class GenerateClientSitemap extends Command
             $categoryCount = 0;
             $categoryQuery->chunk(200, function ($categories) use ($sitemap, &$categoryCount) {
                 foreach ($categories as $category) {
-                    $url = Url::create(route('client.category', ['slug' => $category->slug]))
+                    // Use absolute URL for sitemap
+                    $urlString = route('client.category', ['slug' => $category->slug], true);
+                    $url = Url::create($urlString)
                         ->setPriority(0.8)
                         ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY);
 
@@ -94,7 +98,9 @@ class GenerateClientSitemap extends Command
             $postCount = 0;
             $postQuery->chunk(200, function ($posts) use ($sitemap, &$postCount) {
                 foreach ($posts as $post) {
-                    $url = Url::create(route('client.post', ['slug' => $post->slug]))
+                    // Use absolute URL for sitemap
+                    $urlString = route('client.post', ['slug' => $post->slug], true);
+                    $url = Url::create($urlString)
                         ->setPriority(0.7)
                         ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY);
 
