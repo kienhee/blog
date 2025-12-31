@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Quickbars settings
             quickbars_selection_toolbar:
                 "bold italic hljs_codeblock quicklink h2 h3 blockquote quickimage quicktable",
-            quickbars_insert_toolbar: "image media table hljs_codeblock hr",
+            quickbars_insert_toolbar: "image media table accordion hljs_codeblock hr",
 
             // Context menu
             contextmenu: "link image table",
