@@ -4,7 +4,7 @@
 
 @section('content')
     <section class="section-py">
-        <div class="main-container">
+        <div class="container">
             {{-- Hashtag Header --}}
             <header class="category-header mb-5">
                 <h1 class="category-title mb-3">#{{ $hashtag->name }}</h1>

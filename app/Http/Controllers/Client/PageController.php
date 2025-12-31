@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Newsletter\SubscribeRequest;
+use App\Models\Setting;
 use App\Repositories\NewsletterRepository;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -25,7 +26,16 @@ class PageController extends Controller
             type: 'website',
         );
 
-        return view('client.pages.about', compact('seoModel'));
+        // Get social media links from settings
+        $socialLinks = [
+            'github' => Setting::getValue('github', ''),
+            'linkedin' => Setting::getValue('linkedin', ''),
+            'facebook' => Setting::getValue('facebook', ''),
+            'twitter' => Setting::getValue('twitter', ''),
+            'email' => Setting::getValue('email', ''),
+        ];
+
+        return view('client.pages.about', compact('seoModel', 'socialLinks'));
     }
 
     /**

@@ -14,31 +14,51 @@
                             alt="contact customer service" class="contact-img w-100 scaleX-n1-rtl" />
                         <div class="py-3 px-1 ">
                             <div class="row gy-3 gx-md-4">
-                                <div class="col-md-6 col-lg-12 col-xl-6">
-                                    <div class="d-flex align-items-center">
-                                        <div class="badge bg-label-primary rounded p-2 me-2"><i
-                                                class="bx bx-envelope bx-sm"></i></div>
-                                        <div>
-                                            <p class="mb-0">Email</p>
-                                            <h5 class="mb-0">
-                                                <a href="mailto:example@gmail.com"
-                                                    class="text-heading">example@gmail.com</a>
-                                            </h5>
+                                @if (!empty($contactInfo['email']))
+                                    <div class="col-md-6 col-lg-12 col-xl-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="badge bg-label-primary rounded p-2 me-2"><i
+                                                    class="bx bx-envelope bx-sm"></i></div>
+                                            <div>
+                                                <p class="mb-0">Email</p>
+                                                <h5 class="mb-0">
+                                                    <a href="mailto:{{ $contactInfo['email'] }}"
+                                                        class="text-heading">{{ $contactInfo['email'] }}</a>
+                                                </h5>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6 col-lg-12 col-xl-6">
-                                    <div class="d-flex align-items-center">
-                                        <div class="badge bg-label-success rounded p-2 me-2">
-                                            <i class="bx bx-phone-call bx-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0">Điện thoại</p>
-                                            <h5 class="mb-0"><a href="tel:+1234-568-963" class="text-heading">+1234
-                                                    568 963</a></h5>
+                                @endif
+                                @if (!empty($contactInfo['phone']))
+                                    <div class="col-md-6 col-lg-12 col-xl-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="badge bg-label-success rounded p-2 me-2">
+                                                <i class="bx bx-phone-call bx-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="mb-0">Điện thoại</p>
+                                                <h5 class="mb-0">
+                                                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactInfo['phone']) }}" 
+                                                        class="text-heading">{{ $contactInfo['phone'] }}</a>
+                                                </h5>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endif
+                                @if (!empty($contactInfo['address']))
+                                    <div class="col-md-12">
+                                        <div class="d-flex align-items-center">
+                                            <div class="badge bg-label-primary rounded p-2 me-2"><i
+                                                    class="bx bx-map bx-sm"></i></div>
+                                            <div>
+                                                <p class="mb-0">Địa chỉ</p>
+                                                <h5 class="mb-0">
+                                                    <span class="text-heading">{{ $contactInfo['address'] }}</span>
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -62,13 +82,13 @@
                                             placeholder="nguyenvana@gmail.com" required />
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <label class="form-label" for="contact-form-phone">Số điện thoại <span class="text-danger">*</span></label>
                                         <input type="tel" id="contact-form-phone" name="phone" class="form-control"
                                             placeholder="0123 456 789" required />
                                         <div class="invalid-feedback"></div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-md-6">
                                         <label class="form-label" for="contact-form-subject">Tiêu đề <span class="text-danger">*</span></label>
                                         <input type="text" id="contact-form-subject" name="subject" class="form-control"
                                             placeholder="Tiêu đề tin nhắn" required />

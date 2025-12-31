@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Contact\StoreRequest;
 use App\Jobs\SendContactNotificationEmail;
+use App\Models\Setting;
 use App\Repositories\ContactRepository;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -27,7 +28,14 @@ class ContactController extends Controller
             robots: 'noindex, follow',
         );
 
-        return view('client.pages.contact', compact('seoModel'));
+        // Get contact information from settings
+        $contactInfo = [
+            'email' => Setting::getValue('email', ''),
+            'phone' => Setting::getValue('phone', ''),
+            'address' => Setting::getValue('address', ''),
+        ];
+
+        return view('client.pages.contact', compact('seoModel', 'contactInfo'));
     }
 
     /**

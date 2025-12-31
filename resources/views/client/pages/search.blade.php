@@ -4,7 +4,7 @@
 @section('content')
     <!-- Search Page: Start -->
     <section class="section-py">
-        <div class="main-container">
+        <div class="container">
             <!-- Search Header -->
             <div class="mb-5">
                 <h1 class="mb-3">Tìm kiếm</h1>

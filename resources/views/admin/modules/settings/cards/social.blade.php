@@ -59,4 +59,11 @@
                value="{{ old('pinterest', $settings['pinterest'] ?? '') }}" 
                placeholder="https://pinterest.com/yourprofile">
     </div>
+    
+    <div class="col-md-6 mb-3">
+        <label class="form-label">GitHub</label>
+        <input type="url" name="github" class="form-control" 
+               value="{{ old('github', $settings['github'] ?? '') }}" 
+               placeholder="https://github.com/yourusername">
+    </div>
 </div>

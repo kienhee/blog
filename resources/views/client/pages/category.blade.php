@@ -7,7 +7,7 @@
 
 @section('content')
     <section class="section-py bg-gradient">
-        <div class="main-container">
+        <div class="container">
             {{-- Category Header --}}
             <header class="category-header mb-5">
                 <h1 class="category-title mb-3">{{ $category->name }}</h1>

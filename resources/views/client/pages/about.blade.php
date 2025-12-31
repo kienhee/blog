@@ -14,31 +14,41 @@
                             để xây dựng các ứng dụng web hiện đại.
                         </p>
                         <div class="d-flex gap-3">
-                            <a href="#"
-                                class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
-                                style="width: 48px; height: 48px;" target="_blank" title="GitHub">
-                                <i class="bx bxl-github fs-4"></i>
-                            </a>
-                            <a href="#"
-                                class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
-                                style="width: 48px; height: 48px;" target="_blank" title="LinkedIn">
-                                <i class="bx bxl-linkedin fs-4"></i>
-                            </a>
-                            <a href="#"
-                                class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
-                                style="width: 48px; height: 48px;" target="_blank" title="Facebook">
-                                <i class="bx bxl-facebook fs-4"></i>
-                            </a>
-                            <a href="#"
-                                class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
-                                style="width: 48px; height: 48px;" target="_blank" title="Twitter">
-                                <i class="bx bxl-twitter fs-4"></i>
-                            </a>
-                            <a href="mailto:contact@example.com"
-                                class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
-                                style="width: 48px; height: 48px;" title="Email">
-                                <i class="bx bx-envelope fs-4"></i>
-                            </a>
+                            @if (!empty($socialLinks['github']))
+                                <a href="{{ $socialLinks['github'] }}"
+                                    class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
+                                    style="width: 48px; height: 48px;" target="_blank" rel="noopener noreferrer" title="GitHub">
+                                    <i class="bx bxl-github fs-4"></i>
+                                </a>
+                            @endif
+                            @if (!empty($socialLinks['linkedin']))
+                                <a href="{{ $socialLinks['linkedin'] }}"
+                                    class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
+                                    style="width: 48px; height: 48px;" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                                    <i class="bx bxl-linkedin fs-4"></i>
+                                </a>
+                            @endif
+                            @if (!empty($socialLinks['facebook']))
+                                <a href="{{ $socialLinks['facebook'] }}"
+                                    class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
+                                    style="width: 48px; height: 48px;" target="_blank" rel="noopener noreferrer" title="Facebook">
+                                    <i class="bx bxl-facebook fs-4"></i>
+                                </a>
+                            @endif
+                            @if (!empty($socialLinks['twitter']))
+                                <a href="{{ $socialLinks['twitter'] }}"
+                                    class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
+                                    style="width: 48px; height: 48px;" target="_blank" rel="noopener noreferrer" title="Twitter">
+                                    <i class="bx bxl-twitter fs-4"></i>
+                                </a>
+                            @endif
+                            @if (!empty($socialLinks['email']))
+                                <a href="mailto:{{ $socialLinks['email'] }}"
+                                    class="rounded-circle d-flex align-items-center justify-content-center text-decoration-none bg-white bg-opacity-25 border border-white border-opacity-50"
+                                    style="width: 48px; height: 48px;" title="Email">
+                                    <i class="bx bx-envelope fs-4"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -74,7 +84,7 @@
                         Với kiến thức sâu về frontend và backend, tôi luôn cập nhật công nghệ mới và không ngừng học hỏi.
                         Website <a href="https://kienhee.com/" target="_blank" class="text-primary">kienhee.com</a> là blog
                         cá nhân chuyên về lập trình, được thành lập từ <span
-                            class="fw-semibold text-primary">25-12-2016</span> và vẫn đang hoạt động.
+                            class="fw-semibold text-primary">01-01-2026</span> và vẫn đang hoạt động.
                     </p>
                 </div>
             </div>
@@ -153,7 +163,7 @@
                                     <span class="badge rounded-pill bg-label-secondary">Redis</span>
                                     <span class="badge rounded-pill bg-label-secondary">Git</span>
                                     <span class="badge rounded-pill bg-label-secondary">Docker</span>
-                                    <span class="badge rounded-pill bg-label-secondary">AWS</span>
+                                    <span class="badge rounded-pill bg-label-secondary">Cursor AI</span>
                                 </div>
                             </div>
                         </div>
