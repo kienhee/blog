@@ -13,5 +13,7 @@
 <script src="{{ asset_admin_url('assets/js/front-page-landing.js') }}"></script>
 <!-- Toastr JS -->
 <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
+<!-- Fancybox JS -->
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 @vite(['resources/js/admin/common/ui/toastr-config.js'])
 @stack('scripts')

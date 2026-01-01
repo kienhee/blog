@@ -15,6 +15,8 @@
 <link rel="stylesheet" href="{{ asset_shared_url('css/inter-font.css') }}" />
 <!-- Vendors CSS -->
 <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
+<!-- Fancybox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
 <!-- Client CSS (compiled from SCSS) -->
 @vite('resources/scss/client/client.scss')
 <!-- Helpers -->

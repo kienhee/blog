@@ -3,6 +3,62 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof hljs !== "undefined") {
         hljs.highlightAll();
     }
+    
+    // Initialize Fancybox for images in article content
+    if (typeof Fancybox !== "undefined") {
+        const articleContent = document.querySelector(".article-content");
+        if (articleContent) {
+            // Find all images in article content
+            const images = articleContent.querySelectorAll("img");
+            
+            images.forEach((img) => {
+                // Get image source
+                const imgSrc = img.src || img.getAttribute("data-src");
+                if (!imgSrc) {
+                    return;
+                }
+                
+                // Check if image is already wrapped in a link
+                let link = img.parentElement;
+                
+                if (link && link.tagName === "A") {
+                    // Image already has a link, just add Fancybox attributes
+                    link.setAttribute("data-fancybox", "gallery");
+                    if (!link.getAttribute("data-caption") && img.alt) {
+                        link.setAttribute("data-caption", img.alt);
+                    }
+                } else {
+                    // Create a new link wrapper for Fancybox
+                    link = document.createElement("a");
+                    link.href = imgSrc;
+                    link.setAttribute("data-fancybox", "gallery");
+                    link.setAttribute("data-caption", img.alt || "");
+                    
+                    // Wrap image with link
+                    img.parentNode.insertBefore(link, img);
+                    link.appendChild(img);
+                }
+            });
+            
+            // Initialize Fancybox
+            Fancybox.bind("[data-fancybox]", {
+                Toolbar: {
+                    display: {
+                        left: ["infobar"],
+                        middle: [],
+                        right: ["slideshow", "download", "thumbs", "close"],
+                    },
+                },
+                Thumbs: {
+                    autoStart: false,
+                },
+                Image: {
+                    zoom: true,
+                    wheel: "slide",
+                },
+            });
+        }
+    }
 });
 
 // Toggle TOC function - expose to global scope for onclick handlers
