@@ -6,6 +6,9 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     @vite('resources/js/client/pages/auth.js')
 @endpush
 
@@ -36,7 +39,7 @@
                             @endif
 
                             <!-- Register Form -->
-                            <form action="{{ route('client.auth.register') }}" method="POST">
+                            <form id="registerForm" action="{{ route('client.auth.register') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="full_name" class="form-label">Họ và tên <span

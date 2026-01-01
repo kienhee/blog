@@ -5,6 +5,13 @@
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-auth.css') }}" />
 @endpush
 
+@push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
+    @vite('resources/js/client/pages/auth.js')
+@endpush
+
 @section('content')
     <section class="section-py">
         <div class="container">
@@ -33,7 +40,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('client.auth.forgot-password.send') }}" method="POST">
+                            <form id="forgotPasswordForm" action="{{ route('client.auth.forgot-password.send') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>

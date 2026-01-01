@@ -6,6 +6,9 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     @vite('resources/js/client/pages/auth.js')
 @endpush
 
@@ -29,7 +32,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('client.auth.reset-password.update') }}" method="POST">
+                        <form id="resetPasswordForm" action="{{ route('client.auth.reset-password.update') }}" method="POST">
                             @csrf
                             <input type="hidden" name="token" value="{{ $token ?? old('token') }}">
                             <input type="hidden" name="email" value="{{ $email ?? old('email') }}">

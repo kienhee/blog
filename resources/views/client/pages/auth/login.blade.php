@@ -6,6 +6,9 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
     @vite('resources/js/client/pages/auth.js')
 @endpush
 
@@ -36,13 +39,13 @@
                             </div>
                         @endif
 
-                        <!-- Email/Password Login Form -->
-                        <form action="{{ route('client.auth.loginHandle') }}" method="POST">
+                        <!-- Email Login Form -->
+                        <form id="loginForm" action="{{ route('client.auth.loginHandle') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email / Số điện thoại</label>
-                                <input type="text" class="form-control" id="email" name="email" 
-                                    placeholder="Nhập email hoặc số điện thoại" value="{{ old('email') }}" required autofocus>
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                    placeholder="Nhập email của bạn" value="{{ old('email') }}" required autofocus>
                             </div>
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
