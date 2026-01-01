@@ -119,6 +119,19 @@ class GenerateClientSitemap extends Command
 
             // Write sitemap to file
             $sitemapPath = public_path('sitemap.xml');
+            
+            // Ensure directory exists
+            $sitemapDir = dirname($sitemapPath);
+            if (!is_dir($sitemapDir)) {
+                mkdir($sitemapDir, 0755, true);
+                $this->info("✓ Created directory: {$sitemapDir}");
+            }
+            
+            // Check if sitemap.xml exists, if not create new file
+            if (!file_exists($sitemapPath)) {
+                $this->info("✓ Sitemap.xml not found, creating new file...");
+            }
+            
             $sitemap->writeToFile($sitemapPath);
 
             $totalUrls = $urlCount + $categoryCount + $postCount;
