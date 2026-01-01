@@ -82,7 +82,7 @@ return [
          * so you'll need to add the suffix manually if you want that. If set to null, we'll determine the title
          * just like the other pages.
          */
-        'homepage_title' => config('app.name') . ' - Blog chia sẻ kiến thức về lập trình, công nghệ và cuộc sống',
+        'homepage_title' => 'Trang chủ | ' . config('app.name'),
     ],
 
     'description' => [
