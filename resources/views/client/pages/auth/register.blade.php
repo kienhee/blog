@@ -75,7 +75,8 @@
                                 <button type="submit" class="btn btn-primary d-grid w-100">Đăng ký</button>
                             </form>
 
-                            <div class="divider my-4">
+                            {{-- TODO: Phát triển sau --}}
+                            {{-- <div class="divider my-4">
                                 <div class="divider-text">hoặc</div>
                             </div>
 
@@ -110,7 +111,7 @@
                                     </svg>
                                     Đăng ký với Github
                                 </a>
-                            </div>
+                            </div> --}}
 
                             <p class="text-center mt-4">
                                 <span>Đã có tài khoản?</span>

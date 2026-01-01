@@ -50,6 +50,9 @@ export default defineConfig({
                 //User
                 "resources/js/admin/pages/user/list.js",
                 "resources/js/admin/pages/user/form.js",
+                //Role
+                "resources/js/admin/pages/role/list.js",
+                "resources/js/admin/pages/role/form.js",
                 // -----------Pages-----------
 
                 //Client

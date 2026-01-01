@@ -9,7 +9,7 @@
                     <div class="pe-lg-4">
                         <h1 class="display-3 fw-bold mb-4">Xin chào, tôi là Trần Trung Kiên</h1>
                         <p class="lead mb-4 opacity-90">
-                            Một Full-stack Developer đam mê với công nghệ, luôn tìm kiếm những giải pháp sáng tạo và hiệu
+                            Một Backend Developer đam mê với công nghệ, luôn tìm kiếm những giải pháp sáng tạo và hiệu
                             quả
                             để xây dựng các ứng dụng web hiện đại.
                         </p>
@@ -77,7 +77,7 @@
                         style="width: 80px; height: 4px;"></span></h3>
                 <div>
                     <p class="fs-5 lh-lg mb-3">
-                        Tôi là một Full-stack Developer với nhiều năm kinh nghiệm phát triển ứng dụng web. Đam mê tạo ra
+                        Tôi là một Backend Developer với nhiều năm kinh nghiệm phát triển ứng dụng web. Đam mê tạo ra
                         những sản phẩm chất lượng cao, có trải nghiệm người dùng tốt và hiệu năng tối ưu.
                     </p>
                     <p class="fs-5 lh-lg mb-0">
@@ -188,7 +188,7 @@
                         </div>
                         <div class="card border shadow-sm">
                             <div class="card-body p-4">
-                                <h4 class="h5 fw-semibold mb-2">Full-stack Developer</h4>
+                                <h4 class="h5 fw-semibold mb-2">Backend Developer</h4>
                                 <p class="text-primary fw-semibold mb-2">RikkeiSoft | 2023 - Hiện tại</p>
                                 <ul class="mb-0 lh-lg">
                                     <li>
