@@ -11,6 +11,7 @@ use App\Repositories\AuthRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
@@ -30,7 +31,15 @@ class AuthController extends Controller
             return $this->redirectByRole(Auth::user());
         }
 
-        return view('client.pages.auth.login');
+        $seoModel = new SEOData(
+            title: 'Đăng nhập',
+            description: 'Đăng nhập vào tài khoản của bạn để truy cập các tính năng độc quyền và quản lý thông tin cá nhân.',
+            url: route('client.auth.login', [], false),
+            type: 'website',
+            robots: 'noindex, follow',
+        );
+
+        return view('client.pages.auth.login', compact('seoModel'));
     }
 
     public function loginHandle(LoginRequest $request)
@@ -61,7 +70,15 @@ class AuthController extends Controller
             return redirect()->route('client.home');
         }
 
-        return view('client.pages.auth.register');
+        $seoModel = new SEOData(
+            title: 'Đăng ký',
+            description: 'Tạo tài khoản mới để tham gia cộng đồng, nhận thông báo và truy cập các tính năng độc quyền.',
+            url: route('client.auth.register', [], false),
+            type: 'website',
+            robots: 'noindex, follow',
+        );
+
+        return view('client.pages.auth.register', compact('seoModel'));
     }
 
     public function registerHandle(RegisterRequest $request)
@@ -117,7 +134,15 @@ class AuthController extends Controller
 
     public function showForgotPasswordForm()
     {
-        return view('client.pages.auth.forgot-password');
+        $seoModel = new SEOData(
+            title: 'Quên mật khẩu',
+            description: 'Khôi phục mật khẩu của bạn bằng cách nhập email đã đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu đến email của bạn.',
+            url: route('client.auth.forgot-password', [], false),
+            type: 'website',
+            robots: 'noindex, follow',
+        );
+
+        return view('client.pages.auth.forgot-password', compact('seoModel'));
     }
 
     public function sendPasswordResetLink(ForgotPasswordRequest $request)
@@ -144,9 +169,18 @@ class AuthController extends Controller
                 ->withErrors(['email' => $tokenValidation['message']]);
         }
 
+        $seoModel = new SEOData(
+            title: 'Đặt lại mật khẩu',
+            description: 'Đặt lại mật khẩu mới cho tài khoản của bạn. Vui lòng nhập mật khẩu mới và xác nhận.',
+            url: route('client.auth.reset-password', [], false),
+            type: 'website',
+            robots: 'noindex, follow',
+        );
+
         return view('client.pages.auth.reset-password', [
             'token' => $tokenValidation['token'],
             'email' => $tokenValidation['email'],
+            'seoModel' => $seoModel,
         ]);
     }
 
