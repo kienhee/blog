@@ -1,52 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     <url>
-    <loc>http://localhost</loc>
+    <loc>http://127.0.0.1:8000</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
             </url>
     <url>
-    <loc>http://localhost/bai-viet</loc>
+    <loc>http://127.0.0.1:8000/bai-viet</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
             </url>
     <url>
-    <loc>http://localhost/lien-he</loc>
+    <loc>http://127.0.0.1:8000/lien-he</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
             </url>
     <url>
-    <loc>http://localhost/tac-gia</loc>
+    <loc>http://127.0.0.1:8000/tac-gia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
             </url>
     <url>
-    <loc>http://localhost/danh-muc/laravel</loc>
-    <lastmod>2025-12-29T00:31:20+07:00</lastmod>
+    <loc>http://127.0.0.1:8000/danh-muc/php-co-ban</loc>
+    <lastmod>2025-12-29T16:16:16+07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://localhost/danh-muc/aaaaaaaaa</loc>
-    <lastmod>2025-12-28T11:40:11+07:00</lastmod>
+    <loc>http://127.0.0.1:8000/danh-muc/php-huong-oi-tuong</loc>
+    <lastmod>2025-12-29T16:34:56+07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://localhost/bai-viet/aaaaaaaaa</loc>
-    <lastmod>2025-12-28T08:50:41+07:00</lastmod>
+    <loc>http://127.0.0.1:8000/danh-muc/php-standards</loc>
+    <lastmod>2025-12-29T16:35:40+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/danh-muc/laravel</loc>
+    <lastmod>2025-12-29T16:36:21+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/aaaaaaaaaa</loc>
+    <lastmod>2026-01-01T23:30:00+07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://localhost/bai-viet/aaaaaaaaaaddd</loc>
-    <lastmod>2025-12-28T08:50:41+07:00</lastmod>
+    <loc>http://127.0.0.1:8000/bai-viet/cac-kieu-du-lieu-trong-php</loc>
+    <lastmod>2026-01-01T22:52:11+07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://localhost/bai-viet/co-nhieu-cach-phan-loai-phan-quyen-he-thong-tuy-thuoc-vao-goc-o-va-ngu-canh</loc>
-    <lastmod>2025-12-28T08:50:27+07:00</lastmod>
+    <loc>http://127.0.0.1:8000/bai-viet/testsssss</loc>
+    <lastmod>2025-12-31T16:26:58+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/bien-va-hang-trong-php</loc>
+    <lastmod>2025-12-29T17:16:45+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/chuong-trinh-helloworld-au-tien</loc>
+    <lastmod>2025-12-29T17:10:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/huong-dan-cai-at-xampp</loc>
+    <lastmod>2025-12-29T17:06:58+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/php-la-gi-va-cach-hoc</loc>
+    <lastmod>2025-12-29T17:04:44+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/cac-kieu-code-co-ban-phan-2</loc>
+    <lastmod>2025-12-29T17:01:53+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/cac-kieu-code-co-ban</loc>
+    <lastmod>2025-12-29T17:01:30+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/bai-viet/quy-tac-co-ban</loc>
+    <lastmod>2025-12-29T17:01:05+07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>

@@ -200,6 +200,7 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
         // Settings - Read permissions
         Route::get('/', [SettingController::class, 'index'])->name('index')->middleware('permission:setting.read');
         Route::get('/test-email-setup', [SettingController::class, 'testEmailSetup'])->name('testEmailSetup')->middleware('permission:setting.read');
+        Route::get('/test-queue', [SettingController::class, 'testQueue'])->name('testQueue')->middleware('permission:setting.read');
 
         // Update permissions
         Route::post('/', [SettingController::class, 'update'])->name('update')->middleware('permission:setting.update');

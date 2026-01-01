@@ -52,10 +52,10 @@
             url: '{{ route('admin.settings.testEmailSetup') }}',
             type: 'GET',
             success: function(response) {
-                toastr.success(response.message);
+                toastr.success(response.message, "Thông báo");
             },
             error: function () {
-                toastr.error('Không thể kiểm tra kết nối gửi mail.');
+                toastr.error('Không thể kiểm tra kết nối gửi mail.', "Đã có lỗi xảy ra");
             },
             complete: function () {
                 $btn.prop('disabled', false);

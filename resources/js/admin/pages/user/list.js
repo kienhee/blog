@@ -240,11 +240,11 @@ $(function () {
                             userTable.ajax.reload();
                             userTrashTable.ajax.reload();
                         } else {
-                            toastr.error(data.message || "Có lỗi xảy ra");
+                            toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                         }
                     })
                     .catch(() => {
-                        toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                        toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                     })
                     .finally(() => {
                         confirmBtn.disabled = false;
@@ -309,11 +309,11 @@ $(function () {
                             userTable.ajax.reload();
                             userTrashTable.ajax.reload();
                         } else {
-                            toastr.error(data.message || "Có lỗi xảy ra");
+                            toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                         }
                     })
                     .catch(() => {
-                        toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                        toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                     })
                     .finally(() => {
                         confirmBulkDeleteBtn.disabled = false;
@@ -382,11 +382,11 @@ $(function () {
                                 userTable.ajax.reload();
                                 userTrashTable.ajax.reload();
                             } else {
-                                toastr.error(data.message || "Có lỗi xảy ra");
+                                toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                             }
                         })
                         .catch(() => {
-                            toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                            toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                         })
                         .finally(() => {
                             restoreBtn.disabled = false;
@@ -449,11 +449,11 @@ $(function () {
                                 userTable.ajax.reload();
                                 userTrashTable.ajax.reload();
                             } else {
-                                toastr.error(data.message || "Có lỗi xảy ra");
+                                toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                             }
                         })
                         .catch(() => {
-                            toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                            toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                         })
                         .finally(() => {
                             forceDeleteBtn.disabled = false;
@@ -537,11 +537,11 @@ $(function () {
                             userTable.ajax.reload();
                             userTrashTable.ajax.reload();
                         } else {
-                            toastr.error(data.message || "Có lỗi xảy ra");
+                            toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                         }
                     })
                     .catch(() => {
-                        toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                        toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                     })
                     .finally(() => {
                         confirmBulkRestoreBtn.disabled = false;
@@ -599,11 +599,11 @@ $(function () {
                             userTable.ajax.reload();
                             userTrashTable.ajax.reload();
                         } else {
-                            toastr.error(data.message || "Có lỗi xảy ra");
+                            toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                         }
                     })
                     .catch(() => {
-                        toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                        toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                     })
                     .finally(() => {
                         confirmBulkForceDeleteBtn.disabled = false;

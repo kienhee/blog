@@ -14,9 +14,8 @@
         @include('admin.components.headingPage',
                     [
                         'description' => 'Quản lý và cấu hình các thiết lập cho website',
-                        'button' => 'edit',
+                        'button' => null,
                         'listLink' => '',
-                        'buttonPermission' => 'setting.update',
                     ])
 
         <div class="card">
@@ -43,6 +42,11 @@
                             <i class="bx bx-slider me-1"></i> Hiển thị
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="system-check-tab" data-bs-toggle="pill" data-bs-target="#system-check" type="button" role="tab">
+                            <i class="bx bx-check-circle me-1"></i> Kiểm tra hệ thống
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Tabs Content -->
@@ -66,6 +70,11 @@
                     <div class="tab-pane fade" id="display" role="tabpanel">
                         @include('admin.modules.settings.cards.display', ['categories' => $categories])
                     </div>
+
+                    <!-- System Check Tab -->
+                    <div class="tab-pane fade" id="system-check" role="tabpanel">
+                        @include('admin.modules.settings.cards.system-check', ['users' => $users, 'settings' => $settings])
+                    </div>
                 </div>
 
                 <!-- Save Button -->
@@ -88,17 +97,46 @@
 ])
 <script>
 $(document).ready(function() {
-    // Form validation
+    // AJAX form submission
     $('#settingsForm').on('submit', function(e) {
-        const $btn = $(this).find('button[type="submit"]');
+        e.preventDefault();
+        
+        const $form = $(this);
+        const $btn = $form.find('button[type="submit"]');
         const originalText = $btn.html();
+        const formData = new FormData(this);
 
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...');
 
-        // Re-enable after 3 seconds as fallback
-        setTimeout(function() {
-            $btn.prop('disabled', false).html(originalText);
-        }, 3000);
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message, "Thông báo");
+                } else {
+                    toastr.error(response.message, "Đã có lỗi xảy ra");
+                }
+                $btn.prop('disabled', false).html(originalText);
+            },
+            error: function(xhr) {
+                let message = 'Có lỗi xảy ra khi lưu cài đặt.';
+                
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    const errors = xhr.responseJSON.errors;
+                    const firstError = Object.values(errors)[0];
+                    message = Array.isArray(firstError) ? firstError[0] : firstError;
+                }
+                
+                toastr.error(message, "Đã có lỗi xảy ra");
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
     });
 });
 </script>

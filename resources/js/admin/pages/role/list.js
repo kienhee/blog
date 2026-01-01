@@ -115,13 +115,13 @@ $(function () {
                             roleTable.ajax.reload();
                         } else {
                             if (typeof toastr !== "undefined") {
-                                toastr.error(data.message || "Có lỗi xảy ra");
+                                toastr.error(data.message || "Có lỗi xảy ra", "Đã có lỗi xảy ra");
                             }
                         }
                     })
                     .catch(() => {
                         if (typeof toastr !== "undefined") {
-                            toastr.error("Có lỗi xảy ra, vui lòng thử lại");
+                            toastr.error("Có lỗi xảy ra, vui lòng thử lại", "Đã có lỗi xảy ra");
                         }
                     })
                     .finally(() => {

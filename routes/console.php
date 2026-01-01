@@ -13,3 +13,6 @@ Schedule::command('posts:publish-scheduled')->everyMinute();
 
 // Tạo sitemap client hàng ngày
 Schedule::command('sitemap:generate')->daily();
+
+// Kiểm tra schedule test - chạy mỗi phút
+Schedule::command('schedule:test')->everyMinute();

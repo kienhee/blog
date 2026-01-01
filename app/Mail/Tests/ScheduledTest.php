@@ -1,29 +1,41 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Tests;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
 
-class EmailConnection extends Mailable
+class ScheduledTest extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $full_name;
     public $environment;
     public $sentAt;
+    public $interval;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($email, $interval = null)
     {
-        $this->full_name = Auth::user()->full_name;
+        // Find user by email to get their name
+        $user = User::where('email', $email)->first();
+        
+        if ($user && $user->full_name) {
+            $this->full_name = $user->full_name;
+        } else {
+            // If user not found or no full_name, use email or a default
+            $this->full_name = $email;
+        }
+        
         $this->environment = app()->environment();
         $this->sentAt = now()->format('d/m/Y H:i:s');
+        $this->interval = $interval ?? 'N/A';
     }
 
     /**
@@ -32,7 +44,7 @@ class EmailConnection extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Thông báo kết nối hệ thống email',
+            subject: 'Thông báo kiểm tra schedule hệ thống',
         );
     }
 
@@ -42,7 +54,7 @@ class EmailConnection extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.email-connection',
+            view: 'emails.tests.scheduled-test',
         );
     }
 
@@ -56,3 +68,4 @@ class EmailConnection extends Mailable
         return [];
     }
 }
+
