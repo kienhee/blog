@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/css/pages/page-auth.css') }}" />
 @endpush
 
+@push('scripts')
+    @vite('resources/js/client/pages/auth.js')
+@endpush
+
 @section('content')
     <section class="section-py">
         <div class="container">

@@ -191,6 +191,7 @@ class CategoryRepository extends BaseRepository
             ->orderBy('parent_id', 'asc')
             ->orderBy('order', 'asc')
             ->orderBy('created_at', 'asc')
+            ->where('id', '!=', 9999) // không lấy danh mục "Chưa phân loại"
             ->get();
     }
 

@@ -6,7 +6,6 @@
 function updateBadgeCount(badgeId, url) {
     const badgeElement = document.getElementById(badgeId);
     if (!badgeElement) {
-        console.warn(`Badge element with id "${badgeId}" not found`);
         return;
     }
 
@@ -32,12 +31,10 @@ function updateBadgeCount(badgeId, url) {
                     badgeElement.style.display = 'none';
                 }
             } else {
-                console.error('Invalid response format:', response);
                 badgeElement.classList.remove('badge-heartbeat');
             }
         },
         error: function(xhr, status, error) {
-            console.error(`Error updating badge count for ${badgeId}:`, error);
             badgeElement.classList.remove('badge-heartbeat');
         }
     });
@@ -49,7 +46,6 @@ function updateBadgeCount(badgeId, url) {
  */
 function initBadgeCounts(badgeConfigs) {
     if (!badgeConfigs || typeof badgeConfigs !== 'object') {
-        console.warn('Badge configs not provided or invalid');
         return;
     }
 

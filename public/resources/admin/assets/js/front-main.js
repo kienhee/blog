@@ -16,6 +16,9 @@ window.isDarkStyle = window.Helpers.isDarkStyle();
         window.Helpers.initCustomOptionCheck();
     }, 1000);
 
+    // Init Password Toggle
+    window.Helpers.initPasswordToggle();
+
     // Init BS Tooltip
     const tooltipTriggerList = [].slice.call(
         document.querySelectorAll('[data-bs-toggle="tooltip"]')

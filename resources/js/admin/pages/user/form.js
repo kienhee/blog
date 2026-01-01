@@ -391,8 +391,6 @@ document.addEventListener("DOMContentLoaded", function () {
         fv.validate().then(function (status) {
             if (status !== "Valid") {
                 // Validation failed - không cho phép submit
-                console.log("Validation failed, không thể submit form");
-
                 // Scroll to first error field
                 const firstError = $form.find(".is-invalid").first();
                 if (firstError.length) {

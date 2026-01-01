@@ -65,7 +65,8 @@ export default defineConfig({
                 "resources/js/client/pages/profile/index.js",
                 "resources/js/client/pages/profile/change-password.js",
                 "resources/js/client/pages/contact.js",
-                "resources/js/client/pages/newsletter.js"
+                "resources/js/client/pages/newsletter.js",
+                "resources/js/client/pages/auth.js"
             ],
             refresh: true,
         }),

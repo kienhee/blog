@@ -217,7 +217,7 @@ $(function () {
                         });
                 },
                 error: function (xhr) {
-                    console.error("Lỗi tải danh mục cha:", xhr);
+                    // Silent fail
                 },
             });
         };

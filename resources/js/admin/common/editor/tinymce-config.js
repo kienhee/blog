@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Highlight.js on code blocks in TinyMCE editor
     const initHighlightJS = (editor) => {
         if (typeof hljs === "undefined") {
-            console.warn("Highlight.js is not loaded");
             return;
         }
 
@@ -59,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         } catch (error) {
-            console.warn("Error initializing Highlight.js in TinyMCE:", error);
+            // Silent fail
         }
     };
 
@@ -313,10 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         }
                     } catch (e) {
-                        console.warn(
-                            "Could not add inline_code to blocks dropdown:",
-                            e
-                        );
+                        // Silent fail
                     }
                 });
 

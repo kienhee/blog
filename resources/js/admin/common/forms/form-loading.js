@@ -12,7 +12,6 @@ export function initFormLoading(form, options = {}) {
     const formElement = typeof form === 'string' ? document.querySelector(form) : form;
 
     if (!formElement) {
-        console.warn('Form element not found');
         return;
     }
 

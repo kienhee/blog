@@ -31,6 +31,18 @@ class AuthController extends Controller
             return $this->redirectByRole(Auth::user());
         }
 
+        // Lưu URL redirect vào session nếu có (chỉ chấp nhận URL cùng domain để tránh open redirect)
+        if ($request->has('redirect')) {
+            $redirectUrl = $request->input('redirect');
+            $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+            $redirectHost = parse_url($redirectUrl, PHP_URL_HOST);
+            
+            // Chỉ lưu nếu URL là relative hoặc cùng domain với app
+            if ($redirectHost === null || $redirectHost === $appHost) {
+                $request->session()->put('url.intended', $redirectUrl);
+            }
+        }
+
         $seoModel = new SEOData(
             title: 'Đăng nhập',
             description: 'Đăng nhập vào tài khoản của bạn để truy cập các tính năng độc quyền và quản lý thông tin cá nhân.',

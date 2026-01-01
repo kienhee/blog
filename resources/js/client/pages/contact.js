@@ -175,8 +175,6 @@ $(function () {
                                 res.message || "Gửi tin nhắn thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.",
                                 "Thành công"
                             );
-                        } else {
-                            alert(res.message || "Gửi tin nhắn thành công!");
                         }
 
                         // Reset form
@@ -189,8 +187,6 @@ $(function () {
                                 res?.message || "Không thể gửi tin nhắn. Vui lòng thử lại.",
                                 "Lỗi"
                             );
-                        } else {
-                            alert(res?.message || "Không thể gửi tin nhắn. Vui lòng thử lại.");
                         }
                     }
                 },
@@ -222,8 +218,6 @@ $(function () {
                     // Hiển thị thông báo lỗi
                     if (typeof toastr !== "undefined") {
                         toastr.error(errorMessage, "Lỗi");
-                    } else {
-                        alert(errorMessage);
                     }
                 },
                 complete: () => {

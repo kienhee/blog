@@ -64,9 +64,6 @@
          */
         function highlightCodeBlocks() {
             if (!isHighlightJSLoaded()) {
-                console.warn(
-                    "Highlight.js is not loaded. Code blocks will not be highlighted."
-                );
                 return;
             }
 
@@ -87,11 +84,11 @@
                     try {
                         hljs.highlightElement(codeElement);
                     } catch (e) {
-                        console.warn("Failed to highlight code block:", e);
+                        // Silent fail
                     }
                 });
             } catch (error) {
-                console.warn("Error highlighting code blocks:", error);
+                // Silent fail
             }
         }
 
@@ -108,7 +105,6 @@
                 );
                 return codeBlock;
             } catch (e) {
-                console.warn("Error getting current code block:", e);
                 return null;
             }
         }
@@ -146,7 +142,6 @@
 
                 return { code: code, language: language };
             } catch (e) {
-                console.warn("Error extracting code data:", e);
                 return { code: "", language: "auto" };
             }
         }
@@ -284,7 +279,7 @@
                     }
                 });
             } catch (error) {
-                console.warn("Error applying non-editable styles:", error);
+                // Silent fail
             }
         }
 

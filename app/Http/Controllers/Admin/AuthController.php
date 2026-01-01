@@ -42,18 +42,13 @@ class AuthController extends Controller
             $user = Auth::user();
             $user->load('roles');
             
-            // Kiểm tra role: không cho phép guest đăng nhập vào admin
-            if ($user->hasRole('guest')) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                
-                return back()->withErrors([
-                    'password' => 'Tài khoản của bạn không có quyền truy cập vào khu vực quản trị.',
-                ])->onlyInput('password');
-            }
-
             $request->session()->regenerate();
+            
+            // Kiểm tra role: nếu là guest thì chuyển hướng về trang home client
+            if ($user->hasRole('guest')) {
+                return redirect()->route('client.home')
+                    ->with('info', 'Bạn đã đăng nhập thành công. Tài khoản của bạn không có quyền truy cập vào khu vực quản trị.');
+            }
 
             // Ưu tiên đưa về trang người dùng định truy cập (intended URL) nhưng chỉ nội bộ /admin
             $intended = $request->session()->pull('url.intended');

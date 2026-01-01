@@ -479,7 +479,6 @@ $(function () {
         const title = $(this).data("title");
 
         if (!deleteUrl || !deleteUrl.includes("/destroy/")) {
-            console.error("Invalid delete URL:", deleteUrl);
             toastr.error("URL xóa không hợp lệ", "Thông báo");
             return;
         }
@@ -502,7 +501,6 @@ $(function () {
                 }
             },
             error: function (xhr) {
-                console.error("Error getting delete info:", xhr);
                 toastr.error("Không thể lấy thông tin danh mục", "Thông báo");
             },
         });
@@ -613,7 +611,6 @@ $(function () {
                 }
             },
             error: function (xhr) {
-                console.error("Delete error:", xhr);
                 let errorMessage = "Lỗi khi xóa danh mục.";
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;

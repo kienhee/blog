@@ -1,0 +1,110 @@
+// Error Pages Styles
+// ====================================
+
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.error-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 1rem;
+    color: $error-color;
+}
+
+.error-icon {
+    font-size: 6rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+    color: $error-color;
+}
+
+.error-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 1rem;
+}
+
+.error-description {
+    font-size: 1.125rem;
+    color: $text-muted;
+    margin-bottom: 2rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-image {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto 2rem;
+    display: block;
+}
+
+.error-illustration {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto 2rem;
+    display: block;
+    
+    svg {
+        width: 100%;
+        height: auto;
+        --error-color: #{$error-color};
+    }
+    
+    // SVG color classes - use CSS variable
+    .error-illustration-fill {
+        fill: var(--error-color);
+    }
+    
+    .error-illustration-bg {
+        fill: var(--error-color);
+    }
+    
+    .error-illustration-stroke {
+        stroke: var(--error-color);
+    }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+    .error-image {
+        max-width: 300px;
+    }
+    
+    .error-code {
+        font-size: 5rem;
+    }
+    
+    .error-title {
+        font-size: 1.5rem;
+    }
+    
+    .error-description {
+        font-size: 1rem;
+    }
+    
+    .error-illustration {
+        max-width: 300px;
+    }
+}
+

@@ -278,7 +278,6 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Error loading posts:', error);
                         container.innerHTML =
                             '<div class="text-center py-5"><p class="text-danger">Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại.</p></div>';
                     });

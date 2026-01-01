@@ -215,8 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 // Update URL without jumping
                 window.history.pushState(null, null, href);
-            } else {
-                console.warn('TOC target not found:', targetId);
             }
         });
 
@@ -242,7 +240,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const saveBtn = document.getElementById('savePostBtn');
     
     if (!saveBtn) {
-        console.log('Save button not found');
         return;
     }
     
@@ -250,27 +247,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     
     if (!postId) {
-        console.error('Post ID not found');
         return;
     }
     
     if (!csrfToken) {
-        console.error('CSRF token not found');
         return;
     }
-    
-    console.log('Save button initialized', { postId, hasToken: !!csrfToken });
     
     saveBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('Save button clicked');
-        
         const icon = saveBtn.querySelector('i');
         const isCurrentlySaved = saveBtn.classList.contains('saved');
-        
-        console.log('Current state:', { isCurrentlySaved, postId });
         
         // Disable button during request to prevent double clicks
         saveBtn.disabled = true;
@@ -305,8 +294,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         
         // Make AJAX request using Fetch API
-        console.log('Making AJAX request to:', `/saved-posts/${postId}/toggle`);
-        
         fetch(`/saved-posts/${postId}/toggle`, {
             method: 'POST',
             headers: {
@@ -318,15 +305,12 @@ document.addEventListener("DOMContentLoaded", function() {
             credentials: 'same-origin'
         })
         .then(response => {
-            console.log('Fetch response status:', response.status);
             if (!response.ok) {
                 return response.json().then(err => Promise.reject({ status: response.status, data: err }));
             }
             return response.json();
         })
         .then(data => {
-            console.log('AJAX success:', data);
-            
             if (data && data.success !== undefined) {
                 // Update button state based on server response
                 if (data.saved) {
@@ -355,8 +339,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .catch(error => {
-            console.error('AJAX error:', error);
-            
             // Revert optimistic update on error
             revertButtonState(saveBtn, icon, originalState);
             
@@ -421,9 +403,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 timeOut: 5000,
                 positionClass: 'toast-top-right'
             });
-        } else {
-            console.log(message);
-            alert(message);
         }
     }
     
@@ -436,11 +415,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 timeOut: 5000,
                 positionClass: 'toast-top-right'
             });
-        } else {
-            console.error(message);
-            alert(message);
         }
     }
+    
+    /**
+     * Copy link to clipboard and show toast notification
+     */
+    window.copyLinkToClipboard = function(url) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (typeof toastr !== 'undefined') {
+                toastr.success('Đã sao chép link!', 'Thành công', {
+                    timeOut: 3000,
+                    positionClass: 'toast-top-right'
+                });
+            }
+        }).catch(function(err) {
+            if (typeof toastr !== 'undefined') {
+                toastr.error('Không thể sao chép link. Vui lòng thử lại.', 'Lỗi');
+            }
+        });
+    };
 });
 
 // Comment Form functionality
@@ -458,7 +452,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     
     if (!csrfToken) {
-        console.error('CSRF token not found');
         return;
     }
     
@@ -538,8 +531,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .catch(error => {
-            console.error('Comment submission error:', error);
-            
             let message = 'Có lỗi xảy ra khi gửi bình luận. Vui lòng thử lại.';
             
             if (error.status === 401) {
@@ -618,9 +609,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 timeOut: 3000,
                 positionClass: 'toast-top-right'
             });
-        } else {
-            console.log(message);
-            alert(message);
         }
     }
     
@@ -633,9 +621,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 timeOut: 5000,
                 positionClass: 'toast-top-right'
             });
-        } else {
-            console.error(message);
-            alert(message);
         }
     }
 });
@@ -709,8 +694,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!content || content.length < 3) {
                 if (typeof toastr !== 'undefined') {
                     toastr.error('Nội dung phản hồi phải có ít nhất 3 ký tự.', 'Lỗi');
-                } else {
-                    alert('Nội dung phản hồi phải có ít nhất 3 ký tự.');
                 }
                 return;
             }
@@ -718,8 +701,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (content.length > 1000) {
                 if (typeof toastr !== 'undefined') {
                     toastr.error('Nội dung phản hồi không được vượt quá 1000 ký tự.', 'Lỗi');
-                } else {
-                    alert('Nội dung phản hồi không được vượt quá 1000 ký tự.');
                 }
                 return;
             }
@@ -781,8 +762,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         // Show success message
                         if (typeof toastr !== 'undefined') {
                             toastr.success(data.message || 'Phản hồi đã được gửi thành công.', 'Thành công');
-                        } else {
-                            alert(data.message || 'Phản hồi đã được gửi thành công.');
                         }
                         
                         // Scroll to new reply
@@ -791,14 +770,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     if (typeof toastr !== 'undefined') {
                         toastr.error(data.message || 'Có lỗi xảy ra khi gửi phản hồi.', 'Lỗi');
-                    } else {
-                        alert(data.message || 'Có lỗi xảy ra khi gửi phản hồi.');
                     }
                 }
             })
             .catch(error => {
-                console.error('Reply submission error:', error);
-                
                 let message = 'Có lỗi xảy ra khi gửi phản hồi. Vui lòng thử lại.';
                 
                 if (error.status === 401) {
@@ -815,8 +790,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 if (typeof toastr !== 'undefined') {
                     toastr.error(message, 'Lỗi');
-                } else {
-                    alert(message);
                 }
             })
             .finally(() => {
@@ -870,3 +843,4 @@ document.addEventListener("DOMContentLoaded", function() {
         return div.innerHTML;
     }
 });
+
