@@ -100,12 +100,22 @@ class Post extends Model
             }
         }
 
-        // Build full URL for image
+        // Build full absolute URL for image (required for Open Graph)
         $imageUrl = null;
         if ($this->thumbnail) {
             $imageUrl = $this->thumbnail;
             if (!str_starts_with($imageUrl, 'http')) {
-                $imageUrl = asset($imageUrl);
+                // Ensure path starts with /
+                $path = '/' . ltrim($imageUrl, '/');
+                // Encode each path segment properly (keep slashes)
+                $pathSegments = explode('/', trim($path, '/'));
+                $encodedSegments = array_map(function($segment) {
+                    return $segment ? rawurlencode($segment) : '';
+                }, $pathSegments);
+                $encodedPath = '/' . implode('/', array_filter($encodedSegments));
+                // Build full absolute URL
+                $baseUrl = rtrim(config('app.url'), '/');
+                $imageUrl = $baseUrl . $encodedPath;
             }
         }
 
