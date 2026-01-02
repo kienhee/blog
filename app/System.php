@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class System
 {
-    public static $version_view = 5; // Tăng view mỗi khi thay đổi css or js
+    public static $version_view = 6; // Tăng view mỗi khi thay đổi css or js
     /**
      * Get the admin asset URL with versioning.
      *
