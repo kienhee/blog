@@ -6,6 +6,7 @@ use App\Mail\PostPublishedNotification;
 use App\Models\Post;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class PublishScheduledPosts extends Command
 {
@@ -39,7 +40,7 @@ class PublishScheduledPosts extends Command
 
         if ($scheduledPosts->isEmpty()) {
             $this->info('Không có bài viết nào cần đăng.');
-            return Command::SUCCESS;
+            return SymfonyCommand::SUCCESS;
         }
 
         $count = 0;
@@ -67,6 +68,6 @@ class PublishScheduledPosts extends Command
 
         $this->info("Hoàn thành! Đã đăng {$count} bài viết.");
 
-        return Command::SUCCESS;
+        return SymfonyCommand::SUCCESS;
     }
 }

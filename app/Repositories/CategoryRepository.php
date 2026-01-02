@@ -105,7 +105,7 @@ class CategoryRepository extends BaseRepository
                 if ($isUncategorized) {
                     return '<span class="text-muted">—</span>';
                 }
-
+                
                 $canEdit = auth()->user()->can('category.update');
                 $canDelete = auth()->user()->can('category.delete');
 

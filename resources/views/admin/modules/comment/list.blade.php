@@ -79,15 +79,11 @@
                                             <button type="button" class="btn btn-warning btn-sm me-2" id="bulkSpamBtn">
                                                 <i class="bx bx-shield-x me-1"></i> Đánh dấu spam
                                             </button>
-                                            <button type="button" class="btn btn-secondary btn-sm me-2" id="bulkTrashBtn">
+                                            <button type="button" class="btn btn-secondary btn-sm" id="bulkTrashBtn">
                                                 <i class="bx bx-trash me-1"></i> Chuyển vào thùng rác
                                             </button>
                                         @endcan
-                                        @can('comment.delete')
-                                            <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteBtn">
-                                                <i class="bx bx-trash-alt me-1"></i> Xóa đã chọn
-                                            </button>
-                                        @endcan
+                                        {{-- Xóa nút "Xóa đã chọn" - để xóa vĩnh viễn, phải vào tab "Thùng rác" trước --}}
                                     </div>
                                 </div>
                             </div>
@@ -374,33 +370,6 @@
                 </div>
             </div>
 
-            <!-- Bulk Delete Confirmation Modal -->
-            <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="bulkDeleteLabel">Xác nhận xóa bình luận</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="alert alert-warning mb-0">
-                                <i class="bx bx-info-circle me-2"></i>
-                                Bạn có chắc chắn muốn xóa <strong id="bulkDeleteCount">0</strong> bình luận đã chọn?<br>
-                                <small class="d-block mt-2">Các bình luận sẽ được chuyển vào <strong>Thùng rác</strong> và bạn có thể khôi phục lại sau.</small>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
-                                <span class="spinner-border spinner-border-sm me-2 d-none" role="status"
-                                    aria-hidden="true"></span>
-                                Xóa
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Bulk Restore Confirmation Modal -->
             <div class="modal fade" id="bulkRestoreModal" tabindex="-1" aria-labelledby="bulkRestoreLabel"
@@ -472,7 +441,7 @@
         window.commentBulkChangeStatusUrl = "{{ route('admin.comments.bulkChangeStatus') }}";
         window.commentReplyUrl = "{{ route('admin.comments.reply', ':id') }}";
         window.commentDeleteUrl = "{{ route('admin.comments.destroy', ':id') }}";
-        window.commentBulkDeleteUrl = "{{ route('admin.comments.bulkDelete') }}";
+        // window.commentBulkDeleteUrl đã bị xóa - chỉ dùng "Chuyển vào thùng rác"
         window.commentRestoreUrl = "{{ route('admin.comments.restore', ':id') }}";
         window.commentForceDeleteUrl = "{{ route('admin.comments.forceDelete', ':id') }}";
         window.commentBulkRestoreUrl = "{{ route('admin.comments.bulkRestore') }}";

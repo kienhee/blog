@@ -63,7 +63,7 @@ class ProfileController extends Controller
         }
 
         return redirect()
-            ->route('admin.users.socials')
+            ->route('admin.users.information')
             ->with('success', 'Cập nhật thông tin thành công!');
     }
 

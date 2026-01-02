@@ -40,7 +40,7 @@ class CategoryController extends Controller
             })
             ->whereIn('categories.id', $categoryIds)
             ->orderBy('posts.created_at', 'desc')
-            ->paginate(12);
+            ->paginate(get_posts_per_page());
 
         // Pass model for SEO
         $seoModel = $category;

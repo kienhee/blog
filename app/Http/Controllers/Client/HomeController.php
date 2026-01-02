@@ -123,7 +123,7 @@ class HomeController extends Controller
                 })
                 ->orderBy('posts.created_at', 'desc');
 
-            $posts = $query->paginate(12)->withQueryString();
+            $posts = $query->paginate(get_posts_per_page())->withQueryString();
         }
 
         // SEO Data for search page
@@ -161,7 +161,7 @@ class HomeController extends Controller
             });
         }
 
-        $posts = $query->paginate(12);
+        $posts = $query->paginate(get_posts_per_page());
 
         // SEO Data for posts listing page
         $seoModel = new SEOData(

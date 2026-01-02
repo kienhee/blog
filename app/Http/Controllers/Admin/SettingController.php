@@ -31,7 +31,6 @@ class SettingController extends Controller
             'phone' => '',
             'map' => '',
             'posts_per_page' => 15,
-            'home_categories' => [],
             'schedule_test_enabled' => false,
             'schedule_test_interval' => 5,
             'test_emails' => [],
@@ -42,8 +41,6 @@ class SettingController extends Controller
             $settings[$key] = Setting::getValue($key, $default);
         }
 
-        $categories = [];
-        
         // Get users with emails for select2
         $users = User::whereNotNull('email')
             ->where('email', '!=', '')
@@ -51,7 +48,7 @@ class SettingController extends Controller
             ->orderBy('email')
             ->get();
 
-        return view('admin.modules.settings.index', compact('settings', 'categories', 'users'));
+        return view('admin.modules.settings.index', compact('settings', 'users'));
     }
 
     public function update(Request $request)
@@ -73,7 +70,6 @@ class SettingController extends Controller
             'phone' => $request->phone,
             'map' => $request->map,
             'posts_per_page' => (int) $request->posts_per_page,
-            'home_categories' => $request->home_categories ?? [],
             'schedule_test_enabled' => $request->has('schedule_test_enabled'),
             'schedule_test_interval' => (int) ($request->schedule_test_interval ?? 5),
             'test_emails' => $request->test_emails ?? [],

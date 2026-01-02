@@ -230,3 +230,15 @@ if (! class_exists('CategoryMenuBuilder')) {
         }
     }
 }
+
+if (! function_exists('get_posts_per_page')) {
+    /**
+     * Lấy số lượng bài viết mỗi trang từ settings
+     *
+     * @return int
+     */
+    function get_posts_per_page(): int
+    {
+        return (int) \App\Models\Setting::getValue('posts_per_page', 15);
+    }
+}

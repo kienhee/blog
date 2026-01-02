@@ -7,11 +7,10 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileRepository
 {
-    protected $model;
-
     public function __construct(User $model)
     {
-        $this->model = $model;
+        // Model được inject để đảm bảo DI container hoạt động đúng
+        // Nhưng không được sử dụng vì các methods nhận User object trực tiếp
     }
 
     /**
@@ -67,11 +66,15 @@ class ProfileRepository
      * Lấy danh sách bài viết đã lưu
      *
      * @param int $userId
-     * @param int $perPage
+     * @param int|null $perPage Nếu null, sử dụng giá trị từ settings
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getSavedPosts($userId, $perPage = 12)
+    public function getSavedPosts($userId, $perPage = null)
     {
+        if ($perPage === null) {
+            $perPage = get_posts_per_page();
+        }
+        
         return \App\Models\SavedPost::where('user_id', $userId)
             ->with(['post' => function($query) {
                 $query->where('status', 'published')

@@ -192,16 +192,26 @@ class CommentRepository extends BaseRepository
                 $spamUrl = route('admin.comments.changeStatus', [$row->id, Comment::STATUS_SPAM]);
                 $trashUrl = route('admin.comments.changeStatus', [$row->id, Comment::STATUS_TRASH]);
 
+                $canRead = auth()->user()->can('comment.read');
                 $canUpdate = auth()->user()->can('comment.update');
                 $canDelete = auth()->user()->can('comment.delete');
 
                 $html = '<div class="d-inline-block text-nowrap">';
 
-                if ($canUpdate) {
-                    $html .= '<button type="button" class="btn btn-sm btn-icon text-primary btn-show-comment" title="Xem chi tiết" data-url="' . $showUrl . '">';
+                // View buttons - chỉ hiển thị nếu có quyền read
+                if ($canRead) {
+                    // Modal view button
+                    $html .= '<button type="button" class="btn btn-sm btn-icon text-primary btn-show-comment" title="Xem chi tiết (Modal)" data-url="' . $showUrl . '">';
                     $html .= '<i class="bx bx-show"></i>';
                     $html .= '</button>';
 
+                    // Full page view link
+                    $html .= '<a href="' . $showUrl . '" class="btn btn-sm btn-icon" title="Xem chi tiết (Page)">';
+                    $html .= '<i class="bx bx-file"></i>';
+                    $html .= '</a>';
+                }
+
+                if ($canUpdate) {
                     if ($row->status !== Comment::STATUS_APPROVED) {
                         $html .= '<button type="button" class="btn btn-sm btn-icon text-success btn-approve-comment" title="Duyệt" data-url="' . $approveUrl . '">';
                         $html .= '<i class="bx bx-check"></i>';
@@ -221,11 +231,13 @@ class CommentRepository extends BaseRepository
                     }
                 }
 
-                if ($canDelete) {
-                    $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa" data-url="' . $deleteUrl . '" data-title="Bình luận #' . $row->id . '">';
-                    $html .= '<i class="bx bx-trash-alt"></i>';
-                    $html .= '</button>';
-                }
+                // Chỉ hiển thị nút xóa vĩnh viễn khi comment đã ở trong thùng rác
+                // (Nếu muốn xóa vĩnh viễn, phải vào tab "Thùng rác" trước)
+                // if ($canDelete && $row->status === Comment::STATUS_TRASH) {
+                //     $html .= '<button type="button" class="btn btn-sm btn-icon text-danger btn-delete" title="Xóa vĩnh viễn" data-url="' . $deleteUrl . '" data-title="Bình luận #' . $row->id . '">';
+                //     $html .= '<i class="bx bx-trash-alt"></i>';
+                //     $html .= '</button>';
+                // }
 
                 $html .= '</div>';
 

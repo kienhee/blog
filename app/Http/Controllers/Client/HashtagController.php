@@ -44,7 +44,7 @@ class HashtagController extends Controller
             })
             ->whereIn('posts.id', $postIds)
             ->orderBy('posts.created_at', 'desc')
-            ->paginate(12);
+            ->paginate(get_posts_per_page());
 
         // SEO Data for hashtag page
         $seoModel = new SEOData(

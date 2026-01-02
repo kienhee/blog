@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class GenerateClientSitemap extends Command
 {
@@ -142,7 +143,7 @@ class GenerateClientSitemap extends Command
             $this->info("  Total URLs: {$totalUrls}");
             $this->info("  Execution time: {$executionTime}s");
 
-            return Command::SUCCESS;
+            return SymfonyCommand::SUCCESS;
         } catch (\Exception $e) {
             $this->error("Failed to generate sitemap: {$e->getMessage()}");
             
@@ -157,7 +158,7 @@ class GenerateClientSitemap extends Command
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return Command::FAILURE;
+            return SymfonyCommand::FAILURE;
         }
     }
 }

@@ -224,7 +224,7 @@ class PostController extends Controller
     public function restore($id)
     {
         try {
-            $post = \App\Models\Post::withTrashed()->find($id);
+            $post = Post::withTrashed()->find($id);
             if (! $post || ! $post->trashed()) {
                 return response()->json([
                     'status' => false,
@@ -249,7 +249,7 @@ class PostController extends Controller
     public function forceDelete($id)
     {
         try {
-            $post = \App\Models\Post::withTrashed()->find($id);
+            $post = Post::withTrashed()->find($id);
             if (! $post || ! $post->trashed()) {
                 return response()->json([
                     'status' => false,

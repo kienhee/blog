@@ -66,10 +66,10 @@
                         @include('admin.modules.settings.cards.map')
                     </div>
 
-                    <!-- Display Tab -->
-                    <div class="tab-pane fade" id="display" role="tabpanel">
-                        @include('admin.modules.settings.cards.display', ['categories' => $categories])
-                    </div>
+      <!-- Display Tab -->
+      <div class="tab-pane fade" id="display" role="tabpanel">
+          @include('admin.modules.settings.cards.display')
+      </div>
 
                     <!-- System Check Tab -->
                     <div class="tab-pane fade" id="system-check" role="tabpanel">

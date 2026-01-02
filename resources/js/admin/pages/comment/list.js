@@ -245,62 +245,7 @@ $(function () {
         });
     });
 
-    // Bulk delete
-    $(document).on("click", "#bulkDeleteBtn", function (e) {
-        e.preventDefault();
-        const checkedBoxes = $(".row-checkbox:checked");
-        bulkActionIds = checkedBoxes.map(function () {
-            return $(this).val();
-        }).get();
-
-        if (bulkActionIds.length === 0) {
-            toastr.warning("Vui lòng chọn ít nhất một bình luận", "Thông báo");
-            return;
-        }
-
-        $("#bulkDeleteCount").text(bulkActionIds.length);
-        const modal = new bootstrap.Modal($("#bulkDeleteModal"));
-        modal.show();
-    });
-
-    // Confirm bulk delete
-    $(document).on("click", "#confirmBulkDeleteBtn", function () {
-        const btn = $(this);
-        const spinner = btn.find(".spinner-border");
-        btn.prop("disabled", true);
-        spinner.removeClass("d-none");
-
-        $.ajax({
-            url: window.commentBulkDeleteUrl,
-            type: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            data: { ids: bulkActionIds },
-            success: function (response) {
-                if (response.status) {
-                    $("#bulkDeleteModal").modal("hide");
-                    table.draw();
-                    $("#selectAllComments").prop("checked", false);
-                    updateBulkActionsComments();
-                    toastr.success(response.message || "Xóa thành công", "Thông báo");
-                } else {
-                    toastr.error(response.message || "Không thể xóa", "Thông báo");
-                }
-            },
-            error: function (xhr) {
-                let errorMessage = "Có lỗi xảy ra khi xóa";
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                }
-                toastr.error(errorMessage, "Thông báo");
-            },
-            complete: function () {
-                btn.prop("disabled", false);
-                spinner.addClass("d-none");
-            },
-        });
-    });
+    // Đã xóa bulk delete - chỉ sử dụng "Chuyển vào thùng rác"
 
     // Helper function để bulk change status
     function bulkChangeStatus(ids, status, callback) {
