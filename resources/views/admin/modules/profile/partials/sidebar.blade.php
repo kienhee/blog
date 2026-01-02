@@ -26,7 +26,10 @@
                 <span>
                     @if ($user->roles->count() > 0)
                         @foreach ($user->roles as $role)
-                            <span class="badge bg-label-primary me-1">{{ ucfirst($role->name) }}</span>
+                            <span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1 me-1">
+                                <span class="badge badge-dot text-bg-primary me-1"></span>
+                                {{ ucfirst($role->name) }}
+                            </span>
                         @endforeach
                     @else
                         <span class="text-muted">—</span>

@@ -85,7 +85,8 @@ class NewsletterRepository extends BaseRepository
                 ];
                 $badgeClass = isset($class[$status]) ? $class[$status] : 'bg-label-secondary';
 
-                return '<span class="badge '.$badgeClass.'">'.$label.'</span>';
+                $dotColor = str_replace('bg-label-', 'text-bg-', $badgeClass);
+                return '<span class="badge rounded-pill '.$badgeClass.' d-inline-flex align-items-center lh-1"><span class="badge badge-dot '.$dotColor.' me-1"></span>'.$label.'</span>';
             })
             ->addColumn('is_human', function ($row) {
                 if ($row->is_human === null) {
@@ -93,9 +94,9 @@ class NewsletterRepository extends BaseRepository
                 }
                 
                 if ($row->is_human) {
-                    return '<span class="badge bg-label-success"><i class="bx bx-user-check me-1"></i>Người</span>';
+                    return '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span><i class="bx bx-user-check me-1"></i>Người</span>';
                 } else {
-                    return '<span class="badge bg-label-danger"><i class="bx bx-bot me-1"></i>Bot/Spam</span>';
+                    return '<span class="badge rounded-pill bg-label-danger d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-danger me-1"></span><i class="bx bx-bot me-1"></i>Bot/Spam</span>';
                 }
             })
             ->addColumn('spam_score', function ($row) {
@@ -113,7 +114,8 @@ class NewsletterRepository extends BaseRepository
                     $badgeClass = 'bg-label-info';
                 }
                 
-                return '<span class="badge '.$badgeClass.'">'.$score.'</span>';
+                $dotColor = str_replace('bg-label-', 'text-bg-', $badgeClass);
+                return '<span class="badge rounded-pill '.$badgeClass.' d-inline-flex align-items-center lh-1"><span class="badge badge-dot '.$dotColor.' me-1"></span>'.$score.'</span>';
             })
             ->addColumn('behavior', function ($row) {
                 $html = '<div class="small">';

@@ -23,7 +23,11 @@
                         <h5 class="mb-0">
                             <i class="bx bx-info-circle me-2"></i>Thông tin liên hệ
                         </h5>
-                        <span class="badge bg-label-{{ $statusLabels[$contact->status] == 'Chưa xử lý' ? 'warning' : ($statusLabels[$contact->status] == 'Đã trả lời email' ? 'success' : ($statusLabels[$contact->status] == 'Spam' ? 'danger' : 'info')) }}">
+                        @php
+                            $statusColor = $statusLabels[$contact->status] == 'Chưa xử lý' ? 'warning' : ($statusLabels[$contact->status] == 'Đã trả lời email' ? 'success' : ($statusLabels[$contact->status] == 'Spam' ? 'danger' : 'info'));
+                        @endphp
+                        <span class="badge rounded-pill bg-label-{{ $statusColor }} d-inline-flex align-items-center lh-1">
+                            <span class="badge badge-dot text-bg-{{ $statusColor }} me-1"></span>
                             {{ $statusLabels[$contact->status] }}
                         </span>
                     </div>
@@ -171,7 +175,11 @@
 
                             <dt class="col-sm-5 text-muted">Trạng thái:</dt>
                             <dd class="col-sm-7">
-                                <span class="badge bg-label-{{ $statusLabels[$contact->status] == 'Chưa xử lý' ? 'warning' : ($statusLabels[$contact->status] == 'Đã trả lời email' ? 'success' : ($statusLabels[$contact->status] == 'Spam' ? 'danger' : 'info')) }}">
+                                @php
+                                    $statusColor = $statusLabels[$contact->status] == 'Chưa xử lý' ? 'warning' : ($statusLabels[$contact->status] == 'Đã trả lời email' ? 'success' : ($statusLabels[$contact->status] == 'Spam' ? 'danger' : 'info'));
+                                @endphp
+                                <span class="badge rounded-pill bg-label-{{ $statusColor }} d-inline-flex align-items-center lh-1">
+                                    <span class="badge badge-dot text-bg-{{ $statusColor }} me-1"></span>
                                     {{ $statusLabels[$contact->status] }}
                                 </span>
                             </dd>

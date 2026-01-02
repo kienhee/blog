@@ -156,26 +156,26 @@ class PostRepository extends BaseRepository
                 $scheduledAt = isset($row->scheduled_at) ? $row->scheduled_at : null;
 
                 if ($status == 'published') {
-                    return '<span class="badge bg-label-success">Xuất bản</span>';
+                    return '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>Xuất bản</span>';
                 } elseif ($status == 'scheduled' && $scheduledAt && Carbon::parse($scheduledAt) > now()) {
                     $scheduledDate = Carbon::parse($scheduledAt)->format('d/m/Y H:i');
 
-                    return '<span class="badge bg-label-warning">Lên lịch</span> <small class="text-muted d-block">'.$scheduledDate.'</small>';
+                    return '<span class="badge rounded-pill bg-label-warning d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-warning me-1"></span>Lên lịch</span> <small class="text-muted d-block">'.$scheduledDate.'</small>';
                 } else {
-                    return '<span class="badge bg-label-danger">Bản nháp</span>';
+                    return '<span class="badge rounded-pill bg-label-danger d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-danger me-1"></span>Bản nháp</span>';
                 }
             })
 
             ->addColumn('allow_comment_html', function ($row) {
                 $isComment = $row->allow_comment;
 
-                return $isComment == 1 ? '<span class="badge bg-label-success">Bật</span>' : '<span class="badge bg-label-danger">Tắt</span>';
+                return $isComment == 1 ? '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>Bật</span>' : '<span class="badge rounded-pill bg-label-danger d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-danger me-1"></span>Tắt</span>';
             })
 
             ->addColumn('view_count_html', function ($row) {
                 $viewCount = (int) ($row->view_count ?? 0);
 
-                return '<span class="badge bg-label-primary">'.number_format($viewCount).'</span>';
+                return '<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-primary me-1"></span>'.number_format($viewCount).'</span>';
             })
 
             ->addColumn('created_at_html', function ($row) {
@@ -282,22 +282,22 @@ class PostRepository extends BaseRepository
             ->addColumn('status_html', function ($row) {
                 $status = $row->status;
                 if ($status == 'published') {
-                    return '<span class="badge bg-label-success">Xuất bản</span>';
+                    return '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>Xuất bản</span>';
                 } elseif ($status == 'scheduled') {
-                    return '<span class="badge bg-label-warning">Lên lịch</span>';
+                    return '<span class="badge rounded-pill bg-label-warning d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-warning me-1"></span>Lên lịch</span>';
                 } else {
-                    return '<span class="badge bg-label-danger">Bản nháp</span>';
+                    return '<span class="badge rounded-pill bg-label-danger d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-danger me-1"></span>Bản nháp</span>';
                 }
             })
             ->addColumn('allow_comment_html', function ($row) {
                 $isComment = $row->allow_comment;
 
-                return $isComment == 1 ? '<span class="badge bg-label-success">Bật</span>' : '<span class="badge bg-label-danger">Tắt</span>';
+                return $isComment == 1 ? '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>Bật</span>' : '<span class="badge rounded-pill bg-label-danger d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-danger me-1"></span>Tắt</span>';
             })
             ->addColumn('view_count_html', function ($row) {
                 $viewCount = (int) ($row->view_count ?? 0);
 
-                return '<span class="badge bg-label-primary">'.number_format($viewCount).'</span>';
+                return '<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-primary me-1"></span>'.number_format($viewCount).'</span>';
             })
             ->addColumn('deleted_at_html', function ($row) {
                 $deletedAt = $row->deleted_at;

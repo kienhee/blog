@@ -139,7 +139,8 @@ class ContactRepository extends BaseRepository
                 ];
                 $badgeClass = isset($class[$status]) ? $class[$status] : 'bg-label-secondary';
 
-                return '<span class="badge '.$badgeClass.'">'.$label.'</span>';
+                $dotColor = str_replace('bg-label-', 'text-bg-', $badgeClass);
+                return '<span class="badge rounded-pill '.$badgeClass.' d-inline-flex align-items-center lh-1"><span class="badge badge-dot '.$dotColor.' me-1"></span>'.$label.'</span>';
             })
             ->addColumn('created_at', function ($row) {
                 return '<span class="text-muted">'.$row->created_at->format('d/m/Y H:i').'</span>';

@@ -188,9 +188,9 @@
                             <h6 class="mb-2 fw-bold">Thông tin danh mục:</h6>
                             <ul class="list-unstyled mb-2">
                                 <li class="mb-1"><strong>Số danh mục con:</strong> <span id="deleteChildrenCount"
-                                        class="badge bg-label-info">0</span></li>
+                                        class="badge rounded-pill bg-label-info d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-info me-1"></span>0</span></li>
                                 <li class="mb-1"><strong>Số bài viết trực tiếp:</strong> <span id="deletePostCount"
-                                        class="badge bg-label-success">0</span></li>
+                                        class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>0</span></li>
                             </ul>
                         </div>
 

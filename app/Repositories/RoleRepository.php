@@ -51,7 +51,7 @@ class RoleRepository extends BaseRepository
             ->addColumn('permissions_count_html', function ($row) {
                 $count = $row->permissions()->count();
 
-                return '<span class="badge bg-label-info">'.$count.' quyền</span>';
+                return '<span class="badge rounded-pill bg-label-info d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-info me-1"></span>'.$count.' quyền</span>';
             })
             ->addColumn('users_count_html', function ($row) {
                 $count = $row->users()->count();

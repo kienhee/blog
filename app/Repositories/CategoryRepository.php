@@ -87,7 +87,7 @@ class CategoryRepository extends BaseRepository
             ->addColumn('post_count_html', function ($row) {
                 $postCount = isset($row->post_count) ? (int) $row->post_count : 0;
 
-                return '<span class="badge bg-label-primary">'.number_format($postCount).'</span>';
+                return '<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-primary me-1"></span>'.number_format($postCount).'</span>';
             })
             ->addColumn('created_at_html', function ($row) {
                 $createdAt = $row->created_at;
@@ -707,7 +707,7 @@ class CategoryRepository extends BaseRepository
             ->addColumn('post_count_html', function ($row) {
                 $postCount = isset($row->post_count) ? (int) $row->post_count : 0;
 
-                return '<span class="badge bg-label-primary">'.number_format($postCount).'</span>';
+                return '<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-primary me-1"></span>'.number_format($postCount).'</span>';
             })
             ->addColumn('checkbox_html', function ($row) {
                 return '<input type="checkbox" class="form-check-input row-checkbox" value="'.$row->id.'" />';

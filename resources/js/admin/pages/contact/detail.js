@@ -117,7 +117,7 @@ $(function () {
                         <i class="bx bx-history me-1"></i> Lịch sử trả lời
                         ${
                             contact.replies && contact.replies.length > 0
-                                ? `<span class="badge bg-label-primary ms-1">${contact.replies.length}</span>`
+                                ? `<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1 ms-1"><span class="badge badge-dot text-bg-primary me-1"></span>${contact.replies.length}</span>`
                                 : ""
                         }
                     </button>

@@ -88,15 +88,15 @@ class UserRepository extends BaseRepository
             })
             ->addColumn('email_verified_html', function ($row) {
                 if ($row->email_verified_at) {
-                    return '<span class="badge bg-label-success">Đã xác minh</span>';
+                    return '<span class="badge rounded-pill bg-label-success d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-success me-1"></span>Đã xác minh</span>';
                 }
 
-                return '<span class="badge bg-label-warning">Chưa xác minh</span>';
+                return '<span class="badge rounded-pill bg-label-warning d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-warning me-1"></span>Chưa xác minh</span>';
             })
             ->addColumn('roles_html', function ($row) {
                 if ($row->roles && $row->roles->count() > 0) {
                     $badges = $row->roles->map(function ($role) {
-                        return '<span class="badge bg-label-primary me-1">'.e(ucfirst($role->name)).'</span>';
+                        return '<span class="badge rounded-pill bg-label-primary d-inline-flex align-items-center lh-1 me-1"><span class="badge badge-dot text-bg-primary me-1"></span>'.e(ucfirst($role->name)).'</span>';
                     })->implode('');
 
                     return $badges;
