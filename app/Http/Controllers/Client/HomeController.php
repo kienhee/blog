@@ -94,7 +94,7 @@ class HomeController extends Controller
 
         // SEO Data for homepage
         $seoModel = new SEOData(
-            title: config('seo.title.homepage_title') ?? config('app.name'),
+            title: 'Trang chủ',
             description: 'Khám phá các bài viết mới nhất về lập trình, công nghệ và cuộc sống. Chia sẻ kiến thức và kinh nghiệm từ cộng đồng.',
             url: route('client.home', [], false),
             type: 'website',
