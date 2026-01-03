@@ -266,9 +266,6 @@ $(function () {
         resetForm();
         $('#accountOffcanvasLabel').text('Thêm tài khoản');
         $('#accountId').val('');
-        $('#passwordRequired').show();
-        $('#passwordOptional').hide();
-        $('#accountPassword').prop('required', true);
         accountOffcanvas.show();
     });
 
@@ -293,9 +290,7 @@ $(function () {
                     $('#accountType').val(account.type || '');
                     $('#accountName').val(account.name);
                     $('#accountNote').val(account.note || '');
-                    $('#accountPassword').val('').removeAttr('required');
-                    $('#passwordRequired').hide();
-                    $('#passwordOptional').show();
+                    $('#accountPassword').val('');
                     $('#accountOffcanvasLabel').text('Chỉnh sửa tài khoản');
                     resetFormValidation();
                     accountOffcanvas.show();
@@ -346,9 +341,9 @@ $(function () {
             note: $('#accountNote').val(),
         };
 
-        // Chỉ thêm password nếu có giá trị (hoặc bắt buộc khi tạo mới)
+        // Chỉ thêm password nếu có giá trị
         const password = $('#accountPassword').val();
-        if (password || !isEdit) {
+        if (password) {
             formData.password = password;
         }
 

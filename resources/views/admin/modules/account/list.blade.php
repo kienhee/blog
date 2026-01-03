@@ -88,19 +88,18 @@
                 <form id="accountForm">
                     <input type="hidden" id="accountId" name="id" value="">
                     
-                    <div class="mb-3">
-                        <label class="form-label" for="accountName">Tên tài khoản <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="accountName" name="name" 
-                            placeholder="Nhập tên tài khoản" required maxlength="255" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label" for="accountName">Tên tài khoản</label>
+                    <input type="text" class="form-control" id="accountName" name="name"
+                        placeholder="Nhập tên tài khoản" maxlength="255" />
+                    <div class="invalid-feedback"></div>
+                </div>
                     
                    
                     
                     <div class="mb-3 form-password-toggle">
                         <label class="form-label" for="accountPassword">
-                            Mật khẩu <span class="text-danger" id="passwordRequired">*</span>
-                            <small class="text-muted" id="passwordOptional" style="display: none;">(Để trống nếu không đổi)</small>
+                            Mật khẩu
                         </label>
                         <div class="input-group input-group-merge">
                             <input type="password" class="form-control" id="accountPassword" name="password" 

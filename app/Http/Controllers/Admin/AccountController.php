@@ -81,26 +81,29 @@ class AccountController extends Controller
     {
         $request->validate([
             'type' => 'nullable|string|max:255',
-            'name' => 'required|string|max:255',
-            'password' => 'required|string|min:1',
+            'name' => 'nullable|string|max:255',
+            'password' => 'nullable|string',
             'note' => 'nullable|string',
-        ], [
-            'name.required' => 'Vui lòng nhập tên tài khoản',
-            'password.required' => 'Vui lòng nhập mật khẩu',
         ]);
 
         try {
             // Lấy order lớn nhất + 1
             $maxOrder = Account::where('user_id', Auth::id())->max('order') ?? 0;
             
-            $account = Account::create([
+            $data = [
                 'user_id' => Auth::id(),
                 'type' => $request->input('type'),
                 'name' => $request->input('name'),
-                'password' => $request->input('password'), // Sẽ được encrypt tự động qua mutator
                 'note' => $request->input('note'),
                 'order' => $maxOrder + 1,
-            ]);
+            ];
+            
+            // Chỉ set password nếu có giá trị (sẽ được encrypt tự động qua mutator)
+            if ($request->filled('password')) {
+                $data['password'] = $request->input('password');
+            }
+            
+            $account = Account::create($data);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -155,11 +158,9 @@ class AccountController extends Controller
 
         $request->validate([
             'type' => 'nullable|string|max:255',
-            'name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:1',
+            'name' => 'nullable|string|max:255',
+            'password' => 'nullable|string',
             'note' => 'nullable|string',
-        ], [
-            'name.required' => 'Vui lòng nhập tên tài khoản',
         ]);
 
         try {

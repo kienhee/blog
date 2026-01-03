@@ -54,6 +54,9 @@ class Account extends Model
     {
         if (!empty($value)) {
             $this->attributes['password'] = \Illuminate\Support\Facades\Crypt::encryptString($value);
+        } else {
+            // Nếu password rỗng, set null
+            $this->attributes['password'] = null;
         }
     }
 }
