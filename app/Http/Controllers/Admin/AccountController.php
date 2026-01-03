@@ -41,7 +41,11 @@ class AccountController extends Controller
                 return '<span class="account-name">' . e($account->name) . '</span>';
             })
             ->addColumn('type_html', function ($account) {
-                return '<span class="badge bg-label-info">' . e($account->type ?? '-') . '</span>';
+                $type = $account->type ?? '-';
+                if ($type === '-') {
+                    return '<span class="text-muted">-</span>';
+                }
+                return '<span class="badge rounded-pill bg-label-info d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-info me-1"></span>' . e($type) . '</span>';
             })
             ->addColumn('password_html', function ($account) {
                 return '<button type="button" class="btn btn-sm btn-link p-0 text-primary btn-view-password" data-account-id="' . $account->id . '" title="Xem mật khẩu">

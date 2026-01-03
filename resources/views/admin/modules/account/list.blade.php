@@ -66,9 +66,9 @@
                             </th>
                             @endcan
                             <th width="50">STT</th>
-                            <th>Loại</th>
                             <th>Tên tài khoản</th>
                             <th>Mật khẩu</th>
+                            <th>Loại</th>
                             <th>Ghi chú</th>
                             <th>Ngày tạo</th>
                             <th>Hành động</th>
@@ -95,12 +95,7 @@
                         <div class="invalid-feedback"></div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label" for="accountType">Loại tài khoản</label>
-                        <input type="text" class="form-control" id="accountType" name="type" 
-                            placeholder="Nhập loại tài khoản" maxlength="255" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                   
                     
                     <div class="mb-3 form-password-toggle">
                         <label class="form-label" for="accountPassword">
@@ -119,7 +114,12 @@
                         </div>
                         <div class="invalid-feedback"></div>
                     </div>
-                    
+                    <div class="mb-3">
+                        <label class="form-label" for="accountType">Loại tài khoản</label>
+                        <input type="text" class="form-control" id="accountType" name="type" 
+                            placeholder="Nhập loại tài khoản" maxlength="255" />
+                        <div class="invalid-feedback"></div>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label" for="accountNote">Ghi chú</label>
                         <textarea class="form-control" id="accountNote" name="note" rows="3" 

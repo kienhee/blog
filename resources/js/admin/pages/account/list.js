@@ -57,16 +57,16 @@ $(function () {
                     searchable: false,
                     width: "50px",
                 },
-                { 
-                    data: "type_html", 
-                    name: "type",
-                    orderable: false,
-                    searchable: false,
-                },
                 { data: "name_html", name: "name" },
                 { 
                     data: "password_html", 
                     name: "password",
+                    orderable: false,
+                    searchable: false,
+                },
+                { 
+                    data: "type_html", 
+                    name: "type",
                     orderable: false,
                     searchable: false,
                 },
@@ -398,7 +398,10 @@ $(function () {
     });
 
     // Password toggle trong offcanvas
-    $('#togglePassword').on('click', function() {
+    // Dùng event delegation để hoạt động với offcanvas render động
+    $(document).on('click', '#togglePassword', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         const $input = $('#accountPassword');
         const $icon = $(this).find('i');
         
@@ -408,6 +411,13 @@ $(function () {
         } else {
             $input.attr('type', 'password');
             $icon.removeClass('bx-show').addClass('bx-hide');
+        }
+    });
+
+    // Gọi lại Helpers.initPasswordToggle() khi offcanvas được mở (nếu có)
+    $('#accountOffcanvas').on('shown.bs.offcanvas', function() {
+        if (typeof window.Helpers !== 'undefined' && typeof window.Helpers.initPasswordToggle === 'function') {
+            window.Helpers.initPasswordToggle();
         }
     });
 
