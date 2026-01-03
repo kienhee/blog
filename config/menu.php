@@ -129,6 +129,12 @@ return [
     //     'url' => 'admin.media',
     // ],
     [
+        'title' => 'Quản lý tài khoản',
+        'icon' => 'bx-user',
+        'url' => 'admin.accounts.list',
+        'permission' => 'account.read',
+    ],
+    [
         'title' => 'Cài đặt',
         'icon' => 'bx-cog',
         'url' => 'admin.settings.index',
