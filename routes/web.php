@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\NewsletterController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\FinanceMonthController;
+use App\Http\Controllers\Admin\FinanceYearController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
@@ -195,6 +197,32 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
     Route::get('media', function () {
         return view('admin.modules.media.index');
     })->name('media');
+
+    Route::prefix('finance')->name('finance.')->group(function () {
+        Route::prefix('years')->name('years.')->group(function () {
+            Route::get('/', [FinanceYearController::class, 'list'])->name('list');
+            Route::post('/', [FinanceYearController::class, 'store'])->name('store');
+            Route::get('/get-by-year', [FinanceYearController::class, 'getYearByNumber'])->name('getByYear');
+            Route::get('/{id}', [FinanceYearController::class, 'show'])->name('show')->where('id', '[0-9]+');
+            Route::put('/{id}/target', [FinanceYearController::class, 'updateTarget'])->name('updateTarget')->where('id', '[0-9]+');
+            Route::put('/{id}/note', [FinanceYearController::class, 'updateNote'])->name('updateNote')->where('id', '[0-9]+');
+            
+            Route::get('/{yearId}/months/{month}', [FinanceMonthController::class, 'show'])
+                ->name('months.show')
+                ->where(['yearId' => '[0-9]+', 'month' => '[1-9]|1[0-2]']);
+        });
+        
+        Route::prefix('months')->name('months.')->group(function () {
+            Route::put('/{monthId}', [FinanceMonthController::class, 'update'])->name('update')->where('monthId', '[0-9]+');
+            Route::prefix('{monthId}/expenses')->name('expenses.')->group(function () {
+                Route::get('/', [FinanceMonthController::class, 'getExpenses'])->name('index')->where('monthId', '[0-9]+');
+                Route::post('/', [FinanceMonthController::class, 'storeExpense'])->name('store')->where('monthId', '[0-9]+');
+                Route::put('/{id}', [FinanceMonthController::class, 'updateExpense'])->name('update')->where(['monthId' => '[0-9]+', 'id' => '[0-9]+']);
+                Route::delete('/{id}', [FinanceMonthController::class, 'destroyExpense'])->name('destroy')->where(['monthId' => '[0-9]+', 'id' => '[0-9]+']);
+            });
+        });
+
+    });
 
     Route::prefix('settings')->name('settings.')->group(function () {
         // Settings - Read permissions

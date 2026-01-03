@@ -129,6 +129,11 @@ return [
     //     'url' => 'admin.media',
     // ],
     [
+        'title' => 'Danh sách chi tiêu',
+        'icon' => 'bx-wallet',
+        'url' => 'admin.finance.years.list',
+    ],
+    [
         'title' => 'Cài đặt',
         'icon' => 'bx-cog',
         'url' => 'admin.settings.index',
