@@ -135,6 +135,11 @@ return [
         'permission' => 'account.read',
     ],
     [
+        'title' => 'Danh sách chi tiêu',
+        'icon' => 'bx-wallet',
+        'url' => 'admin.finance.years.list',
+    ],
+    [
         'title' => 'Cài đặt',
         'icon' => 'bx-cog',
         'url' => 'admin.settings.index',

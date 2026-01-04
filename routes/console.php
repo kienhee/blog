@@ -16,3 +16,6 @@ Schedule::command('sitemap:generate')->daily();
 
 // Kiểm tra schedule test - chạy mỗi phút
 Schedule::command('schedule:test')->everyMinute();
+
+// Gửi email nhắc nhở kiểm tra và khóa tháng tài chính - chạy vào ngày 1 hàng tháng lúc 9:00
+Schedule::command('finance:send-month-reminders')->monthlyOn(1, '9:00');
