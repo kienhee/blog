@@ -14,17 +14,25 @@ class FinanceMonth extends Model
         'year_id',
         'month',
         'total_money',
-        'fix_money',
-        'invest_money',
         'remaining_money',
         'note',
+        'locked_time',
     ];
 
     protected function casts(): array
     {
         return [
             'note' => 'array',
+            'locked_time' => 'datetime',
         ];
+    }
+
+    /**
+     * Check if the month is locked
+     */
+    public function isLocked(): bool
+    {
+        return !is_null($this->locked_time);
     }
 
     /**

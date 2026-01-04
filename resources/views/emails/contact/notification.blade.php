@@ -53,7 +53,7 @@
 
     <div style="margin:24px 0; text-align:center;">
         <a href="{{ route('admin.contacts.show', $contact->id) }}" 
-           style="display:inline-block; padding:12px 20px; border-radius:8px; text-decoration:none; background:#FF6A3D; color:#fff; font-weight:700;">
+           style="display:inline-block; padding:14px 32px; background-color:#FF6A3D; color:#FFFFFF; text-decoration:none; border-radius:6px; font-weight:500; font-size:16px;">
             Xem chi tiết
         </a>
     </div>

@@ -39,6 +39,19 @@
         .card-hover .card-body {
             color: inherit;
         }
+        .card-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .card-disabled:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #e0e0e0;
+        }
+        .card-disabled .card-body {
+            color: #999;
+        }
     </style>
 @endpush
 
@@ -128,6 +141,15 @@
                     </form>
                 </div>
             </div>
+            <!-- Actions buttons chung -->
+            <div class="mt-3" id="editActions" style="display: none;">
+                <button type="button" class="btn btn-success" id="saveAllBtn">
+                    <i class="bx bx-save me-1"></i> Lưu tất cả
+                </button>
+                <button type="button" class="btn btn-secondary" id="cancelEditBtn">
+                    <i class="bx bx-x me-1"></i> Hủy
+                </button>
+            </div>
             <hr/>
             <div class="card-header">
                 <h5 class="card-title mb-0">Danh sách tháng năm {{ $year->year }}</h5>
@@ -151,29 +173,34 @@
                         ];
                     @endphp
                     @for ($month = 1; $month <= 12; $month++)
+                        @php
+                            $isExisting = in_array($month, $existingMonths ?? []);
+                            $canCreate = in_array($month, $creatableMonths ?? []);
+                            $isDisabled = !$isExisting && !$canCreate;
+                        @endphp
                         <div class="col-md-3 col-sm-4 col-6">
-                            <a href="{{ route('admin.finance.years.months.show', ['yearId' => $year->id, 'month' => $month]) }}"
-                               class="card card-hover h-100 text-decoration-none">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title mb-0">{{ $monthNames[$month] }}/{{ $year->year }}</h6>
-                                    @if (in_array($month, $existingMonths ?? []))
-                                        <span class="badge bg-label-success mt-2">Đã có dữ liệu</span>
-                                    @else
-                                        <span class="badge bg-label-secondary mt-2">Chưa có dữ liệu</span>
-                                    @endif
+                            @if ($isDisabled)
+                                <div class="card card-disabled h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title mb-0">{{ $monthNames[$month] }}/{{ $year->year }}</h6>
+                                        <span class="badge bg-label-warning mt-2">Chưa thể tạo</span>
+                                    </div>
                                 </div>
-                            </a>
+                            @else
+                                <a href="{{ route('admin.finance.years.months.show', ['yearId' => $year->id, 'month' => $month]) }}"
+                                   class="card card-hover h-100 text-decoration-none">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title mb-0">{{ $monthNames[$month] }}/{{ $year->year }}</h6>
+                                        @if ($isExisting)
+                                            <span class="badge bg-label-success mt-2">Đã có dữ liệu</span>
+                                        @else
+                                            <span class="badge bg-label-secondary mt-2">Chưa có dữ liệu</span>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endif
                         </div>
                     @endfor
-                </div>
-                <!-- Actions buttons chung -->
-                <div class="mt-3" id="editActions" style="display: none;">
-                    <button type="button" class="btn btn-success" id="saveAllBtn">
-                        <i class="bx bx-save me-1"></i> Lưu tất cả
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">
-                        <i class="bx bx-x me-1"></i> Hủy
-                    </button>
                 </div>
             </div>
         </div>

@@ -7,17 +7,12 @@
 
 @section('content')
 <section>
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-        <div>
-            <h5 class="mb-1 mt-3">@yield('title')</h5>
-            <small class="text-muted">Quản lý chi tiêu theo năm</small>
-        </div>
-        <div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#createYearOffcanvas">
-                <i class="bx bx-plus-circle me-1"></i> Tạo năm mới
-            </button>
-        </div>
-    </div>
+    @include('admin.components.headingPage', [
+        'description' => 'Quản lý chi tiêu theo năm',
+        'button' => 'offcanvas',
+        'buttonId' => 'createYearOffcanvas',
+        'buttonText' => 'Tạo năm mới',
+    ])
 
     @if($years->count() > 0)
         <div class="row g-3">
@@ -70,8 +65,8 @@
                 <div class="mb-3">
                     <label for="year" class="form-label">Năm <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="year" name="year" 
-                        min="2000" max="2100" 
-                        value="{{ date('Y') }}" 
+                        min="2026" max="2100" 
+                        value="{{ date('Y') >= 2026 ? date('Y') : 2026 }}" 
                         placeholder="Nhập năm" required>
                     <div class="invalid-feedback"></div>
                 </div>

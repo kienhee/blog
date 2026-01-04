@@ -70,9 +70,47 @@
                 </div>
             @break
 
+            @case('back')
+                @if (!empty($buttonLink))
+                    <a href="{{ $buttonLink }}" class="btn btn-label-secondary">
+                        <i class='bx bx-arrow-back'></i> Quay lại
+                    </a>
+                @endif
+            @break
+
+            @case('offcanvas')
+                @if (!empty($buttonId))
+                    <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#{{ $buttonId }}">
+                        <i class='bx bx-plus-circle me-1'></i> {{ $buttonText ?? 'Thêm mới' }}
+                    </button>
+                @endif
+            @break
+
             @default
                 {{-- Có thể thêm mặc định nếu cần --}}
         @endswitch
+        
+        @if(!empty($extraButtons ?? []))
+            @foreach($extraButtons as $extraButton)
+                @if(!empty($extraButton['type']) && $extraButton['type'] === 'button')
+                    <button type="button" 
+                            class="btn {{ $extraButton['class'] ?? 'btn-primary' }}"
+                            @if(!empty($extraButton['id'])) id="{{ $extraButton['id'] }}" @endif>
+                        @if(!empty($extraButton['icon']))
+                            <i class="bx {{ $extraButton['icon'] }} me-1"></i>
+                        @endif
+                        {{ $extraButton['text'] }}
+                    </button>
+                @else
+                    <a href="{{ $extraButton['url'] ?? '#' }}" class="btn {{ $extraButton['class'] ?? 'btn-primary' }}">
+                        @if(!empty($extraButton['icon']))
+                            <i class="bx {{ $extraButton['icon'] }} me-1"></i>
+                        @endif
+                        {{ $extraButton['text'] }}
+                    </a>
+                @endif
+            @endforeach
+        @endif
     </div>
 </div>
 

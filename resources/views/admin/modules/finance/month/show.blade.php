@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title', $monthNames[$financeMonth->month] . ' / ' . $year->year)
+@section('title', $monthNames[$financeMonth->month] . '/' . $year->year)
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
@@ -43,6 +43,14 @@
             'description' => 'Chi tiết ' . $monthNames[$financeMonth->month] . ' / ' . $year->year,
             'button' => 'back',
             'buttonLink' => route('admin.finance.years.show', $year->id),
+            'extraButtons' => $financeDays->count() >= 1 ? [
+                [
+                    'url' => route('admin.finance.months.dayDetails', $financeMonth->id),
+                    'text' => 'Xem chi tiết',
+                    'icon' => 'bx-list-ul',
+                    'class' => 'btn-primary'
+                ]
+            ] : [],
         ])
         <div class="card app-calendar-wrapper">
             <div class="row g-0">
@@ -50,7 +58,7 @@
                 <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
                     <div class="border-bottom p-4 my-sm-0 mb-3">
                         <div class="d-grid">
-                            <button class="btn btn-primary" type="button" id="btnAddExpense">
+                            <button class="btn btn-primary" type="button" id="btnAddExpense" @if($financeMonth->isLocked()) disabled @endif>
                                 <i class="bx bx-plus me-1"></i>
                                 <span class="align-middle">Thêm chi tiêu</span>
                             </button>
@@ -59,11 +67,29 @@
                     <div class="p-4">
                         <!-- Thông tin tháng -->
                         <div class="mb-4">
-                            <h6 class="mb-2">Thông tin tháng</h6>
+                            <h6 class="mb-2 d-flex align-items-center justify-content-between">
+                                <span>Thông tin tháng</span>
+                                @if($financeMonth->isLocked())
+                                    <span class="badge bg-label-warning">
+                                        <i class="bx bx-lock me-1"></i>Đã khóa
+                                    </span>
+                                @endif
+                            </h6>
                             <dl class="row mb-2 small">
                                 <dt class="col-6 text-muted">Tháng:</dt>
                                 <dd class="col-6">{{ $monthNames[$financeMonth->month] }}/{{ $year->year }}</dd>
                             </dl>
+                            @if($financeMonth->isLocked())
+                                <div class="alert alert-warning alert-dismissible mb-3" role="alert">
+                                    <small>
+                                        <i class="bx bx-info-circle me-1"></i>
+                                        Tháng này đã bị khóa, không thể chỉnh sửa dữ liệu.
+                                        @if($financeMonth->locked_time)
+                                            Đã khóa vào: {{ $financeMonth->locked_time->format('d/m/Y H:i') }}
+                                        @endif
+                                    </small>
+                                </div>
+                            @endif
                             
                             @php
                                 $totalExpenses = $financeDays->sum('money');
@@ -73,21 +99,7 @@
                                 <label class="form-label small mb-1">Tổng tiền trong tháng</label>
                                 <input type="text" class="form-control form-control-sm format-money" id="totalMoney" 
                                     value="{{ number_format($financeMonth->total_money, 0, ',', '.') }}" 
-                                    data-field="total_money">
-                            </div>
-                            
-                            <div class="mb-2">
-                                <label class="form-label small mb-1">Chi phí cố định</label>
-                                <input type="text" class="form-control form-control-sm format-money" id="fixMoney" 
-                                    value="{{ number_format($financeMonth->fix_money, 0, ',', '.') }}" 
-                                    data-field="fix_money">
-                            </div>
-                            
-                            <div class="mb-2">
-                                <label class="form-label small mb-1">Đầu tư</label>
-                                <input type="text" class="form-control form-control-sm format-money" id="investMoney" 
-                                    value="{{ number_format($financeMonth->invest_money, 0, ',', '.') }}" 
-                                    data-field="invest_money">
+                                    data-field="total_money" @if($financeMonth->isLocked()) readonly style="background-color: #f5f5f5;" @endif>
                             </div>
                             
                             <div class="mb-2">
@@ -165,59 +177,61 @@
                         </div>
                     </div>
                     <div class="app-overlay"></div>
-                    <!-- FullCalendar Offcanvas -->
-                    <div class="offcanvas offcanvas-end" tabindex="-1" id="addExpenseSidebar"
-                        aria-labelledby="addExpenseSidebarLabel">
-                        <div class="offcanvas-header border-bottom">
-                            <h5 class="offcanvas-title mb-2" id="addExpenseSidebarLabel">Thêm chi tiêu</h5>
-                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="offcanvas-body">
-                            <form id="expenseForm">
-                                @csrf
-                                <div class="mb-3">
-                                    <label class="form-label" for="expenseDate">Ngày <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="expenseDate" name="date" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="expenseType">Loại chi tiêu <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="expenseType" name="finance_type_id" required>
-                                        <option value="">Chọn loại chi tiêu</option>
-                                        @foreach($financeTypes as $type)
-                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="expenseMoney">Số tiền chi tiêu <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control format-money" id="expenseMoney" name="money" 
-                                        placeholder="Nhập số tiền" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="expenseNote">Ghi chú</label>
-                                    <textarea class="form-control" id="expenseNote" name="note" rows="3" 
-                                        placeholder="Nhập ghi chú (nếu có)"></textarea>
-                                </div>
-                                <div class="d-flex justify-content-between my-4">
-                                    <div>
-                                        <button type="submit" class="btn btn-primary" id="btnSaveExpense">
-                                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
-                                            Lưu
-                                        </button>
-                                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">
-                                            Hủy
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-label-danger d-none" id="btnDeleteExpense">Xóa</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
                 <!-- /Calendar & Modal -->
+            </div>
+        </div>
+        
+        <!-- FullCalendar Offcanvas -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="addExpenseSidebar"
+            aria-labelledby="addExpenseSidebarLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title mb-2" id="addExpenseSidebarLabel">Thêm chi tiêu</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <form id="expenseForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseDate">Ngày <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control date-picker" id="expenseDate" name="date" 
+                            placeholder="dd/mm/yyyy" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseType">Loại chi tiêu <span class="text-danger">*</span></label>
+                        <select class="form-select" id="expenseType" name="finance_type_id" required>
+                            <option value="">Chọn loại chi tiêu</option>
+                            @foreach($financeTypes as $type)
+                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseMoney">Số tiền chi tiêu <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control format-money" id="expenseMoney" name="money" 
+                            placeholder="Nhập số tiền" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseNote">Ghi chú</label>
+                        <textarea class="form-control" id="expenseNote" name="note" rows="3" 
+                            placeholder="Nhập ghi chú (nếu có)"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between my-4">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="btnSaveExpense">
+                                <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                                Lưu
+                            </button>
+                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">
+                                Hủy
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-label-danger d-none" id="btnDeleteExpense">Xóa</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </section>
@@ -227,6 +241,7 @@
     <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/fullcalendar/fullcalendar.js') }}"></script>
     <script src="{{ asset_admin_url('assets/vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script>
     // Hàm format số với dấu chấm phân cách hàng nghìn
     function formatNumber(num) {
@@ -245,11 +260,21 @@
         const monthId = {{ $financeMonth->id }};
         const year = {{ $year->year }};
         const month = {{ $financeMonth->month }};
+        const isLocked = {{ $financeMonth->isLocked() ? 'true' : 'false' }};
         const expenseIndexUrl = '{{ route("admin.finance.months.expenses.index", $financeMonth->id) }}';
         const expenseStoreUrl = '{{ route("admin.finance.months.expenses.store", $financeMonth->id) }}';
         const expenseUpdateUrl = '{{ route("admin.finance.months.expenses.update", ["monthId" => $financeMonth->id, "id" => ":id"]) }}';
         const expenseDeleteUrl = '{{ route("admin.finance.months.expenses.destroy", ["monthId" => $financeMonth->id, "id" => ":id"]) }}';
         const monthUpdateUrl = '{{ route("admin.finance.months.update", $financeMonth->id) }}';
+        
+        // Khởi tạo flatpickr cho date picker với format d/m/y
+        $('#expenseDate').flatpickr({
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            locale: {
+                firstDayOfWeek: 1
+            }
+        });
         
         // Format money khi nhập (cho các input có class format-money)
         $('.format-money').on('input', function() {
@@ -308,11 +333,15 @@
         calendar = new Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             initialDate: year + '-' + String(month).padStart(2, '0') + '-01',
-            plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
+            plugins: [dayGridPlugin, interactionPlugin],
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                right: ''
+            },
+            validRange: {
+                start: moment('2026-01-01').startOf('month').toDate(), // Bắt đầu từ tháng 1/2026
+                end: moment().endOf('month').toDate() // Chỉ cho phép xem đến cuối tháng hiện tại
             },
             events: function(fetchInfo, successCallback) {
                 // Filter events theo finance_type_id đã chọn
@@ -380,8 +409,13 @@
                 return ['fc-event-' + colorName, 'text-white']; // Thêm text-white để chữ trắng, dễ đọc
             },
             dateClick: function(info) {
+                // Kiểm tra nếu tháng đã bị lock
+                if (isLocked) {
+                    toastr.warning('Tháng này đã bị khóa, không thể thêm chi tiêu', "Thông báo");
+                    return;
+                }
                 // Khi click vào ngày, mở offcanvas và fill ngày
-                const clickedDate = moment(info.dateStr).format('YYYY-MM-DD');
+                const clickedDate = moment(info.dateStr).format('DD/MM/YYYY');
                 document.getElementById('expenseDate').value = clickedDate;
                 document.getElementById('expenseType').value = '';
                 document.getElementById('expenseMoney').value = '';
@@ -392,10 +426,15 @@
                 expenseSidebar.show();
             },
             eventClick: function(info) {
+                // Kiểm tra nếu tháng đã bị lock
+                if (isLocked) {
+                    toastr.warning('Tháng này đã bị khóa, không thể chỉnh sửa chi tiêu', "Thông báo");
+                    return;
+                }
                 // Khi click vào event, mở offcanvas để chỉnh sửa
                 const event = info.event;
                 currentExpenseId = event.id;
-                const eventDate = moment(event.start).format('YYYY-MM-DD');
+                const eventDate = moment(event.start).format('DD/MM/YYYY');
                 
                 document.getElementById('expenseDate').value = eventDate;
                 document.getElementById('expenseType').value = event.extendedProps.finance_type_id;
@@ -509,7 +548,11 @@
         
         // Button thêm chi tiêu
         $('#btnAddExpense').on('click', function() {
-            const today = moment().format('YYYY-MM-DD');
+            if (isLocked) {
+                toastr.warning('Tháng này đã bị khóa, không thể thêm chi tiêu', "Thông báo");
+                return;
+            }
+            const today = moment().format('DD/MM/YYYY');
             $('#expenseDate').val(today);
             $('#expenseType').val('').trigger('change');
             $('#expenseMoney').val('');
@@ -528,8 +571,19 @@
             const originalHtml = $btn.html();
             $btn.prop('disabled', true).find('.spinner-border').removeClass('d-none');
             
+            // Convert date từ d/m/Y sang Y-m-d để gửi lên server
+            const dateValue = $('#expenseDate').val();
+            let dateFormatted = dateValue;
+            if (dateValue) {
+                // Nếu format là d/m/Y, convert sang Y-m-d
+                const dateParts = dateValue.split('/');
+                if (dateParts.length === 3) {
+                    dateFormatted = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                }
+            }
+            
             const formData = {
-                date: $('#expenseDate').val(),
+                date: dateFormatted,
                 finance_type_id: $('#expenseType').val(),
                 money: unformatNumber($('#expenseMoney').val()), // Unformat trước khi gửi
                 note: $('#expenseNote').val()
@@ -663,7 +717,10 @@
         }
         
         // Xử lý khi người dùng nhập vào các input
-        $('#totalMoney, #fixMoney, #investMoney').on('input blur', function() {
+        $('#totalMoney').on('input blur', function() {
+            if (isLocked) {
+                return; // Không cho phép chỉnh sửa nếu đã lock
+            }
             const field = $(this).data('field');
             const value = $(this).val();
             

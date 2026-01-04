@@ -31,7 +31,7 @@ class FinanceYearController extends Controller
             'year' => [
                 'required',
                 'integer',
-                'min:2000',
+                'min:2026',
                 'max:2100',
                 Rule::unique('finance_years', 'year')->where(function ($query) {
                     return $query->where('user_id', Auth::id());
@@ -40,7 +40,7 @@ class FinanceYearController extends Controller
         ], [
             'year.required' => 'Vui lòng nhập năm',
             'year.integer' => 'Năm phải là số nguyên',
-            'year.min' => 'Năm phải lớn hơn hoặc bằng 2000',
+            'year.min' => 'Năm phải lớn hơn hoặc bằng 2026',
             'year.max' => 'Năm phải nhỏ hơn hoặc bằng 2100',
             'year.unique' => 'Năm này đã tồn tại trong hệ thống',
         ]);
@@ -81,7 +81,24 @@ class FinanceYearController extends Controller
         // Lấy danh sách các tháng đã có
         $existingMonths = $year->financeMonths()->pluck('month')->toArray();
         
-        return view('admin.modules.finance.show', compact('year', 'existingMonths'));
+        // Tính toán các tháng có thể tạo
+        $now = \Carbon\Carbon::now();
+        $currentYear = $now->year;
+        $currentMonth = $now->month;
+        $creatableMonths = [];
+        
+        if ($year->year < $currentYear) {
+            // Năm quá khứ: cho phép tạo tất cả tháng
+            $creatableMonths = range(1, 12);
+        } elseif ($year->year == $currentYear) {
+            // Cùng năm: chỉ cho phép tạo tháng <= tháng hiện tại
+            $creatableMonths = range(1, $currentMonth);
+        } else {
+            // Năm tương lai: không cho phép tạo tháng nào
+            $creatableMonths = [];
+        }
+        
+        return view('admin.modules.finance.show', compact('year', 'existingMonths', 'creatableMonths'));
     }
 
     /**
@@ -121,8 +138,16 @@ class FinanceYearController extends Controller
     public function getYearByNumber(Request $request)
     {
         $request->validate([
-            'year' => 'required|integer|min:2000|max:2100',
+            'year' => 'required|integer|min:2026|max:2100',
         ]);
+
+        // Kiểm tra: chỉ cho phép tạo năm >= 2026
+        if ($request->input('year') < 2026) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Năm phải lớn hơn hoặc bằng 2026',
+            ], 422);
+        }
 
         $year = FinanceYear::firstOrCreate(
             [
