@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
@@ -195,7 +196,7 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
         Route::delete('/destroy/{id}', [RoleController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:role.delete');
     });
     Route::get('media', function () {
-        return view('admin.modules.media.index');
+return view('admin.modules.media.index');
     })->name('media');
 
     Route::prefix('finance')->name('finance.')->group(function () {
@@ -238,6 +239,27 @@ Route::prefix('admin')->middleware(['auth', 'prevent.guest.admin'])->name('admin
             Route::post('/{monthId}/lock', [FinanceMonthController::class, 'lock'])->name('lock')->where('monthId', '[0-9]+')->middleware('permission:finance.update');
         });
 
+    });
+
+    Route::prefix('accounts')->name('accounts.')->group(function () {
+        // Read permissions
+        Route::get('/', [AccountController::class, 'list'])->name('list')->middleware('permission:account.read');
+        Route::get('/ajax-get-data', [AccountController::class, 'ajaxGetData'])->name('ajaxGetData')->middleware('permission:account.read');
+        Route::get('/edit/{id}', [AccountController::class, 'edit'])->name('edit')->where('id', '[0-9]+')->middleware('permission:account.read');
+        Route::get('/generate-password', [AccountController::class, 'generatePassword'])->name('generatePassword')->middleware('permission:account.read');
+
+        // Create permissions
+        Route::get('/create', [AccountController::class, 'create'])->name('create')->middleware('permission:account.create');
+        Route::post('/store', [AccountController::class, 'store'])->name('store')->middleware('permission:account.create');
+
+        // Update permissions
+        Route::put('/update/{id}', [AccountController::class, 'update'])->name('update')->where('id', '[0-9]+')->middleware('permission:account.update');
+        Route::post('/update-order', [AccountController::class, 'updateOrder'])->name('updateOrder')->middleware('permission:account.update');
+        Route::post('/{id}/view-password', [AccountController::class, 'viewPassword'])->name('viewPassword')->where('id', '[0-9]+')->middleware('permission:account.read');
+
+        // Delete permissions
+        Route::delete('/destroy/{id}', [AccountController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+')->middleware('permission:account.delete');
+        Route::post('/bulk-delete', [AccountController::class, 'bulkDelete'])->name('bulkDelete')->middleware('permission:account.delete');
     });
 
     Route::prefix('settings')->name('settings.')->group(function () {

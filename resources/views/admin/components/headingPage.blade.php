@@ -17,9 +17,15 @@
         @switch($button)
             @case('add')
                 @if (empty($buttonPermission) || auth()->user()->can($buttonPermission))
-                    <a href="{{ route($buttonLink) }}" class="btn btn-primary">
-                        <i class='bx bx-plus-circle me-1'></i> Thêm mới
-                    </a>
+                    @if (!empty($buttonId))
+                        <button type="button" id="{{ $buttonId }}" class="btn btn-primary">
+                            <i class='bx bx-plus-circle me-1'></i> Thêm mới
+                        </button>
+                    @else
+                        <a href="{{ !empty($buttonLink) && $buttonLink !== '#' ? route($buttonLink) : ($buttonLink ?? '#') }}" class="btn btn-primary">
+                            <i class='bx bx-plus-circle me-1'></i> Thêm mới
+                        </a>
+                    @endif
                 @endif
             @break
 

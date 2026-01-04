@@ -53,6 +53,8 @@ export default defineConfig({
                 //Role
                 "resources/js/admin/pages/role/list.js",
                 "resources/js/admin/pages/role/form.js",
+                //Account
+                "resources/js/admin/pages/account/list.js",
                 // -----------Pages-----------
 
                 //Client

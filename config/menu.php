@@ -129,6 +129,12 @@ return [
     //     'url' => 'admin.media',
     // ],
     [
+        'title' => 'Quản lý tài khoản',
+        'icon' => 'bx-user',
+        'url' => 'admin.accounts.list',
+        'permission' => 'account.read',
+    ],
+    [
         'title' => 'Danh sách chi tiêu',
         'icon' => 'bx-wallet',
         'url' => 'admin.finance.years.list',
