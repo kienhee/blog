@@ -1,0 +1,363 @@
+---
+alwaysApply: true
+---
+
+# Rules cho dự án Laravel Blog
+
+## Kiến trúc và Pattern
+
+### 1. Repository Pattern
+- **Luôn sử dụng Repository Pattern** cho tất cả các thao tác với database
+- Repository phải extend `BaseRepository` và implement `BaseRepositoryInterface`
+- Mỗi resource có một Repository riêng: `PostRepository`, `CategoryRepository`, `UserRepository`, etc.
+- Repository phải implement các method abstract từ `BaseRepository`:
+  - `gridData()`: Query builder cho DataTables với các cột cần thiết
+  - `filterData($grid)`: Áp dụng filters từ request
+  - `renderDataTables($data)`: Render HTML cho DataTables với các cột custom
+- Repository có thể có thêm các method riêng như `createWithHashtags()`, `updateWithHashtags()`, `getPostBySlug()`, etc.
+
+### 2. Controller Pattern
+- Controllers phải inject Repository qua constructor (Dependency Injection)
+- Controllers chỉ xử lý HTTP logic, business logic nằm trong Repository
+- Standard methods cho CRUD:
+  - `list()`: Hiển thị danh sách (view)
+  - `ajaxGetData()`: API trả về data cho DataTables
+  - `ajaxGetTrashedData()`: API trả về data đã xóa (soft delete)
+  - `create()`: Form tạo mới
+  - `store(StoreRequest $request)`: Lưu dữ liệu mới
+  - `edit($id)`: Form chỉnh sửa
+  - `update(UpdateRequest $request, $id)`: Cập nhật dữ liệu
+  - `destroy($id)`: Xóa (soft delete)
+  - `restore($id)`: Khôi phục từ trash
+  - `forceDelete($id)`: Xóa vĩnh viễn
+  - `bulkDelete(Request $request)`: Xóa nhiều bản ghi
+  - `bulkRestore(Request $request)`: Khôi phục nhiều bản ghi
+  - `bulkForceDelete(Request $request)`: Xóa vĩnh viễn nhiều bản ghi
+
+### 3. Form Request Validation
+- **Luôn sử dụng Form Request** cho validation
+- Đặt trong namespace `App\Http\Requests\Admin\{Resource}\`
+- Tên file: `StoreRequest.php`, `UpdateRequest.php`, `ReplyRequest.php`, etc.
+- Form Request phải có:
+  - `authorize()`: Return true (hoặc check permission nếu cần)
+  - `rules()`: Validation rules
+  - `messages()`: Custom messages bằng tiếng Việt
+- Validation messages phải rõ ràng, thân thiện với người dùng
+
+### 4. Model Pattern
+- Models sử dụng `SoftDeletes` trait cho các resource có thể xóa mềm
+- Models định nghĩa constants cho status: `STATUS_DRAFT`, `STATUS_PUBLISHED`, `STATUS_SCHEDULED`
+- Models định nghĩa relationships: `hasMany`, `belongsTo`, `belongsToMany`
+- Models có `$fillable` array cho mass assignment
+- Models có `casts()` method cho type casting (datetime, boolean, etc.)
+
+## Naming Conventions
+
+### Controllers
+- Admin: `App\Http\Controllers\Admin\{Resource}Controller`
+- Client: `App\Http\Controllers\Client\{Resource}Controller`
+- Ví dụ: `PostController`, `CategoryController`, `UserController`
+
+### Repositories
+- `App\Repositories\{Resource}Repository`
+- Ví dụ: `PostRepository`, `CategoryRepository`, `UserRepository`
+
+### Form Requests
+- `App\Http\Requests\Admin\{Resource}\{Action}Request`
+- Ví dụ: `StoreRequest`, `UpdateRequest`, `ReplyRequest`
+
+### Routes
+- Admin routes: `admin.{resource}.{action}`
+- Ví dụ: `admin.posts.list`, `admin.posts.store`, `admin.posts.update`
+- Routes phải có middleware `permission:{resource}.{action}`
+- Routes cho trash: `ajaxGetTrashedData`, `restore`, `forceDelete`
+
+### Views
+- Admin views: `admin.modules.{resource}.{action}`
+- Ví dụ: `admin.modules.post.list`, `admin.modules.post.create`, `admin.modules.post.edit`
+
+## Permission System
+
+### Permission Naming
+- Format: `{resource}.{action}`
+- Actions: `read`, `create`, `update`, `delete`
+- Ví dụ: `post.read`, `post.create`, `post.update`, `post.delete`
+
+### Middleware Usage
+- Tất cả admin routes phải có middleware `permission:{resource}.{action}`
+- Routes đọc dữ liệu: `middleware('permission:post.read')`
+- Routes tạo mới: `middleware('permission:post.create')`
+- Routes cập nhật: `middleware('permission:post.update')`
+- Routes xóa: `middleware('permission:post.delete')`
+
+### Permission Checks trong Views
+- Sử dụng `auth()->user()->can('post.update')` để check permission trong views
+- Ẩn/hiện buttons dựa trên permissions
+
+## DataTables Integration
+
+### Repository Methods
+- `gridData()`: Query builder với select các cột cần thiết, joins, subqueries
+- `filterData($grid)`: Apply filters từ request (date, category, status, search, etc.)
+- `renderDataTables($data)`: 
+  - Sử dụng `DataTables::of($data)`
+  - Thêm các cột HTML: `addColumn('{name}_html', function($row) { ... })`
+  - Sử dụng `rawColumns()` để render HTML
+  - Return `->make(true)`
+
+### Controller Methods
+- `ajaxGetData()`: Gọi `gridData()`, `filterData()`, `renderDataTables()`
+- `ajaxGetTrashedData()`: Tương tự nhưng với `onlyTrashed()`
+
+## Soft Deletes và Trash Management
+
+### Models
+- Sử dụng `SoftDeletes` trait
+- Import: `use Illuminate\Database\Eloquent\SoftDeletes;`
+
+### Repository Methods
+- `gridTrashedData()`: Query với `onlyTrashed()`
+- `renderTrashedDataTables($data)`: Render cho trash table
+- `restore($id)`: Khôi phục bản ghi
+- `forceDelete($id)`: Xóa vĩnh viễn
+- `bulkRestore(array $ids)`: Khôi phục nhiều bản ghi
+- `bulkForceDelete(array $ids)`: Xóa vĩnh viễn nhiều bản ghi
+
+### Controller Methods
+- `ajaxGetTrashedData()`: API cho trash table
+- `restore($id)`: Khôi phục một bản ghi
+- `forceDelete($id)`: Xóa vĩnh viễn một bản ghi
+- `bulkRestore(Request $request)`: Khôi phục nhiều bản ghi
+- `bulkForceDelete(Request $request)`: Xóa vĩnh viễn nhiều bản ghi
+
+## Bulk Operations
+
+### Standard Bulk Operations
+- `bulkDelete(Request $request)`: Xóa nhiều bản ghi (soft delete)
+- `bulkRestore(Request $request)`: Khôi phục nhiều bản ghi
+- `bulkForceDelete(Request $request)`: Xóa vĩnh viễn nhiều bản ghi
+- Request phải có `ids` array
+- Validate: `$ids = $request->input('ids', []); if (empty($ids) || !is_array($ids)) { ... }`
+- Return JSON response với status, message, count
+
+### Custom Bulk Operations
+- Có thể có thêm bulk operations như `bulkMoveCategory()`, `bulkChangeStatus()`, etc.
+- Luôn validate input và return JSON response
+
+## Error Handling
+
+### Try-Catch Blocks
+- Sử dụng try-catch trong controllers cho các operations quan trọng
+- Catch `\Throwable $e` để bắt mọi loại exception
+- Return error messages thân thiện bằng tiếng Việt
+- Log errors nếu cần thiết
+
+### Response Format
+- Success: `back()->with('success', 'Thông báo thành công')`
+- Error: `back()->with('error', 'Thông báo lỗi')`
+- JSON success: `response()->json(['status' => true, 'message' => '...'])`
+- JSON error: `response()->json(['status' => false, 'message' => '...'], 400/404/500)`
+
+## Database Transactions
+
+### Khi nào sử dụng
+- Khi có nhiều database operations liên quan (create post + attach hashtags)
+- Sử dụng `DB::transaction(function() { ... })`
+- Ví dụ: `createWithHashtags()`, `updateWithHashtags()`
+
+## Relationships và Eager Loading
+
+### Model Relationships
+- Định nghĩa relationships trong Models: `hasMany()`, `belongsTo()`, `belongsToMany()`
+- Sử dụng `with()` để eager load relationships khi cần
+- Ví dụ: `Post::with(['user', 'hashtags', 'category'])->find($id)`
+
+## Status Management
+
+### Status Constants
+- Định nghĩa constants trong Model:
+  ```php
+  const STATUS_DRAFT = 'draft';
+  const STATUS_PUBLISHED = 'published';
+  const STATUS_SCHEDULED = 'scheduled';
+  ```
+- Sử dụng constants thay vì hardcode strings
+- Repository có method `getStatusLabel()` để lấy labels cho status
+
+## Scheduled Posts
+
+### Logic xử lý
+- Nếu có `scheduled_at` và chưa đến thời gian: status = `scheduled`
+- Nếu `scheduled_at` đã qua: không cho phép edit scheduled_at
+- Nếu status = `published`: không được có `scheduled_at`
+- Check `canEditScheduledAt` trong edit form
+
+## Vietnamese Language
+
+### Messages
+- Tất cả messages cho user phải bằng tiếng Việt
+- Validation messages trong Form Requests
+- Flash messages: 'Thêm mới thành công', 'Cập nhật thành công', 'Xóa thành công'
+- Error messages: 'Có lỗi xảy ra', 'Không tìm thấy bản ghi'
+
+## Code Style
+
+### PHP
+- Sử dụng type hints cho parameters và return types
+- Sử dụng strict types nếu có thể
+- Format code theo PSR-12
+- Sử dụng short array syntax `[]` thay vì `array()`
+
+### Comments
+- Comment bằng tiếng Việt cho các method phức tạp
+- Sử dụng PHPDoc cho methods: `@param`, `@return`
+
+## Security
+
+### Authorization
+- Luôn check permissions trước khi thực hiện actions
+- Sử dụng middleware `permission:{resource}.{action}`
+- Check permissions trong views để ẩn/hiện buttons
+
+### Validation
+- Luôn validate input từ user
+- Sử dụng Form Requests cho validation
+- Validate file uploads (size, mime types)
+
+### SQL Injection
+- Sử dụng Query Builder hoặc Eloquent ORM (đã được protect)
+- Không sử dụng raw SQL queries trừ khi thực sự cần thiết
+
+## Testing
+
+### Test Structure
+- Unit tests cho Repositories
+- Feature tests cho Controllers
+- Test permissions, validations, business logic
+
+## Best Practices
+
+1. **Separation of Concerns**: Controllers chỉ xử lý HTTP, business logic trong Repository
+2. **DRY Principle**: Tránh lặp code, tạo helper methods khi cần
+3. **Single Responsibility**: Mỗi class chỉ làm một việc
+4. **Dependency Injection**: Luôn inject dependencies qua constructor
+5. **Error Handling**: Luôn handle errors và return messages rõ ràng
+6. **Validation**: Validate tất cả input từ user
+7. **Permissions**: Luôn check permissions trước khi thực hiện actions
+8. **Soft Deletes**: Sử dụng soft deletes cho các resource quan trọng
+9. **Transactions**: Sử dụng transactions cho các operations phức tạp
+10. **Eager Loading**: Sử dụng eager loading để tránh N+1 queries
+
+## File Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/
+│   │   │   └── {Resource}Controller.php
+│   │   └── Client/
+│   │       └── {Resource}Controller.php
+│   └── Requests/
+│       ├── Admin/
+│       │   └── {Resource}/
+│       │       ├── StoreRequest.php
+│       │       └── UpdateRequest.php
+│       └── Client/
+├── Models/
+│   └── {Resource}.php
+├── Repositories/
+│   ├── BaseRepository.php
+│   ├── BaseRepositoryInterface.php
+│   └── {Resource}Repository.php
+resources/
+└── views/
+    ├── admin/
+    │   └── modules/
+    │       └── {resource}/
+    │           ├── list.blade.php
+    │           ├── create.blade.php
+    │           └── edit.blade.php
+    └── client/
+routes/
+└── web.php
+```
+
+## Helper Functions
+
+### Available PHP Helpers (app/helpers.php)
+
+**Asset Helpers:**
+- `asset_admin_url($path)`: Get admin asset URL với versioning
+- `asset_client_url($path)`: Get client asset URL với versioning
+- `asset_shared_url($path)`: Get public asset URL với versioning (cho files trong public directory)
+
+**Image Helpers:**
+- `thumb_path($path, $prefix = 'thumbs')`: Sinh đường dẫn thumbnail tương ứng với ảnh gốc
+
+**Content Helpers:**
+- `calculateReadingTime($content)`: Tính thời gian đọc ước tính (200 từ/phút)
+
+**Pagination Helpers:**
+- `get_posts_per_page()`: Lấy số lượng bài viết mỗi trang từ settings (default: 15)
+
+**Menu Helpers:**
+- `isOpenMenu($child)`: Kiểm tra URL có được active không
+- `hasActiveChild($children = [])`: Kiểm tra phần tử con có active hay không
+- `renderCategoryDesktop($items)`: Render category menu cho desktop (recursive)
+
+**Menu Builder Class:**
+- `CategoryMenuBuilder`: Class để build mobile category menu structure với stack navigation
+  - `buildMobileMenu($items, $level = 0, $parentId = 0)`: Build mobile menu structure recursively
+
+**Database Helpers:**
+- `seed_version($tableName, $version = 1, $isTruncate = true)`: Handle SeedVersion cho database seeding
+
+**Lưu ý:**
+- **KHÔNG viết lại** các helper functions này
+- Sử dụng các helpers có sẵn thay vì tự implement
+- Nếu cần helper mới, thêm vào `app/helpers.php` và document trong rules
+
+### Available JavaScript Helpers
+
+**Admin JavaScript Helpers:**
+
+**Form Helpers:**
+- `initFormLoading(form, options)`: Khởi tạo loading state cho form (exported, trong `form-loading.js`)
+  - Options: `buttonSelector`, `buttonId`, `loadingText`, `useFormValidation`
+  - Exposed to `window.initFormLoading`
+
+**Badge Count Helpers:**
+- `updateBadgeCount(badgeId, url)`: Cập nhật badge count qua AJAX (exposed to window, trong `badge-count.js`)
+- `initBadgeCounts(badgeConfigs)`: Khởi tạo tất cả badge counts từ config (exposed to window, trong `badge-count.js`)
+
+**Input Formatting:**
+- `.format-money` class: Format money input (chỉ số, max 11 số, dấu phân cách hàng nghìn, trong `helper.js`)
+- Slug generation: Tự động tạo slug từ title (trong `generate-slug.js`)
+
+**File Manager Helpers:**
+- `$.fn.filemanager(type, options)`: jQuery plugin cho Laravel File Manager (trong `upload-images.js`, `upload-image-alone.js`, `upload-avatar.js`)
+  - Types: `'image'`, `'file'`
+  - Options: `prefix`, `targetInput`, `targetPreview`
+
+**Editor Helpers:**
+- TinyMCE configuration và plugins (trong `tinymce-config.js`, `tinymce-hljs-plugin.js`, `tinymce-inline-code-plugin.js`)
+- `window.tinyMCEEditor`: Global reference đến TinyMCE editor instance
+
+**Lưu ý JavaScript Helpers:**
+- Các helper functions thường được expose ra `window` object hoặc export
+- Sử dụng lại các helper có sẵn thay vì viết lại
+- Nếu cần helper mới, tạo trong file phù hợp hoặc tạo file helper riêng trong `resources/js/admin/common/utils/`
+
+## Notes
+
+- Dự án sử dụng Laravel với Spatie Permission package
+- Sử dụng DataTables (Yajra DataTables) cho tables
+- Sử dụng Laravel File Manager cho media management
+- Có hệ thống Finance (Years, Months, Expenses) với permissions riêng
+- Có hệ thống Accounts để quản lý tài khoản
+- Có hệ thống Settings để cấu hình
+- Có hệ thống Comments và Contacts với status management
+- Có hệ thống Newsletter subscription
+- Có hệ thống Hashtags với nhiều loại (post, etc.)
+- Có hệ thống Categories với tree structure

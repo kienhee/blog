@@ -1,0 +1,909 @@
+---
+alwaysApply: true
+---
+
+# Rules cho Client Side (Frontend) - Laravel Blog
+
+## Kiến trúc và Pattern
+
+### 1. Controller Pattern
+- Controllers phải inject Repository qua constructor (Dependency Injection)
+- Controllers xử lý HTTP requests và trả về views hoặc JSON responses
+- **Không sử dụng DataTables** cho client side (chỉ dùng cho admin)
+- Sử dụng **pagination** cho danh sách bài viết: `paginate(get_posts_per_page())`
+- Standard methods:
+  - `home()`: Trang chủ
+  - `post($slug)`: Chi tiết bài viết
+  - `category($slug)`: Danh sách bài viết theo danh mục
+  - `hashtag($slug)`: Danh sách bài viết theo hashtag
+  - `search(Request $request)`: Tìm kiếm
+  - `contact()`: Trang liên hệ
+  - `submitContact(StoreRequest $request)`: Xử lý form liên hệ
+  - `store(StoreRequest $request)`: Lưu dữ liệu (comments, etc.)
+
+### 2. Repository Usage
+- Client Controllers **sử dụng lại Repositories** từ admin (PostRepository, CategoryRepository, etc.)
+- Sử dụng `gridData()` từ Repository nhưng filter cho published posts
+- Luôn filter:
+  - `where('posts.status', 'published')`
+  - `whereNull('posts.deleted_at')`
+  - `where(function ($q) { $q->whereNull('posts.scheduled_at')->orWhere('posts.scheduled_at', '<=', now()); })`
+
+### 3. Form Request Validation
+- **Luôn sử dụng Form Request** cho validation
+- Đặt trong namespace `App\Http\Requests\Client\{Resource}\`
+- Tên file: `StoreRequest.php`, `UpdateRequest.php`, `ChangePasswordRequest.php`, etc.
+- Form Request phải có:
+  - `authorize()`: Check authentication nếu cần (return `auth()->check()` hoặc `true`)
+  - `rules()`: Validation rules
+  - `messages()`: Custom messages bằng tiếng Việt
+- Validation messages phải rõ ràng, thân thiện với người dùng
+
+### 4. Routes và URLs
+
+#### Route Naming
+- Client routes: `client.{resource}.{action}`
+- Sử dụng **tiếng Việt không dấu** trong URL paths
+- Ví dụ:
+  - `/bai-viet/{slug}` → `client.post`
+  - `/danh-muc/{slug}` → `client.category`
+  - `/tag/{slug}` → `client.hashtag`
+  - `/tim-kiem` → `client.search`
+  - `/lien-he` → `client.contact`
+  - `/auth/dang-nhap` → `client.auth.login`
+  - `/auth/dang-ky` → `client.auth.register`
+  - `/profile/thong-tin-ca-nhan` → `client.profile.information`
+
+#### Route Groups
+- Public routes: Không cần middleware
+- Protected routes: `middleware('auth')` cho các routes cần đăng nhập
+- Ví dụ: Profile, Comments, Saved Posts
+
+### 5. Views Structure
+
+#### Layout Hierarchy
+```
+client/
+├── layouts/
+│   ├── master.blade.php (main layout)
+│   └── sections/
+│       ├── nav.blade.php
+│       ├── footer.blade.php
+│       ├── styles.blade.php
+│       └── scripts.blade.php
+├── pages/
+│   ├── home.blade.php
+│   ├── single.blade.php (post detail)
+│   ├── category.blade.php
+│   ├── hashtag.blade.php
+│   ├── search.blade.php
+│   ├── posts.blade.php (all posts)
+│   ├── contact.blade.php
+│   ├── about.blade.php
+│   └── profile/
+│       ├── layout.blade.php
+│       └── tabs/
+│           ├── information.blade.php
+│           ├── saved-posts.blade.php
+│           └── change-password.blade.php
+└── components/
+    ├── post/
+    ├── sidebar/
+    └── seo/
+```
+
+#### View Naming
+- Pages: `client.pages.{page}`
+- Components: `client.components.{type}.{name}`
+- Partials: `client.pages.{page}.partials.{name}`
+
+#### View Best Practices
+- Sử dụng `@extends('client.layouts.master')` cho tất cả pages
+- Sử dụng `@include()` cho reusable components
+- Sử dụng `@push('styles')` và `@push('scripts')` cho assets
+- Sử dụng `@section('content')` cho main content
+
+### 6. SEO Integration
+
+#### SEOData Usage
+- Luôn tạo `SEOData` object cho mỗi page
+- Sử dụng package: `RalphJSmit\Laravel\SEO\Support\SEOData`
+- Ví dụ:
+  ```php
+  $seoModel = new SEOData(
+      title: 'Tiêu đề trang',
+      description: 'Mô tả trang',
+      url: route('client.post', ['slug' => $slug], false),
+      type: 'article', // hoặc 'website'
+      robots: 'index, follow', // hoặc 'noindex, follow' cho search pages
+  );
+  ```
+
+#### SEO in Views
+- Trong `master.blade.php`: `{!! seo()->for($seoModel) !!}`
+- Include SEO components:
+  - `@include('client.components.seo.breadcrumbs-schema')`
+  - `@include('client.components.seo.article-schema')`
+  - `@include('client.components.seo.meta-keywords')`
+
+#### Breadcrumbs
+- Luôn tạo breadcrumbs array cho structured data
+- Format:
+  ```php
+  $breadcrumbs = [
+      ['name' => 'Trang chủ', 'url' => route('client.home', [], true)],
+      ['name' => 'Category', 'url' => route('client.category', ['slug' => $slug], true)],
+      ['name' => 'Post Title', 'url' => route('client.post', ['slug' => $slug], true)],
+  ];
+  ```
+
+### 7. Authentication
+
+#### Auth Routes
+- Login: `client.auth.login`, `client.auth.loginHandle`
+- Register: `client.auth.register`, `client.auth.registerHandle`
+- Logout: `client.auth.logout`
+- Forgot Password: `client.auth.forgot-password`, `client.auth.forgot-password.send`
+- Reset Password: `client.auth.reset-password`, `client.auth.reset-password.update`
+
+#### Auth Checks
+- Sử dụng `Auth::check()` để check authentication
+- Sử dụng `Auth::id()` để lấy user ID
+- Sử dụng `Auth::user()` để lấy user object
+- Protected routes: `middleware('auth')`
+
+### 8. AJAX Responses
+
+#### JSON Response Format
+- Success:
+  ```php
+  return response()->json([
+      'status' => true,
+      'success' => true,
+      'message' => 'Thông báo thành công',
+      'data' => [...], // optional
+  ]);
+  ```
+- Error:
+  ```php
+  return response()->json([
+      'status' => false,
+      'success' => false,
+      'message' => 'Thông báo lỗi',
+  ], 400/401/404/500);
+  ```
+
+#### AJAX Request Handling
+- Check `$request->ajax()` để return JSON hoặc redirect
+- Ví dụ:
+  ```php
+  if ($request->ajax()) {
+      return response()->json([...]);
+  }
+  return redirect()->route('...')->with('success', '...');
+  ```
+
+### 9. Pagination
+
+#### Pagination Usage
+- Sử dụng `paginate(get_posts_per_page())` cho danh sách bài viết
+- Helper function: `get_posts_per_page()` (trong `app/helpers.php`)
+- Preserve query string: `->withQueryString()`
+- Ví dụ:
+  ```php
+  $posts = $query->paginate(get_posts_per_page())->withQueryString();
+  ```
+
+#### Pagination in Views
+- Sử dụng `{{ $posts->links() }}` để hiển thị pagination
+- Custom pagination view nếu cần
+
+### 10. Post View Tracking
+
+#### Record Views
+- Sử dụng `PostViewRepository` để ghi nhận lượt xem
+- Gọi `$postViewRepository->recordView($postModel)` khi user xem bài viết
+- Lấy view count: `$postViewRepository->getViewCount($postId)`
+
+### 11. Saved Posts
+
+#### Saved Post Operations
+- `toggle($postId)`: Toggle save/unsave
+- `check($postId)`: Check if post is saved (public route)
+- Luôn check authentication trước khi save/unsave
+- Return JSON response với `saved` boolean
+
+### 12. Comments
+
+#### Comment System
+- Chỉ authenticated users mới có thể comment
+- Comments có thể có `parent_id` cho nested comments
+- Load comments với relationships: `with(['user', 'replies.user'])`
+- Filter approved comments: `where('status', 'approved')`
+- Check `$post->allow_comment` trước khi cho phép comment
+
+### 13. Helper Functions
+
+#### Available PHP Helpers (app/helpers.php)
+**Asset Helpers:**
+- `asset_admin_url($path)`: Get admin asset URL với versioning
+- `asset_client_url($path)`: Get client asset URL với versioning
+- `asset_shared_url($path)`: Get public asset URL với versioning (cho files trong public directory)
+
+**Image Helpers:**
+- `thumb_path($path, $prefix = 'thumbs')`: Sinh đường dẫn thumbnail tương ứng với ảnh gốc
+
+**Content Helpers:**
+- `calculateReadingTime($content)`: Tính thời gian đọc ước tính (200 từ/phút)
+
+**Pagination Helpers:**
+- `get_posts_per_page()`: Lấy số lượng bài viết mỗi trang từ settings (default: 15)
+
+**Menu Helpers:**
+- `isOpenMenu($child)`: Kiểm tra URL có được active không
+- `hasActiveChild($children = [])`: Kiểm tra phần tử con có active hay không
+- `renderCategoryDesktop($items)`: Render category menu cho desktop (recursive)
+
+**Menu Builder Class:**
+- `CategoryMenuBuilder`: Class để build mobile category menu structure với stack navigation
+  - `buildMobileMenu($items, $level = 0, $parentId = 0)`: Build mobile menu structure recursively
+
+**Database Helpers:**
+- `seed_version($tableName, $version = 1, $isTruncate = true)`: Handle SeedVersion cho database seeding
+
+**Lưu ý:**
+- **KHÔNG viết lại** các helper functions này
+- Sử dụng các helpers có sẵn thay vì tự implement
+- Nếu cần helper mới, thêm vào `app/helpers.php` và document trong rules
+
+#### Available JavaScript Helpers
+
+**Client JavaScript Helpers (trong các file JS):**
+
+**Post/Content Helpers:**
+- `toggleTOC()`: Toggle Table of Contents (exposed to window, trong `post/index.js`)
+- `createValidId(text)`: Tạo valid CSS selector ID từ text (trong `post/index.js`)
+- `copyLinkToClipboard(url)`: Copy link vào clipboard (exposed to window, trong `post/index.js`)
+
+**Utility Helpers:**
+- `escapeHtml(text)`: Escape HTML để prevent XSS (trong `post/index.js`, `contact.js`)
+- `formatDateToDisplay(dateStr)`: Chuyển Y-m-d sang d/m/Y (trong `profile/index.js`)
+- `formatDateToSubmit(dateStr)`: Chuyển d/m/Y sang Y-m-d (trong `profile/index.js`)
+- `filterNumericOnly(value)`: Lọc chỉ giữ lại số từ chuỗi (trong `profile/index.js`, `contact.js`)
+
+**Notification Helpers:**
+- `showSuccess(message)`: Hiển thị toastr success message (trong `post/index.js`, `contact.js`)
+- `showError(message)`: Hiển thị toastr error message (trong `post/index.js`, `contact.js`)
+
+**Form Helpers:**
+- `revalidatePhone()`: Revalidate phone field với FormValidation (trong `profile/index.js`, `contact.js`)
+
+**Password Toggle:**
+- Password toggle functionality (sử dụng `window.Helpers.initPasswordToggle()` nếu có, fallback manual trong `auth.js`)
+
+**Lưu ý JavaScript Helpers:**
+- Các helper functions thường được định nghĩa trong cùng file hoặc expose ra `window` object
+- Sử dụng lại các helper có sẵn thay vì viết lại
+- Nếu cần helper mới, tạo trong file phù hợp hoặc tạo file helper riêng
+
+### 14. Error Handling
+
+#### 404 Errors
+- Sử dụng `abort(404, 'Message')` khi không tìm thấy resource
+- Ví dụ: `abort(404, 'Bài viết không tồn tại')`
+
+#### Try-Catch Blocks
+- Sử dụng try-catch cho các operations quan trọng
+- Catch `\Throwable $e` hoặc `\Exception $e`
+- Return error messages thân thiện bằng tiếng Việt
+
+### 15. Response Types
+
+#### View Responses
+- Return view với data: `return view('client.pages.{page}', compact('data'))`
+- Pass SEO model: `compact('seoModel', 'breadcrumbs', ...)`
+
+#### JSON Responses
+- Cho AJAX requests
+- Cho API endpoints (nếu có)
+
+#### Redirect Responses
+- Sau khi submit form: `redirect()->route('...')->with('success', '...')`
+- Với errors: `redirect()->back()->withErrors([...])->withInput()`
+
+### 16. Data Filtering
+
+#### Published Posts Only
+- Luôn filter posts đã published:
+  ```php
+  ->where('posts.status', 'published')
+  ->whereNull('posts.deleted_at')
+  ->where(function ($q) {
+      $q->whereNull('posts.scheduled_at')
+          ->orWhere('posts.scheduled_at', '<=', now());
+  })
+  ```
+
+#### Category Filtering
+- Include child categories: `getAllChildrenIds($categoryId)`
+- Filter: `whereIn('categories.id', $categoryIds)`
+
+### 17. Reading Time
+
+#### Calculate Reading Time
+- Sử dụng helper: `calculateReadingTime($content)`
+- Hiển thị trong post detail page
+
+### 18. Related Posts
+
+#### Get Related Posts
+- Sử dụng `$postRepository->getRelatedPosts($post, $limit = 4)`
+- Ưu tiên cùng category
+- Nếu không đủ, lấy thêm bài mới nhất
+
+### 19. Previous/Next Posts
+
+#### Navigation Posts
+- `$postRepository->getPrevPost($post)`: Bài viết trước (mới hơn)
+- `$postRepository->getNextPost($post)`: Bài viết sau (cũ hơn)
+- Chỉ lấy published posts
+
+### 20. Newsletter Subscription
+
+#### Newsletter Routes
+- `client.newsletter.subscribe`: Subscribe newsletter
+- Sử dụng Form Request validation
+- Return JSON response
+
+### 21. Vietnamese Language
+
+#### Messages
+- Tất cả messages cho user phải bằng tiếng Việt
+- Validation messages trong Form Requests
+- Flash messages: 'Thành công', 'Có lỗi xảy ra'
+- Error messages: 'Vui lòng đăng nhập', 'Bài viết không tồn tại'
+
+### 22. Code Style
+
+#### PHP
+- Sử dụng type hints cho parameters và return types
+- Sử dụng strict types nếu có thể
+- Format code theo PSR-12
+- Sử dụng short array syntax `[]`
+
+#### Comments
+- Comment bằng tiếng Việt cho các method phức tạp
+- Sử dụng PHPDoc cho methods: `@param`, `@return`
+
+### 23. Security
+
+#### CSRF Protection
+- Tất cả forms phải có `@csrf` token
+- AJAX requests phải include CSRF token trong headers
+
+#### Authorization
+- Check authentication trước khi cho phép actions
+- Check ownership khi cần (user chỉ có thể edit profile của mình)
+
+#### Validation
+- Luôn validate input từ user
+- Sử dụng Form Requests cho validation
+- Validate file uploads (size, mime types)
+
+### 24. Best Practices
+
+1. **Separation of Concerns**: Controllers chỉ xử lý HTTP, business logic trong Repository
+2. **Reuse Repositories**: Sử dụng lại Repositories từ admin khi có thể
+3. **SEO First**: Luôn tạo SEOData cho mỗi page
+4. **User Experience**: Return JSON cho AJAX, redirect cho form submissions
+5. **Error Handling**: Luôn handle errors và return messages rõ ràng
+6. **Validation**: Validate tất cả input từ user
+7. **Authentication**: Check authentication trước khi cho phép actions
+8. **Pagination**: Sử dụng pagination cho danh sách dài
+9. **View Components**: Tách views thành components nhỏ, reusable
+10. **Vietnamese URLs**: Sử dụng tiếng Việt không dấu trong URLs
+
+### 25. File Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   └── Client/
+│   │       ├── AuthController.php
+│   │       ├── PostController.php
+│   │       ├── CategoryController.php
+│   │       ├── CommentController.php
+│   │       ├── ContactController.php
+│   │       ├── HashtagController.php
+│   │       ├── HomeController.php
+│   │       ├── PageController.php
+│   │       ├── ProfileController.php
+│   │       └── SavedPostController.php
+│   └── Requests/
+│       └── Client/
+│           ├── Auth/
+│           ├── Comment/
+│           ├── Contact/
+│           ├── Newsletter/
+│           └── Profile/
+resources/
+└── views/
+    └── client/
+        ├── layouts/
+        ├── pages/
+        └── components/
+routes/
+└── client.php
+```
+
+### 26. Notes
+
+- Client side **không có permission system** như admin
+- Client side **không sử dụng DataTables**, chỉ dùng pagination
+- Client side **sử dụng lại Repositories** từ admin
+- Client side **tập trung vào SEO** và user experience
+- Client side **sử dụng tiếng Việt** trong URLs và messages
+- Client side có **authentication đơn giản** (login, register, logout)
+- Client side có **saved posts feature** cho users
+- Client side có **comment system** với nested replies
+- Client side có **newsletter subscription**
+- Client side có **search functionality**
+- Client side có **view tracking** cho posts
+
+## JavaScript Rules cho Client Side
+
+### 1. File Structure và Organization
+
+#### Directory Structure
+```
+resources/js/client/
+├── layout/
+│   └── navbar.js (layout-specific scripts)
+├── pages/
+│   ├── auth.js
+│   ├── contact.js
+│   ├── newsletter.js
+│   └── profile/
+│       ├── index.js
+│       └── change-password.js
+└── post/
+    └── index.js (post-specific functionality)
+```
+
+#### File Naming
+- Sử dụng **kebab-case** hoặc **camelCase** cho tên file
+- Tên file phải mô tả rõ chức năng: `contact.js`, `newsletter.js`, `change-password.js`
+- Mỗi page/component có file JS riêng
+
+### 2. Code Style và Conventions
+
+#### JavaScript Style
+- Sử dụng **ES6+ syntax** (arrow functions, const/let, template literals)
+- Sử dụng **"use strict"** ở đầu file khi sử dụng jQuery
+- Prefer **vanilla JavaScript** cho new code, nhưng có thể dùng jQuery nếu cần
+- Sử dụng **const** cho constants, **let** cho variables có thể thay đổi
+- Tránh **var**, chỉ dùng khi cần thiết
+
+#### Comments
+- Sử dụng **JSDoc** cho functions phức tạp
+- Comment bằng **tiếng Việt** cho logic quan trọng
+- Section comments với `// ================================`
+
+### 3. DOM Ready và Event Handling
+
+#### DOMContentLoaded
+- Luôn wrap code trong `DOMContentLoaded` event listener
+- Format:
+  ```javascript
+  document.addEventListener("DOMContentLoaded", function() {
+      // Code here
+  });
+  ```
+- Hoặc với jQuery:
+  ```javascript
+  $(function() {
+      // Code here
+  });
+  ```
+
+#### Event Listeners
+- Sử dụng `addEventListener` cho vanilla JS
+- Sử dụng `.on()` cho jQuery
+- Luôn check element tồn tại trước khi attach event
+- Sử dụng event delegation khi cần: `document.addEventListener('click', function(e) { ... })`
+
+### 4. AJAX Requests
+
+#### Fetch API (Preferred)
+- Sử dụng **Fetch API** cho AJAX requests mới
+- Luôn include CSRF token trong headers
+- Format:
+  ```javascript
+  fetch(url, {
+      method: 'POST',
+      headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(data)
+  })
+  .then(response => {
+      if (!response.ok) {
+          return response.json().then(err => Promise.reject({ status: response.status, data: err }));
+      }
+      return response.json();
+  })
+  .then(data => {
+      // Handle success
+  })
+  .catch(error => {
+      // Handle error
+  });
+  ```
+
+#### jQuery AJAX (Legacy)
+- Có thể sử dụng jQuery AJAX cho code cũ
+- Format:
+  ```javascript
+  $.ajax({
+      url: url,
+      method: 'POST',
+      data: formData,
+      headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+      },
+      success: (res) => { ... },
+      error: (xhr) => { ... },
+      complete: () => { ... }
+  });
+  ```
+
+#### CSRF Token
+- Luôn lấy CSRF token từ meta tag:
+  ```javascript
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  ```
+- Include trong headers của mọi AJAX request
+
+### 5. Form Validation
+
+#### FormValidation Library
+- Sử dụng **FormValidation** library cho form validation
+- Setup pattern:
+  ```javascript
+  const fvForm = FormValidation.formValidation(formElement, {
+      fields: validationRules,
+      plugins: {
+          trigger: new FormValidation.plugins.Trigger(),
+          bootstrap5: new FormValidation.plugins.Bootstrap5({
+              rowSelector: ".col-md-6, .col-12",
+              eleInvalidClass: "is-invalid",
+              eleValidClass: "is-valid"
+          }),
+          autoFocus: new FormValidation.plugins.AutoFocus(),
+          submitButton: new FormValidation.plugins.SubmitButton()
+      }
+  });
+  ```
+
+#### Validation Rules
+- Định nghĩa rules rõ ràng với messages tiếng Việt
+- Format:
+  ```javascript
+  const validationRules = {
+      fieldName: {
+          validators: {
+              notEmpty: { message: "Vui lòng nhập..." },
+              stringLength: { min: 2, max: 255, message: "..." },
+              emailAddress: { message: "Email không hợp lệ." }
+          }
+      }
+  };
+  ```
+
+#### Form Submission
+- Handle form submission trong `fvForm.on("core.form.valid", ...)`
+- Disable submit button khi đang submit
+- Show loading state
+- Re-enable button trong `complete` callback
+
+### 6. Error Handling
+
+#### Error Response Handling
+- Luôn handle các HTTP status codes: 400, 401, 403, 404, 422, 500
+- Format:
+  ```javascript
+  .catch(error => {
+      let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
+      
+      if (error.status === 401) {
+          message = 'Vui lòng đăng nhập.';
+          // Redirect to login
+      } else if (error.status === 422) {
+          const errors = error.data?.errors || {};
+          // Display validation errors
+      } else if (error.data && error.data.message) {
+          message = error.data.message;
+      }
+      
+      showError(message);
+  });
+  ```
+
+#### Try-Catch Blocks
+- Sử dụng try-catch cho code có thể throw errors
+- Log errors nếu cần: `console.error(error)`
+
+### 7. Notifications (Toastr)
+
+#### Toastr Usage
+- Sử dụng **toastr** cho notifications
+- Check `typeof toastr !== 'undefined'` trước khi sử dụng
+- Format:
+  ```javascript
+  function showSuccess(message) {
+      if (typeof toastr !== 'undefined') {
+          toastr.success(message, 'Thành công', {
+              timeOut: 3000,
+              positionClass: 'toast-top-right'
+          });
+      }
+  }
+  
+  function showError(message) {
+      if (typeof toastr !== 'undefined') {
+          toastr.error(message, 'Lỗi', {
+              timeOut: 5000,
+              positionClass: 'toast-top-right'
+          });
+      }
+  }
+  ```
+
+### 8. Helper Functions
+
+#### Utility Functions
+- Tạo helper functions cho logic tái sử dụng
+- Đặt trong cùng file hoặc separate utility file
+- Ví dụ:
+  ```javascript
+  function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+  }
+  
+  function formatDateToDisplay(dateStr) {
+      // Format logic
+  }
+  ```
+
+#### Global Functions
+- Nếu cần expose function ra global scope:
+  ```javascript
+  window.functionName = function() {
+      // Code
+  };
+  ```
+
+### 9. Selectors và Element Access
+
+#### Query Selectors
+- Sử dụng `document.querySelector()` và `document.querySelectorAll()`
+- Cache selectors trong constants:
+  ```javascript
+  const form = document.getElementById('form-id');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  ```
+- Luôn check element tồn tại trước khi sử dụng:
+  ```javascript
+  if (!form) return;
+  ```
+
+#### jQuery Selectors
+- Nếu dùng jQuery, cache selectors:
+  ```javascript
+  const $form = $("#form-id");
+  const $submitBtn = $form.find('button[type="submit"]');
+  ```
+
+### 10. State Management
+
+#### Button States
+- Disable/enable buttons khi submit
+- Show/hide loading spinners
+- Update button text
+- Format:
+  ```javascript
+  // Disable
+  submitBtn.disabled = true;
+  submitBtn.classList.add('loading');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i>Đang gửi...';
+  
+  // Re-enable
+  submitBtn.disabled = false;
+  submitBtn.classList.remove('loading');
+  submitBtn.innerHTML = originalText;
+  ```
+
+#### Optimistic UI Updates
+- Có thể update UI trước khi nhận response (optimistic update)
+- Revert nếu request fails
+
+### 11. Security
+
+#### XSS Prevention
+- Luôn escape HTML khi insert user input vào DOM
+- Sử dụng `textContent` thay vì `innerHTML` khi có thể
+- Hoặc sử dụng escape function:
+  ```javascript
+  function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+  }
+  ```
+
+#### CSRF Protection
+- Luôn include CSRF token trong AJAX requests
+- Validate responses từ server
+
+### 12. Performance
+
+#### Event Delegation
+- Sử dụng event delegation cho dynamic elements
+- Format:
+  ```javascript
+  document.addEventListener('click', function(e) {
+      if (e.target.closest('.button-class')) {
+          // Handle click
+      }
+  });
+  ```
+
+#### Debouncing/Throttling
+- Sử dụng debounce cho scroll/resize events
+- Format:
+  ```javascript
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+          // Handle resize
+      }, 150);
+  });
+  ```
+
+### 13. Vite Integration
+
+#### Vite Build
+- Sử dụng **Vite** để build JavaScript
+- Import trong views:
+  ```blade
+  @vite(['resources/js/client/pages/contact.js'])
+  ```
+- Multiple files:
+  ```blade
+  @vite(['resources/js/client/post/index.js', 'resources/js/client/pages/newsletter.js'])
+  ```
+
+#### Module System
+- Có thể sử dụng ES6 modules nếu cần
+- Import/export khi cần share code
+
+### 14. Code Organization
+
+#### Constants và Selectors
+- Định nghĩa constants và selectors ở đầu file
+- Format:
+  ```javascript
+  // ================================
+  // Constants & Selectors
+  // ================================
+  const form = document.getElementById('form-id');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  ```
+
+#### Sections
+- Chia code thành sections với comments:
+  ```javascript
+  // ================================
+  // Form Validation Setup
+  // ================================
+  
+  // ================================
+  // Event Handlers
+  // ================================
+  
+  // ================================
+  // Helper Functions
+  // ================================
+  ```
+
+### 15. Best Practices
+
+1. **Always Check Element Existence**: Check element tồn tại trước khi sử dụng
+2. **Error Handling**: Luôn handle errors và show user-friendly messages
+3. **Loading States**: Show loading states cho async operations
+4. **CSRF Protection**: Luôn include CSRF token
+5. **XSS Prevention**: Escape user input
+6. **Performance**: Sử dụng event delegation, debouncing khi cần
+7. **Code Reusability**: Tạo helper functions cho logic tái sử dụng
+8. **Comments**: Comment logic phức tạp bằng tiếng Việt
+9. **Consistent Style**: Follow consistent code style trong project
+10. **Modern JavaScript**: Sử dụng ES6+ features
+
+### 16. Common Patterns
+
+#### Form Submission Pattern
+```javascript
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate
+    if (!validateForm()) return;
+    
+    // Disable button
+    submitBtn.disabled = true;
+    
+    // Submit
+    fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            showSuccess(data.message);
+            form.reset();
+        } else {
+            showError(data.message);
+        }
+    })
+    .catch(error => {
+        showError('Có lỗi xảy ra.');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+    });
+});
+```
+
+#### Toggle Pattern
+```javascript
+button.addEventListener('click', function() {
+    const isActive = button.classList.contains('active');
+    
+    // Optimistic update
+    button.classList.toggle('active');
+    
+    // API call
+    fetch(url, { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+        // Update based on response
+    })
+    .catch(error => {
+        // Revert optimistic update
+        button.classList.toggle('active');
+    });
+});
+```
+
+### 17. Notes
+
+- Client JavaScript **không sử dụng DataTables** (chỉ admin)
+- Client JavaScript **tập trung vào UX** và user interactions
+- Client JavaScript **sử dụng Fetch API** cho AJAX (preferred)
+- Client JavaScript **có thể sử dụng jQuery** cho legacy code
+- Client JavaScript **luôn validate input** trước khi submit
+- Client JavaScript **luôn handle errors** và show messages
+- Client JavaScript **sử dụng toastr** cho notifications
+- Client JavaScript **sử dụng FormValidation** cho form validation
