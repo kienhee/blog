@@ -593,14 +593,23 @@ class PostRepository extends BaseRepository
      */
     public function getPostBySlug($slug)
     {
-        return $this->gridData()
-            ->where('posts.slug', $slug)
-            ->where('posts.status', 'published')
-            ->whereNull('posts.deleted_at')
-            ->where(function ($q) {
-                $q->whereNull('posts.scheduled_at')
-                    ->orWhere('posts.scheduled_at', '<=', now());
-            })
-            ->first();
+        $query = $this->gridData();
+
+        $query->where('posts.slug', $slug);
+        $query->whereNull('posts.deleted_at');
+        $query->where(function ($q) {
+            $q->whereNull('posts.scheduled_at')
+                ->orWhere('posts.scheduled_at', '<=', now());
+        });
+
+        if (auth()->check() && !auth()->user()->hasRole('guest')) {
+            // Nếu đăng nhập và role không phải là guest thì cho phép xem cả bài nháp lẫn đã xuất bản
+            $query->whereIn('posts.status', ['published', 'draft']);
+        } else {
+            // Nếu chưa đăng nhập hoặc role là guest, chỉ xem được bài đã xuất bản
+            $query->where('posts.status', 'published');
+        }
+
+        return $query->first();
     }
-}
+    }
