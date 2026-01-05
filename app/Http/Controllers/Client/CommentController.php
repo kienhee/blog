@@ -4,17 +4,19 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\Comment\StoreRequest;
-use App\Models\Post;
 use App\Repositories\CommentRepository;
+use App\Repositories\PostRepository;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
     protected $commentRepository;
+    protected $postRepository;
 
-    public function __construct(CommentRepository $commentRepository)
+    public function __construct(CommentRepository $commentRepository, PostRepository $postRepository)
     {
         $this->commentRepository = $commentRepository;
+        $this->postRepository = $postRepository;
     }
 
     /**
@@ -23,7 +25,7 @@ class CommentController extends Controller
     public function store(StoreRequest $request)
     {
         try {
-            $post = Post::find($request->validated()['post_id']);
+            $post = $this->postRepository->findById($request->validated()['post_id']);
 
             if (!$post) {
                 return response()->json([

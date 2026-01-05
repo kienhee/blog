@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Finance\StoreExpenseRequest;
+use App\Http\Requests\Admin\Finance\UpdateExpenseRequest;
+use App\Http\Requests\Admin\Finance\UpdateMonthRequest;
 use App\Models\FinanceDay;
 use App\Models\FinanceMonth;
 use App\Models\FinanceType;
 use App\Models\FinanceYear;
+use App\Repositories\FinanceDayRepository;
+use App\Repositories\FinanceMonthRepository;
+use App\Repositories\FinanceYearRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +20,20 @@ use Illuminate\Support\Facades\Log;
 
 class FinanceMonthController extends Controller
 {
+    protected $financeMonthRepository;
+    protected $financeDayRepository;
+    protected $financeYearRepository;
+
+    public function __construct(
+        FinanceMonthRepository $financeMonthRepository,
+        FinanceDayRepository $financeDayRepository,
+        FinanceYearRepository $financeYearRepository
+    ) {
+        $this->financeMonthRepository = $financeMonthRepository;
+        $this->financeDayRepository = $financeDayRepository;
+        $this->financeYearRepository = $financeYearRepository;
+    }
+
     /**
      * Remove format from number string (remove dots)
      */
@@ -51,14 +71,10 @@ class FinanceMonthController extends Controller
             abort(404, 'Tháng không hợp lệ');
         }
 
-        $year = FinanceYear::where('user_id', Auth::id())
-            ->findOrFail($yearId);
+        $year = $this->financeYearRepository->findByIdAndUser($yearId);
 
         // Kiểm tra nếu tháng đã tồn tại thì cho xem, nếu chưa tồn tại thì kiểm tra rule
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->where('year_id', $yearId)
-            ->where('month', $month)
-            ->first();
+        $financeMonth = $this->financeMonthRepository->findByYearAndMonth($yearId, $month);
 
         // Nếu tháng chưa tồn tại, kiểm tra rule tạo tháng
         if (!$financeMonth) {
@@ -77,8 +93,7 @@ class FinanceMonthController extends Controller
             }
 
             // Tạo tháng mới
-            $financeMonth = FinanceMonth::create([
-                'user_id' => Auth::id(),
+            $financeMonth = $this->financeMonthRepository->create([
                 'year_id' => $yearId,
                 'month' => $month,
                 'total_money' => 0,
@@ -95,39 +110,19 @@ class FinanceMonthController extends Controller
         ];
 
         // Lấy danh sách loại chi tiêu
-        $financeTypes = FinanceType::orderBy('name')->get();
+        $financeTypes = $this->financeMonthRepository->getFinanceTypes();
 
         // Lấy danh sách các ngày đã có chi tiêu trong tháng
-        $financeDays = FinanceDay::where('month_id', $financeMonth->id)
-            ->with('financeType')
-            ->orderBy('date', 'asc')
-            ->get();
+        $financeDays = $this->financeMonthRepository->getFinanceDays($financeMonth->id);
 
         // Tính tổng chi phí trong tháng (tổng số tiền trong tháng)
         $totalExpenses = $financeDays->sum('money');
         
         // Tính lại remaining_money = total_money - tổng chi phí
-        $financeMonth->remaining_money = $financeMonth->total_money - $totalExpenses;
+        $financeMonth = $this->financeMonthRepository->recalculateRemainingMoney($financeMonth->id);
         
         // Kiểm tra nếu tháng đã qua và chưa lock thì tự động lock
-        // Sử dụng transaction để tránh race condition
-        $monthDate = \Carbon\Carbon::create($year->year, $financeMonth->month, 1)->endOfMonth();
-        $now = \Carbon\Carbon::now();
-        
-        DB::transaction(function() use ($financeMonth, $monthDate, $now) {
-            // Refresh để lấy data mới nhất từ DB
-            $financeMonth->refresh();
-            
-            // Chỉ lưu nếu remaining_money thay đổi
-            $financeMonth->remaining_money = $financeMonth->total_money - $financeMonth->financeDays()->sum('money');
-            $financeMonth->save();
-            
-            // Auto-lock nếu tháng đã qua và chưa lock
-            if ($monthDate->isPast() && !$financeMonth->isLocked()) {
-                $financeMonth->locked_time = $now;
-                $financeMonth->save();
-            }
-        });
+        $this->financeMonthRepository->autoLockIfPast($financeMonth);
 
         return view('admin.modules.finance.month.show', compact('financeMonth', 'year', 'monthNames', 'financeTypes', 'financeDays', 'totalExpenses'));
     }
@@ -137,13 +132,9 @@ class FinanceMonthController extends Controller
      */
     public function getExpenses($monthId)
     {
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->findOrFail($monthId);
+        $financeMonth = $this->financeMonthRepository->findByIdAndUser($monthId);
 
-        $financeDays = FinanceDay::where('month_id', $monthId)
-            ->with('financeType')
-            ->orderBy('date', 'asc')
-            ->get();
+        $financeDays = $this->financeMonthRepository->getFinanceDays($monthId);
 
         $events = $financeDays->map(function($day) {
             return [
@@ -168,21 +159,8 @@ class FinanceMonthController extends Controller
     /**
      * Store a new finance day (expense)
      */
-    public function storeExpense(Request $request, $monthId)
+    public function storeExpense(StoreExpenseRequest $request, $monthId)
     {
-        $request->validate([
-            'date' => 'required|date',
-            'finance_type_id' => 'required|exists:finance_type,id',
-            'money' => 'required|string', // Accept string first (may contain dots)
-            'note' => 'nullable|string|max:255',
-        ], [
-            'date.required' => 'Vui lòng chọn ngày',
-            'date.date' => 'Ngày không hợp lệ',
-            'finance_type_id.required' => 'Vui lòng chọn loại chi tiêu',
-            'finance_type_id.exists' => 'Loại chi tiêu không tồn tại',
-            'money.required' => 'Vui lòng nhập số tiền',
-        ]);
-
         try {
             // Lấy date từ request và parse để lấy year và month
             $date = \Carbon\Carbon::parse($request->input('date'));
@@ -190,9 +168,8 @@ class FinanceMonthController extends Controller
             $expenseMonth = $date->month;
             
             // Tìm hoặc tạo FinanceYear cho năm của expense
-            $financeYear = FinanceYear::firstOrCreate(
+            $financeYear = $this->financeYearRepository->firstOrCreate(
                 [
-                    'user_id' => Auth::id(),
                     'year' => $expenseYear,
                 ],
                 [
@@ -202,9 +179,8 @@ class FinanceMonthController extends Controller
             );
             
             // Tìm hoặc tạo FinanceMonth cho tháng của expense (dựa trên date, không phải monthId từ route)
-            $financeMonth = FinanceMonth::firstOrCreate(
+            $financeMonth = $this->financeMonthRepository->firstOrCreate(
                 [
-                    'user_id' => Auth::id(),
                     'year_id' => $financeYear->id,
                     'month' => $expenseMonth,
                 ],
@@ -232,8 +208,7 @@ class FinanceMonthController extends Controller
                 ], 422);
             }
             
-            $financeDay = FinanceDay::create([
-                'user_id' => Auth::id(),
+            $financeDay = $this->financeDayRepository->create([
                 'month_id' => $financeMonth->id, // Sử dụng month_id từ date, không phải từ route
                 'date' => $request->input('date'),
                 'finance_type_id' => $request->input('finance_type_id'),
@@ -246,7 +221,7 @@ class FinanceMonthController extends Controller
                 'message' => 'Thêm chi tiêu thành công',
                 'data' => $financeDay,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi thêm chi tiêu',
@@ -257,25 +232,10 @@ class FinanceMonthController extends Controller
     /**
      * Update a finance day (expense)
      */
-    public function updateExpense(Request $request, $monthId, $id)
+    public function updateExpense(UpdateExpenseRequest $request, $monthId, $id)
     {
         // Tìm expense theo id và user_id (không cần kiểm tra month_id từ route)
-        $financeDay = FinanceDay::where('user_id', Auth::id())
-            ->findOrFail($id);
-
-        $request->validate([
-            'date' => 'required|date',
-            'finance_type_id' => 'required|exists:finance_type,id',
-            'money' => 'required|string|max:20', // Accept string first (may contain dots), max 20 chars
-            'note' => 'nullable|string|max:255',
-        ], [
-            'date.required' => 'Vui lòng chọn ngày',
-            'date.date' => 'Ngày không hợp lệ',
-            'finance_type_id.required' => 'Vui lòng chọn loại chi tiêu',
-            'finance_type_id.exists' => 'Loại chi tiêu không tồn tại',
-            'money.required' => 'Vui lòng nhập số tiền',
-            'money.max' => 'Số tiền quá lớn',
-        ]);
+        $financeDay = $this->financeDayRepository->findByIdAndUser($id);
 
         try {
             $oldMonthId = $financeDay->month_id;
@@ -287,9 +247,8 @@ class FinanceMonthController extends Controller
                 $expenseMonth = $date->month;
                 
                 // Tìm hoặc tạo FinanceYear cho năm của expense
-                $financeYear = FinanceYear::firstOrCreate(
+                $financeYear = $this->financeYearRepository->firstOrCreate(
                     [
-                        'user_id' => Auth::id(),
                         'year' => $expenseYear,
                     ],
                     [
@@ -299,9 +258,8 @@ class FinanceMonthController extends Controller
                 );
                 
                 // Tìm hoặc tạo FinanceMonth cho tháng của expense (dựa trên date, không phải monthId từ route)
-                $financeMonth = FinanceMonth::firstOrCreate(
+                $financeMonth = $this->financeMonthRepository->firstOrCreate(
                     [
-                        'user_id' => Auth::id(),
                         'year_id' => $financeYear->id,
                         'month' => $expenseMonth,
                     ],
@@ -351,14 +309,7 @@ class FinanceMonthController extends Controller
                     $monthsToUpdate[] = $oldMonthId;
                 }
                 
-                foreach ($monthsToUpdate as $monthIdToUpdate) {
-                    $monthToUpdate = FinanceMonth::find($monthIdToUpdate);
-                    if ($monthToUpdate) {
-                        $totalExpenses = FinanceDay::where('month_id', $monthIdToUpdate)->sum('money');
-                        $monthToUpdate->remaining_money = $monthToUpdate->total_money - $totalExpenses;
-                        $monthToUpdate->save();
-                    }
-                }
+                $this->financeDayRepository->recalculateRemainingMoneyForMonths($monthsToUpdate);
             });
 
             return response()->json([
@@ -366,7 +317,7 @@ class FinanceMonthController extends Controller
                 'message' => 'Cập nhật chi tiêu thành công',
                 'data' => $financeDay->fresh(),
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error updating expense', [
                 'error' => $e->getMessage(),
                 'expense_id' => $financeDay->id,
@@ -387,12 +338,9 @@ class FinanceMonthController extends Controller
      */
     public function destroyExpense($monthId, $id)
     {
-        $financeDay = FinanceDay::where('month_id', $monthId)
-            ->where('user_id', Auth::id())
-            ->findOrFail($id);
+        $financeDay = $this->financeDayRepository->findByMonthIdAndUser($monthId, $id);
 
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->findOrFail($monthId);
+        $financeMonth = $this->financeMonthRepository->findByIdAndUser($monthId);
 
         // Kiểm tra nếu tháng đã bị lock
         $lockedCheck = $this->checkLocked($financeMonth);
@@ -401,13 +349,13 @@ class FinanceMonthController extends Controller
         }
 
         try {
-            $financeDay->delete();
+            $this->financeDayRepository->delete($id);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa chi tiêu thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi xóa chi tiêu',
@@ -418,10 +366,9 @@ class FinanceMonthController extends Controller
     /**
      * Update finance month information
      */
-    public function update(Request $request, $monthId)
+    public function update(UpdateMonthRequest $request, $monthId)
     {
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->findOrFail($monthId);
+        $financeMonth = $this->financeMonthRepository->findByIdAndUser($monthId);
 
         // Kiểm tra nếu tháng đã bị lock
         $lockedCheck = $this->checkLocked($financeMonth);
@@ -429,23 +376,12 @@ class FinanceMonthController extends Controller
             return $lockedCheck;
         }
 
-        $request->validate([
-            'total_money' => 'nullable|string', // Accept string first (may contain dots)
-        ]);
-
         try {
             // Cập nhật các trường (unformat trước)
             if ($request->has('total_money')) {
-                $financeMonth->total_money = $this->unformatNumber($request->input('total_money', 0));
+                $totalMoney = $this->unformatNumber($request->input('total_money', 0));
+                $financeMonth = $this->financeMonthRepository->updateTotalMoney($monthId, $totalMoney);
             }
-
-            // Tính tổng chi phí trong tháng (tổng từ finance_days)
-            $totalExpenses = FinanceDay::where('month_id', $monthId)->sum('money');
-            
-            // Tính remaining_money = total_money - tổng chi phí
-            $financeMonth->remaining_money = $financeMonth->total_money - $totalExpenses;
-            
-            $financeMonth->save();
 
             return response()->json([
                 'status' => true,
@@ -455,7 +391,7 @@ class FinanceMonthController extends Controller
                     'remaining_money' => $financeMonth->remaining_money,
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi cập nhật',
@@ -468,16 +404,12 @@ class FinanceMonthController extends Controller
      */
     public function dayDetails($monthId)
     {
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->findOrFail($monthId);
+        $financeMonth = $this->financeMonthRepository->findByIdAndUser($monthId);
 
         $year = $financeMonth->financeYear;
 
         // Lấy danh sách các ngày có chi tiêu, nhóm theo ngày
-        $financeDays = FinanceDay::where('month_id', $monthId)
-            ->with('financeType')
-            ->orderBy('date', 'asc')
-            ->get();
+        $financeDays = $this->financeMonthRepository->getFinanceDays($monthId);
 
         // Nhóm theo ngày và tính tổng
         $daysGrouped = $financeDays->groupBy(function($day) {
@@ -512,8 +444,7 @@ class FinanceMonthController extends Controller
      */
     public function lock($monthId)
     {
-        $financeMonth = FinanceMonth::where('user_id', Auth::id())
-            ->findOrFail($monthId);
+        $financeMonth = $this->financeMonthRepository->findByIdAndUser($monthId);
 
         // Kiểm tra nếu tháng đã bị lock
         if ($financeMonth->isLocked()) {
@@ -524,14 +455,7 @@ class FinanceMonthController extends Controller
         }
 
         try {
-            DB::transaction(function() use ($financeMonth) {
-                $financeMonth->refresh(); // Refresh để tránh race condition
-                if ($financeMonth->isLocked()) {
-                    throw new \Exception('Tháng này đã được khóa');
-                }
-                $financeMonth->locked_time = \Carbon\Carbon::now();
-                $financeMonth->save();
-            });
+            $financeMonth = $this->financeMonthRepository->lock($monthId);
 
             return response()->json([
                 'status' => true,
@@ -540,7 +464,7 @@ class FinanceMonthController extends Controller
                     'locked_time' => $financeMonth->fresh()->locked_time->format('d/m/Y H:i'),
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error locking finance month', [
                 'error' => $e->getMessage(),
                 'month_id' => $financeMonth->id,

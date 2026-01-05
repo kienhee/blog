@@ -89,16 +89,8 @@ class CategoryController extends Controller
      * Quick create category from post module (via AJAX)
      * Returns JSON response for quick creation
      */
-    public function quickStore(Request $request)
+    public function quickStore(\App\Http\Requests\Admin\Category\QuickStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|min:2|max:60|unique:categories,name',
-        ], [
-            'name.required' => 'Vui lòng nhập tên danh mục',
-            'name.unique' => 'Danh mục này đã tồn tại',
-            'name.min' => 'Tên danh mục phải có ít nhất 2 ký tự',
-            'name.max' => 'Tên danh mục không được vượt quá 60 ký tự',
-        ]);
 
         try {
             $category = $this->categoryRepository->createWithOrder([
@@ -216,7 +208,7 @@ class CategoryController extends Controller
             $result = $this->categoryRepository->deleteCategory($id);
 
             return response()->json($result);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra',

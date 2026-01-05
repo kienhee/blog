@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\SavedPost;
+use App\Repositories\SavedPostRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SavedPostController extends Controller
 {
+    protected $savedPostRepository;
+
+    public function __construct(SavedPostRepository $savedPostRepository)
+    {
+        $this->savedPostRepository = $savedPostRepository;
+    }
+
     /**
      * Save a post
      */
@@ -24,11 +31,7 @@ class SavedPostController extends Controller
         $userId = Auth::id();
 
         // Kiểm tra xem đã lưu chưa
-        $savedPost = SavedPost::where('user_id', $userId)
-            ->where('post_id', $postId)
-            ->first();
-
-        if ($savedPost) {
+        if ($this->savedPostRepository->isSaved($userId, $postId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bài viết đã được lưu trước đó.',
@@ -37,10 +40,7 @@ class SavedPostController extends Controller
         }
 
         // Lưu bài viết
-        SavedPost::create([
-            'user_id' => $userId,
-            'post_id' => $postId,
-        ]);
+        $this->savedPostRepository->save($userId, $postId);
 
         return response()->json([
             'success' => true,
@@ -63,11 +63,7 @@ class SavedPostController extends Controller
 
         $userId = Auth::id();
 
-        $savedPost = SavedPost::where('user_id', $userId)
-            ->where('post_id', $postId)
-            ->first();
-
-        if (!$savedPost) {
+        if (!$this->savedPostRepository->isSaved($userId, $postId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bài viết chưa được lưu.',
@@ -75,7 +71,7 @@ class SavedPostController extends Controller
             ]);
         }
 
-        $savedPost->delete();
+        $this->savedPostRepository->unsave($userId, $postId);
 
         return response()->json([
             'success' => true,
@@ -97,29 +93,13 @@ class SavedPostController extends Controller
         }
 
         $userId = Auth::id();
+        $result = $this->savedPostRepository->toggle($userId, $postId);
 
-        $savedPost = SavedPost::where('user_id', $userId)
-            ->where('post_id', $postId)
-            ->first();
-
-        if ($savedPost) {
-            $savedPost->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Đã bỏ lưu bài viết.',
-                'saved' => false,
-            ]);
-        } else {
-            SavedPost::create([
-                'user_id' => $userId,
-                'post_id' => $postId,
-            ]);
-            return response()->json([
-                'success' => true,
-                'message' => 'Đã lưu bài viết thành công.',
-                'saved' => true,
-            ]);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => $result['message'],
+            'saved' => $result['saved'],
+        ]);
     }
 
     /**
@@ -134,10 +114,7 @@ class SavedPostController extends Controller
         }
 
         $userId = Auth::id();
-
-        $saved = SavedPost::where('user_id', $userId)
-            ->where('post_id', $postId)
-            ->exists();
+        $saved = $this->savedPostRepository->isSaved($userId, $postId);
 
         return response()->json([
             'saved' => $saved,

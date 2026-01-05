@@ -62,16 +62,8 @@ class HashTagController extends Controller
      * Quick create hashtag from post module (via AJAX)
      * Returns JSON response for quick creation
      */
-    public function quickStore(Request $request)
+    public function quickStore(\App\Http\Requests\Admin\HashTag\QuickStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|min:2|max:20|unique:hash_tags,name',
-        ], [
-            'name.required' => 'Vui lòng nhập tên hashtag',
-            'name.unique' => 'Hashtag này đã tồn tại',
-            'name.min' => 'Tên hashtag phải có ít nhất 2 ký tự',
-            'name.max' => 'Tên hashtag không được vượt quá 20 ký tự',
-        ]);
 
         try {
             $hashtag = $this->hashTagRepository->create([

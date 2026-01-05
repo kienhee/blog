@@ -126,7 +126,7 @@ class AuthController extends Controller
             return redirect()
                 ->route('client.auth.login')
                 ->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return back()
                 ->withErrors(['email' => 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.'])
                 ->withInput();

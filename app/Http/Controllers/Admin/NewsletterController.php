@@ -48,7 +48,7 @@ class NewsletterController extends Controller
                 'status' => true,
                 'message' => 'Xóa email đăng ký thành công.',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi xóa email đăng ký.',

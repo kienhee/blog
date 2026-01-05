@@ -3,21 +3,28 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\FinanceYear;
+use App\Http\Requests\Admin\Finance\GetYearByNumberRequest;
+use App\Http\Requests\Admin\Finance\StoreYearRequest;
+use App\Http\Requests\Admin\Finance\UpdateNoteRequest;
+use App\Http\Requests\Admin\Finance\UpdateTargetRequest;
+use App\Repositories\FinanceYearRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class FinanceYearController extends Controller
 {
+    protected $financeYearRepository;
+
+    public function __construct(FinanceYearRepository $financeYearRepository)
+    {
+        $this->financeYearRepository = $financeYearRepository;
+    }
+
     /**
      * Display list of finance years
      */
     public function list()
     {
-        $years = FinanceYear::where('user_id', Auth::id())
-            ->orderBy('year', 'desc')
-            ->get();
+        $years = $this->financeYearRepository->getYearsByUser();
         
         return view('admin.modules.finance.list', compact('years'));
     }
@@ -25,29 +32,10 @@ class FinanceYearController extends Controller
     /**
      * Store a new finance year
      */
-    public function store(Request $request)
+    public function store(StoreYearRequest $request)
     {
-        $request->validate([
-            'year' => [
-                'required',
-                'integer',
-                'min:2026',
-                'max:2100',
-                Rule::unique('finance_years', 'year')->where(function ($query) {
-                    return $query->where('user_id', Auth::id());
-                }),
-            ],
-        ], [
-            'year.required' => 'Vui lòng nhập năm',
-            'year.integer' => 'Năm phải là số nguyên',
-            'year.min' => 'Năm phải lớn hơn hoặc bằng 2026',
-            'year.max' => 'Năm phải nhỏ hơn hoặc bằng 2100',
-            'year.unique' => 'Năm này đã tồn tại trong hệ thống',
-        ]);
-
         try {
-            $year = FinanceYear::create([
-                'user_id' => Auth::id(),
+            $year = $this->financeYearRepository->create([
                 'year' => $request->input('year'),
                 'target' => [],
             ]);
@@ -57,7 +45,7 @@ class FinanceYearController extends Controller
                 'message' => 'Tạo năm mới thành công',
                 'data' => $year,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi tạo năm',
@@ -70,8 +58,7 @@ class FinanceYearController extends Controller
      */
     public function show($id)
     {
-        $year = FinanceYear::where('user_id', Auth::id())
-            ->findOrFail($id);
+        $year = $this->financeYearRepository->findByIdAndUser($id);
         
         // Initialize target if null
         if (is_null($year->target)) {
@@ -104,27 +91,17 @@ class FinanceYearController extends Controller
     /**
      * Update target (AJAX)
      */
-    public function updateTarget(Request $request, $id)
+    public function updateTarget(UpdateTargetRequest $request, $id)
     {
-        $year = FinanceYear::where('user_id', Auth::id())
-            ->findOrFail($id);
-        
-        $request->validate([
-            'target' => 'nullable|array',
-            'target.*.name' => 'required_with:target|string|max:255',
-            'target.*.completed' => 'boolean',
-        ]);
-
         try {
             $target = $request->input('target', []);
-            $year->target = $target;
-            $year->save();
+            $this->financeYearRepository->updateTarget($id, $target);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật mục tiêu thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi cập nhật',
@@ -135,12 +112,8 @@ class FinanceYearController extends Controller
     /**
      * Get year by year number (find or create)
      */
-    public function getYearByNumber(Request $request)
+    public function getYearByNumber(GetYearByNumberRequest $request)
     {
-        $request->validate([
-            'year' => 'required|integer|min:2026|max:2100',
-        ]);
-
         // Kiểm tra: chỉ cho phép tạo năm >= 2026
         if ($request->input('year') < 2026) {
             return response()->json([
@@ -149,9 +122,8 @@ class FinanceYearController extends Controller
             ], 422);
         }
 
-        $year = FinanceYear::firstOrCreate(
+        $year = $this->financeYearRepository->firstOrCreate(
             [
-                'user_id' => Auth::id(),
                 'year' => $request->input('year'),
             ],
             [
@@ -171,27 +143,19 @@ class FinanceYearController extends Controller
     /**
      * Update note (AJAX)
      */
-    public function updateNote(Request $request, $id)
+    public function updateNote(UpdateNoteRequest $request, $id)
     {
-        $year = FinanceYear::where('user_id', Auth::id())
-            ->findOrFail($id);
-        
-        $request->validate([
-            'note' => 'nullable|string|max:65535',
-        ]);
-
         try {
-            $year->note = $request->input('note');
-            $year->save();
+            $this->financeYearRepository->updateNote($id, $request->input('note'));
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật ghi chú thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra khi cập nhật' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi cập nhật',
             ], 500);
         }
     }

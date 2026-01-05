@@ -62,7 +62,7 @@ class ContactController extends Controller
                 'success' => true,
                 'message' => 'Gửi tin nhắn thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'success' => false,

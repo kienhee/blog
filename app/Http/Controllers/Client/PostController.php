@@ -7,6 +7,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
+use App\Repositories\SavedPostRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,17 +17,20 @@ class PostController extends Controller
     protected $postViewRepository;
     protected $categoryRepository;
     protected $hashTagRepository;
+    protected $savedPostRepository;
 
     public function __construct(
         PostRepository $postRepository,
         PostViewRepository $postViewRepository,
         CategoryRepository $categoryRepository,
-        HashTagRepository $hashTagRepository
+        HashTagRepository $hashTagRepository,
+        SavedPostRepository $savedPostRepository
     ) {
         $this->postRepository = $postRepository;
         $this->postViewRepository = $postViewRepository;
         $this->categoryRepository = $categoryRepository;
         $this->hashTagRepository = $hashTagRepository;
+        $this->savedPostRepository = $savedPostRepository;
     }
 
     public function post($slug)
@@ -74,9 +78,7 @@ class PostController extends Controller
         // Kiểm tra xem bài viết đã được lưu chưa
         $isSaved = false;
         if (Auth::check() && $postModel) {
-            $isSaved = \App\Models\SavedPost::where('user_id', auth()->id())
-                ->where('post_id', $postModel->id)
-                ->exists();
+            $isSaved = $this->savedPostRepository->isSaved(auth()->id(), $postModel->id);
         }
 
         // Load comments

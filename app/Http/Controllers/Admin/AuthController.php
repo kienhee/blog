@@ -25,12 +25,8 @@ class AuthController extends Controller
         return view('admin.modules.auth.login');
     }
 
-    public function loginHandle(Request $request)
+    public function loginHandle(\App\Http\Requests\Admin\Auth\LoginRequest $request)
     {
-        $request->validate([
-            'login' => ['required', 'string'],
-            'password' => ['required'],
-        ]);
 
         $remember = $request->has('remember');
         $loginValue = $request->input('login');
@@ -78,15 +74,8 @@ class AuthController extends Controller
         return view('admin.modules.auth.forgot-password');
     }
 
-    public function sendPasswordResetLink(Request $request)
+    public function sendPasswordResetLink(\App\Http\Requests\Admin\Auth\ForgotPasswordRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
-        ], [
-            'email.required' => 'Vui lòng nhập email của bạn.',
-            'email.email' => 'Email không đúng định dạng.',
-            'email.exists' => 'Email này không tồn tại trong hệ thống.',
-        ]);
 
         $result = $this->authRepository->sendPasswordResetEmail($request->email);
 
@@ -115,15 +104,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(\App\Http\Requests\Admin\Auth\ResetPasswordRequest $request)
     {
-        $request->validate([
-            'password' => ['required', 'min:6', 'confirmed'],
-        ], [
-            'password.required' => 'Vui lòng nhập mật khẩu mới.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
-        ]);
 
         $result = $this->authRepository->resetPassword(
             $request->input('token'),

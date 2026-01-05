@@ -63,7 +63,7 @@ class PageController extends Controller
                 'success' => true,
                 'message' => $result['message'],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',

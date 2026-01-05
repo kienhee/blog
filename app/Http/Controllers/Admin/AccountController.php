@@ -3,14 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Account\BulkDeleteRequest;
+use App\Http\Requests\Admin\Account\StoreRequest;
+use App\Http\Requests\Admin\Account\UpdateOrderRequest;
+use App\Http\Requests\Admin\Account\UpdateRequest;
+use App\Http\Requests\Admin\Account\ViewPasswordRequest;
 use App\Models\Account;
+use App\Repositories\AccountRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Yajra\DataTables\Facades\DataTables;
 
 class AccountController extends Controller
 {
+    protected $accountRepository;
+
+    public function __construct(AccountRepository $accountRepository)
+    {
+        $this->accountRepository = $accountRepository;
+    }
+
     /**
      * Display list of accounts
      */
@@ -24,45 +36,9 @@ class AccountController extends Controller
      */
     public function ajaxGetData()
     {
-        $accounts = Account::where('user_id', Auth::id())
-            ->orderBy('order', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return DataTables::of($accounts)
-            ->addIndexColumn()
-            ->addColumn('checkbox_html', function ($account) {
-                if (auth()->user()->can('account.delete')) {
-                    return '<input type="checkbox" class="form-check-input row-checkbox" value="' . $account->id . '" />';
-                }
-                return '';
-            })
-            ->addColumn('name_html', function ($account) {
-                return '<span class="account-name">' . e($account->name) . '</span>';
-            })
-            ->addColumn('type_html', function ($account) {
-                $type = $account->type ?? '-';
-                if ($type === '-') {
-                    return '<span class="text-muted">-</span>';
-                }
-                return '<span class="badge rounded-pill bg-label-info d-inline-flex align-items-center lh-1"><span class="badge badge-dot text-bg-info me-1"></span>' . e($type) . '</span>';
-            })
-            ->addColumn('password_html', function ($account) {
-                return '<button type="button" class="btn btn-sm btn-link p-0 text-primary btn-view-password" data-account-id="' . $account->id . '" title="Xem mật khẩu">
-                    <i class="bx bx-show me-1"></i><span class="password-display">••••••••</span>
-                </button>';
-            })
-            ->addColumn('note_html', function ($account) {
-                return e($account->note ?? '-');
-            })
-            ->addColumn('created_at_html', function ($account) {
-                return '<span class="text-muted">' . $account->created_at->format('d/m/Y H:i') . '</span>';
-            })
-            ->addColumn('action_html', function ($account) {
-                return view('admin.modules.account.partials.action', compact('account'))->render();
-            })
-            ->rawColumns(['checkbox_html', 'name_html', 'type_html', 'password_html', 'note_html', 'created_at_html', 'action_html'])
-            ->make(true);
+        $data = $this->accountRepository->gridData();
+        $data = $this->accountRepository->filterData($data);
+        return $this->accountRepository->renderDataTables($data);
     }
 
     /**
@@ -77,25 +53,14 @@ class AccountController extends Controller
     /**
      * Store new account
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $request->validate([
-            'type' => 'nullable|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'password' => 'nullable|string',
-            'note' => 'nullable|string',
-        ]);
-
         try {
-            // Lấy order lớn nhất + 1
-            $maxOrder = Account::where('user_id', Auth::id())->max('order') ?? 0;
-            
             $data = [
-                'user_id' => Auth::id(),
                 'type' => $request->input('type'),
                 'name' => $request->input('name'),
                 'note' => $request->input('note'),
-                'order' => $maxOrder + 1,
+                'order' => $this->accountRepository->getNextOrder(),
             ];
             
             // Chỉ set password nếu có giá trị (sẽ được encrypt tự động qua mutator)
@@ -103,7 +68,7 @@ class AccountController extends Controller
                 $data['password'] = $request->input('password');
             }
             
-            $account = Account::create($data);
+            $account = $this->accountRepository->create($data);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -114,7 +79,7 @@ class AccountController extends Controller
             }
 
             return redirect()->route('admin.accounts.list')->with('success', 'Thêm tài khoản thành công');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($request->ajax()) {
                 return response()->json([
                     'status' => false,
@@ -130,7 +95,7 @@ class AccountController extends Controller
      */
     public function edit($id)
     {
-        $account = Account::where('user_id', Auth::id())->findOrFail($id);
+        $account = $this->accountRepository->findByIdAndUser($id);
         
         // Nếu là AJAX request, trả về JSON
         if (request()->ajax()) {
@@ -152,17 +117,8 @@ class AccountController extends Controller
     /**
      * Update account
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        $account = Account::where('user_id', Auth::id())->findOrFail($id);
-
-        $request->validate([
-            'type' => 'nullable|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'password' => 'nullable|string',
-            'note' => 'nullable|string',
-        ]);
-
         try {
             $data = [
                 'type' => $request->input('type'),
@@ -175,7 +131,7 @@ class AccountController extends Controller
                 $data['password'] = $request->input('password');
             }
 
-            $account->update($data);
+            $account = $this->accountRepository->update($id, $data);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -186,7 +142,7 @@ class AccountController extends Controller
             }
 
             return redirect()->route('admin.accounts.list')->with('success', 'Cập nhật tài khoản thành công');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($request->ajax()) {
                 return response()->json([
                     'status' => false,
@@ -202,15 +158,13 @@ class AccountController extends Controller
      */
     public function destroy($id)
     {
-        $account = Account::where('user_id', Auth::id())->findOrFail($id);
-
         try {
-            $account->delete();
+            $this->accountRepository->delete($id);
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa tài khoản thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi xóa tài khoản',
@@ -221,23 +175,19 @@ class AccountController extends Controller
     /**
      * Bulk delete accounts
      */
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:accounts,id',
-        ]);
-
         try {
-            Account::where('user_id', Auth::id())
-                ->whereIn('id', $request->input('ids'))
-                ->delete();
+            $ids = $request->input('ids');
+            foreach ($ids as $id) {
+                $this->accountRepository->delete($id);
+            }
 
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa tài khoản thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi xóa tài khoản',
@@ -248,26 +198,16 @@ class AccountController extends Controller
     /**
      * Update order of accounts (for drag & drop)
      */
-    public function updateOrder(Request $request)
+    public function updateOrder(UpdateOrderRequest $request)
     {
-        $request->validate([
-            'orders' => 'required|array',
-            'orders.*.id' => 'required|exists:accounts,id',
-            'orders.*.order' => 'required|integer',
-        ]);
-
         try {
-            foreach ($request->input('orders') as $item) {
-                Account::where('user_id', Auth::id())
-                    ->where('id', $item['id'])
-                    ->update(['order' => $item['order']]);
-            }
+            $this->accountRepository->updateOrders($request->input('orders'));
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật thứ tự thành công',
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Có lỗi xảy ra khi cập nhật thứ tự',
@@ -278,14 +218,8 @@ class AccountController extends Controller
     /**
      * Verify user password and get account password
      */
-    public function viewPassword(Request $request, $id)
+    public function viewPassword(ViewPasswordRequest $request, $id)
     {
-        $request->validate([
-            'user_password' => 'required|string',
-        ], [
-            'user_password.required' => 'Vui lòng nhập mật khẩu đăng nhập',
-        ]);
-
         // Verify user's login password
         if (!Hash::check($request->input('user_password'), Auth::user()->password)) {
             return response()->json([
@@ -294,7 +228,7 @@ class AccountController extends Controller
             ], 422);
         }
 
-        $account = Account::where('user_id', Auth::id())->findOrFail($id);
+        $account = $this->accountRepository->findByIdAndUser($id);
         
         // Password sẽ được decrypt tự động qua accessor
         // Cần makeVisible để hiển thị password trong JSON (vì nó nằm trong $hidden)

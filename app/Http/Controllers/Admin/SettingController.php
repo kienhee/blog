@@ -133,7 +133,7 @@ class SettingController extends Controller
             return response()->json([
                 'message' => 'Kiểm tra kết nối queue thành công. Email đã được thêm vào queue cho ' . count($validEmails) . ' địa chỉ email.'
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Lỗi khi kiểm tra queue: ' . $e->getMessage()
             ], 500);

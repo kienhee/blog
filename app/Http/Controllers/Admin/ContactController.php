@@ -122,7 +122,7 @@ class ContactController extends Controller
             // Gửi email cho khách hàng
             try {
                 Mail::to($contact->email)->send(new ContactReplyMail($contact, $reply));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Log error nhưng không rollback transaction
                 Log::error('Failed to send contact reply email', [
                     'contact_id' => $contact->id,
