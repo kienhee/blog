@@ -275,11 +275,20 @@ class FinanceMonthController extends Controller
                     throw new \Exception('Tháng này đã bị khóa, không thể chỉnh sửa');
                 }
                 
-                // Validate: Không cho update expense sang tháng tương lai
-                $now = \Carbon\Carbon::now();
-                $monthDate = \Carbon\Carbon::create($expenseYear, $expenseMonth, 1)->endOfMonth();
-                if ($monthDate->isFuture() && $expenseYear >= $now->year) {
-                    throw new \Exception('Không thể chuyển chi tiêu sang tháng trong tương lai');
+                // Validate: Không cho CHUYỂN chi tiêu sang tháng tương lai
+                // Chỉ kiểm tra khi người dùng thực sự đổi tháng/năm của chi tiêu
+                $originalDate = $financeDay->date;
+                $originalYear = $originalDate->year;
+                $originalMonth = $originalDate->month;
+
+                // Nếu tháng/năm mới khác tháng/năm cũ thì mới kiểm tra rule "tháng tương lai"
+                if ($expenseYear !== $originalYear || $expenseMonth !== $originalMonth) {
+                    $now = \Carbon\Carbon::now();
+                    $monthDate = \Carbon\Carbon::create($expenseYear, $expenseMonth, 1)->endOfMonth();
+
+                    if ($monthDate->isFuture() && $expenseYear >= $now->year) {
+                        throw new \Exception('Không thể chuyển chi tiêu sang tháng trong tương lai');
+                    }
                 }
                 
                 // Unformat money (remove dots)
