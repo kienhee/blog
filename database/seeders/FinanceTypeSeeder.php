@@ -9,14 +9,14 @@ class FinanceTypeSeeder extends Seeder
 {
     private $tableName = 'finance_type';
 
-    private $version = 2;
+    private $version = 4;
 
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        if (seed_version($this->tableName, $this->version)) {
+        if (seed_version($this->tableName, $this->version, false)) {
             $types = [
                 ['id' => 1,  'name' => 'Đi chợ'],
                 ['id' => 2,  'name' => 'Ăn uống'],
@@ -34,6 +34,8 @@ class FinanceTypeSeeder extends Seeder
                 ['id' => 14, 'name' => 'Du lịch'],
                 ['id' => 15, 'name' => 'Đầu tư'],
                 ['id' => 16, 'name' => 'Khác'],
+                ['id' => 18, 'name' => 'Trả nợ'],
+                ['id' => 19, 'name' => 'Thanh toán tín dụng'],
             ];
 
             foreach ($types as $type) {
