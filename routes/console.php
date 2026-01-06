@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 Schedule::command('posts:publish-scheduled')->everyMinute();
 
 // Tạo sitemap client hàng ngày
-Schedule::command('sitemap:generate')->daily();
+Schedule::command('sitemap:generate')->dailyAt('0:00');
 
 // Kiểm tra schedule test - chạy mỗi phút
 Schedule::command('schedule:test')->everyMinute();
