@@ -17,6 +17,7 @@
         "ralphjsmit/laravel-seo": "^1.7",
         "spatie/laravel-permission": "^6.24",
         "spatie/laravel-sitemap": "^7.3",
+        "tinify/tinify": "^1.6",
         "tinymce/tinymce": "^8.2",
         "unisharp/laravel-filemanager": "^2.12",
         "yajra/laravel-datatables": "^12"

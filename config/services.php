@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'tinypng' => [
+        'key' => env('TINIFY_API_KEY', env('TINYPNG_API_KEY')), // Hỗ trợ cả TINIFY_API_KEY và TINYPNG_API_KEY
+    ],
+
 ];

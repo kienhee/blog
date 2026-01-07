@@ -285,15 +285,39 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
 Route::group(['prefix' => 'filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
-});
-
-if (config('app.env') === 'local') {
-Route::get('/check-ip', function (Request $request) {
-    return response()->json([
-        'real_ip' => $request->ip(),
-        'all_ips' => $request->ips(),
-        'cf_connecting_ip' => $request->header('CF-Connecting-IP'),
-        'x_forwarded_for' => $request->header('X-Forwarded-For'),
+    
+    // Override upload route to use custom controller
+    Route::any('/upload', [
+        'uses' => \App\Http\Controllers\LfmCustomController::class . '@upload',
+        'as' => 'unisharp.lfm.upload',
     ]);
+    
+    // Route để lấy thông tin optimize chi tiết từ session
+    Route::get('/optimization-messages', function() {
+        $data = session('lfm_optimization_data', []);
+        session()->forget('lfm_optimization_data');
+        
+        // Tính tổng số ảnh và tổng dung lượng tiết kiệm
+        $totalImages = count($data);
+        $totalOriginalSize = 0;
+        $totalOptimizedSize = 0;
+        $totalSpaceSaved = 0;
+        
+        foreach ($data as $item) {
+            $totalOriginalSize += $item['original_size'] ?? 0;
+            $totalOptimizedSize += $item['optimized_size'] ?? 0;
+            $totalSpaceSaved += $item['space_saved'] ?? 0;
+        }
+        
+        return response()->json([
+            'data' => $data,
+            'summary' => [
+                'total_images' => $totalImages,
+                'total_original_size' => $totalOriginalSize,
+                'total_optimized_size' => $totalOptimizedSize,
+                'total_space_saved' => $totalSpaceSaved,
+                'total_percent_saved' => $totalOriginalSize > 0 ? round(($totalSpaceSaved / $totalOriginalSize) * 100, 1) : 0,
+            ]
+        ]);
+    })->name('unisharp.lfm.getOptimizationMessages');
 });
-}
