@@ -283,7 +283,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('reset-password.update');
 });
 
-Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
+Route::group(['prefix' => 'filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
 });
 

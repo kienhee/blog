@@ -15,7 +15,7 @@ return [
     |--------------------------------------------------------------------------
      */
 
-    'use_package_routes'       => true,
+    'use_package_routes'       => false,
 
     //Middlewares to be applied to default routes when use_package_routes is true
     'middlewares'              => ['web','auth'],
