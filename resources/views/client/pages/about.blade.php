@@ -123,6 +123,7 @@
                                     <span class="badge rounded-pill bg-label-secondary">HTML5</span>
                                     <span class="badge rounded-pill bg-label-secondary">CSS3</span>
                                     <span class="badge rounded-pill bg-label-secondary">JavaScript</span>
+                                    <span class="badge rounded-pill bg-label-secondary">jQuery</span>
                                     <span class="badge rounded-pill bg-label-secondary">Vue.js</span>
                                     <span class="badge rounded-pill bg-label-secondary">React</span>
                                     <span class="badge rounded-pill bg-label-secondary">Bootstrap</span>
@@ -189,7 +190,7 @@
                         <div class="card border shadow-sm">
                             <div class="card-body p-4">
                                 <h4 class="h5 fw-semibold mb-2">Backend Developer</h4>
-                                <p class="text-primary fw-semibold mb-2">RikkeiSoft | 2023 - Hiện tại</p>
+                                <p class="text-primary fw-semibold mb-2">RikkeiSoft | 08/2022 - Hiện tại</p>
                                 <ul class="mb-0 lh-lg">
                                     <li>
                                         Phát triển module và bảo trì các dự án nội bộ của công ty: <strong> Intranet system,
