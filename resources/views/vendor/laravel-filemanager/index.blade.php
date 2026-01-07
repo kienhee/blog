@@ -481,7 +481,7 @@
             // Lấy thông báo optimize từ session và hiển thị
             setTimeout(function() {
               $.ajax({
-                url: '{{ route("unisharp.lfm.getOptimizationMessages") }}',
+                url: '{{ url("/filemanager/optimization-messages") }}',
                 method: 'GET',
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest',
