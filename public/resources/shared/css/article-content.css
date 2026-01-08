@@ -179,7 +179,7 @@
 /* Code blocks - Support both old format and new hljs-code-block format */
 .article-content pre,
 .article-content pre.hljs-code-block {
-    font-family: "Courier New", Courier, monospace;
+    /* font-family: "Courier New", Courier, monospace; */
     font-size: 0.9em;
     line-height: 1.6;
     margin: 1.5em 0;
