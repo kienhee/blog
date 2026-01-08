@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
         hljs.highlightAll();
     }
     
+    // Initialize Code Block Overlay (Language label and Copy button)
+    initCodeBlockOverlay();
+    
     // Initialize Fancybox for images in article content
     if (typeof Fancybox !== "undefined") {
         const articleContent = document.querySelector(".article-content");
@@ -843,4 +846,243 @@ document.addEventListener("DOMContentLoaded", function() {
         return div.innerHTML;
     }
 });
+
+// ================================
+// Code Block Overlay (Language label and Copy button)
+// ================================
+function initCodeBlockOverlay() {
+    const articleContent = document.querySelector(".article-content");
+    if (!articleContent) {
+        return;
+    }
+
+    // Language name mapping
+    const languageNames = {
+        'javascript': 'JavaScript',
+        'typescript': 'TypeScript',
+        'html': 'HTML',
+        'xml': 'XML',
+        'css': 'CSS',
+        'scss': 'SCSS',
+        'sass': 'SASS',
+        'php': 'PHP',
+        'python': 'Python',
+        'java': 'Java',
+        'c': 'C',
+        'cpp': 'C++',
+        'csharp': 'C#',
+        'ruby': 'Ruby',
+        'go': 'Go',
+        'rust': 'Rust',
+        'swift': 'Swift',
+        'kotlin': 'Kotlin',
+        'dart': 'Dart',
+        'sql': 'SQL',
+        'json': 'JSON',
+        'yaml': 'YAML',
+        'yml': 'YAML',
+        'markdown': 'Markdown',
+        'bash': 'Bash',
+        'shell': 'Shell',
+        'powershell': 'PowerShell',
+        'dockerfile': 'Dockerfile',
+        'plaintext': 'Plain Text',
+        'text': 'Text'
+    };
+
+    /**
+     * Get language name from code element
+     */
+    function getLanguageName(codeElement) {
+        // Check for language class (language-xxx or hljs language-xxx)
+        const classList = codeElement.className || '';
+        const languageMatch = classList.match(/language-(\w+)/);
+        
+        if (languageMatch) {
+            const lang = languageMatch[1].toLowerCase();
+            return languageNames[lang] || lang.charAt(0).toUpperCase() + lang.slice(1);
+        }
+        
+        // Check parent pre element for class
+        const preElement = codeElement.closest('pre');
+        if (preElement) {
+            const preClassList = preElement.className || '';
+            const preLanguageMatch = preClassList.match(/language-(\w+)/);
+            if (preLanguageMatch) {
+                const lang = preLanguageMatch[1].toLowerCase();
+                return languageNames[lang] || lang.charAt(0).toUpperCase() + lang.slice(1);
+            }
+        }
+        
+        return 'Code';
+    }
+
+    /**
+     * Get code content from code element
+     */
+    function getCodeContent(codeElement) {
+        // Try to get text content
+        let code = codeElement.textContent || codeElement.innerText || '';
+        
+        // If empty, try to get from all text nodes
+        if (!code.trim()) {
+            const walker = document.createTreeWalker(
+                codeElement,
+                NodeFilter.SHOW_TEXT,
+                null
+            );
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node.textContent);
+            }
+            code = textNodes.join('');
+        }
+        
+        return code;
+    }
+
+    /**
+     * Copy code to clipboard
+     */
+    function copyCodeToClipboard(code, button) {
+        if (!navigator.clipboard) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess(button);
+            } catch (err) {
+                showCopyError(button);
+            }
+            document.body.removeChild(textArea);
+            return;
+        }
+
+        navigator.clipboard.writeText(code).then(function() {
+            showCopySuccess(button);
+        }).catch(function(err) {
+            showCopyError(button);
+        });
+    }
+
+    /**
+     * Show copy success feedback
+     */
+    function showCopySuccess(button) {
+        const icon = button.querySelector('i');
+        const originalClass = icon ? icon.className : '';
+        
+        if (icon) {
+            icon.className = 'bx bx-check';
+        }
+        button.classList.add('copied');
+        
+        setTimeout(function() {
+            if (icon) {
+                icon.className = originalClass;
+            }
+            button.classList.remove('copied');
+        }, 2000);
+        
+        // Show toast notification if available
+        if (typeof toastr !== 'undefined') {
+            toastr.success('Đã sao chép code!', 'Thành công', {
+                timeOut: 2000,
+                positionClass: 'toast-top-right'
+            });
+        }
+    }
+
+    /**
+     * Show copy error feedback
+     */
+    function showCopyError(button) {
+        if (typeof toastr !== 'undefined') {
+            toastr.error('Không thể sao chép code. Vui lòng thử lại.', 'Lỗi', {
+                timeOut: 3000,
+                positionClass: 'toast-top-right'
+            });
+        }
+    }
+
+    /**
+     * Create overlay for code block
+     */
+    function createCodeBlockOverlay(preElement, codeElement) {
+        // Check if overlay already exists
+        if (preElement.querySelector('.code-block-overlay')) {
+            return;
+        }
+
+        // Make pre element relative positioned if not already
+        const currentPosition = window.getComputedStyle(preElement).position;
+        if (currentPosition === 'static') {
+            preElement.style.position = 'relative';
+        }
+
+        // Create overlay container
+        const overlay = document.createElement('div');
+        overlay.className = 'code-block-overlay';
+        
+        // Get language name
+        const languageName = getLanguageName(codeElement);
+        
+        // Create language label
+        const languageLabel = document.createElement('span');
+        languageLabel.className = 'code-block-language';
+        languageLabel.textContent = languageName;
+        
+        // Create copy button
+        const copyButton = document.createElement('button');
+        copyButton.className = 'code-block-copy-btn';
+        copyButton.setAttribute('type', 'button');
+        copyButton.setAttribute('title', 'Sao chép code');
+        copyButton.innerHTML = '<i class="bx bx-copy"></i>';
+        
+        // Get code content
+        const codeContent = getCodeContent(codeElement);
+        
+        // Add click handler for copy button
+        copyButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            copyCodeToClipboard(codeContent, copyButton);
+        });
+        
+        // Append elements to overlay
+        overlay.appendChild(languageLabel);
+        overlay.appendChild(copyButton);
+        
+        // Append overlay to pre element
+        preElement.appendChild(overlay);
+    }
+
+    // Find all code blocks
+    // Support both formats: pre.hljs-code-block > code and pre > code[class*="language-"]
+    // Only match actual code blocks, not inline code
+    const preElements = articleContent.querySelectorAll('pre.hljs-code-block, pre');
+    
+    preElements.forEach(function(preElement) {
+        // Find code element inside pre
+        const codeElement = preElement.querySelector('code[class*="language-"], code.hljs, code');
+        
+        if (codeElement && preElement.tagName === 'PRE') {
+            // Only create overlay for code blocks (pre > code), not inline code
+            // Check if code is inside pre (not just any code)
+            const isCodeBlock = preElement.classList.contains('hljs-code-block') || 
+                               codeElement.classList.contains('hljs') ||
+                               codeElement.className.match(/language-/);
+            
+            if (isCodeBlock) {
+                createCodeBlockOverlay(preElement, codeElement);
+            }
+        }
+    });
+}
 
