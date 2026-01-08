@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\HashTag\StoreRequest;
 use App\Http\Requests\Admin\HashTag\UpdateRequest;
 use App\Models\HashTag;
 use App\Repositories\HashTagRepository;
+use App\Support\ClientCacheHelper;
 use Illuminate\Http\Request;
 
 class HashTagController extends Controller
@@ -47,10 +48,15 @@ class HashTagController extends Controller
     public function store(StoreRequest $request)
     {
         try {
-            $this->hashTagRepository->create([
+            $hashtag = $this->hashTagRepository->create([
                 'name' => $request->input('name'),
                 'slug' => $request->input('slug'),
             ]);
+
+            // Clear client cache
+            if ($hashtag) {
+                ClientCacheHelper::clearHashtagCache($hashtag->id);
+            }
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
@@ -70,6 +76,11 @@ class HashTagController extends Controller
                 'name' => $request->input('name'),
                 'slug' => \Illuminate\Support\Str::slug($request->input('name')),
             ]);
+
+            // Clear client cache
+            if ($hashtag) {
+                ClientCacheHelper::clearHashtagCache($hashtag->id);
+            }
 
             return response()->json([
                 'status' => true,
@@ -102,6 +113,9 @@ class HashTagController extends Controller
                 'slug' => $request->input('slug'),
             ]);
 
+            // Clear client cache
+            ClientCacheHelper::clearHashtagCache($id);
+
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $e) {
             return back()->with('error', 'Có lỗi xảy ra');
@@ -120,6 +134,9 @@ class HashTagController extends Controller
             }
 
             $this->hashTagRepository->delete($id);
+
+            // Clear client cache
+            ClientCacheHelper::clearHashtagCache($id);
 
             return response()->json([
                 'status' => true,
@@ -146,6 +163,9 @@ class HashTagController extends Controller
 
             $this->hashTagRepository->restore($id);
 
+            // Clear client cache
+            ClientCacheHelper::clearHashtagCache($id);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Khôi phục hashtag thành công',
@@ -171,6 +191,9 @@ class HashTagController extends Controller
 
             $this->hashTagRepository->forceDelete($id);
 
+            // Clear client cache
+            ClientCacheHelper::clearHashtagCache($id);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa vĩnh viễn hashtag thành công',
@@ -195,6 +218,11 @@ class HashTagController extends Controller
             }
 
             $count = $this->hashTagRepository->bulkRestore($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearHashtagCache($id);
+            }
 
             return response()->json([
                 'status' => true,
@@ -222,6 +250,11 @@ class HashTagController extends Controller
 
             $count = $this->hashTagRepository->bulkDelete($ids);
 
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearHashtagCache($id);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => "Đã xóa {$count} hashtag thành công",
@@ -247,6 +280,11 @@ class HashTagController extends Controller
             }
 
             $count = $this->hashTagRepository->bulkForceDelete($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearHashtagCache($id);
+            }
 
             return response()->json([
                 'status' => true,

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
+use App\Support\ClientCacheHelper;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -22,29 +24,51 @@ class HashtagController extends Controller
 
     public function hashtag($slug)
     {
-        $hashtag = $this->hashTagRepository->getHashTagBySlug($slug);
+        // Lấy hashtag detail (cached - TTL dài hơn)
+        $hashtag = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_HASHTAG_DETAIL . 'slug:' . $slug,
+            function () use ($slug) {
+                return $this->hashTagRepository->getHashTagBySlug($slug);
+            },
+            ClientCacheHelper::TTL_LONG
+        );
 
         if (! $hashtag) {
             abort(404, 'Hashtag không tồn tại');
         }
 
-        // Get post IDs with this hashtag
-        $postIds = DB::table('post_hashtags')
-            ->where('hashtag_id', $hashtag->id)
-            ->pluck('post_id')
-            ->toArray();
+        // Get posts with this hashtag (cached per page)
+        $page = request()->get('page', 1);
+        $cacheKey = ClientCacheHelper::getHashtagPostsKey($hashtag->id, (string) $page);
+        
+        $posts = ClientCacheHelper::remember(
+            $cacheKey,
+            function () use ($hashtag) {
+                // Get post IDs with this hashtag
+                $postIds = DB::table('post_hashtags')
+                    ->where('hashtag_id', $hashtag->id)
+                    ->pluck('post_id')
+                    ->toArray();
 
-        // Get posts with this hashtag
-        $posts = $this->postRepository->gridData()
-            ->where('posts.status', 'published')
-            ->whereNull('posts.deleted_at')
-            ->where(function ($q) {
-                $q->whereNull('posts.scheduled_at')
-                    ->orWhere('posts.scheduled_at', '<=', now());
-            })
-            ->whereIn('posts.id', $postIds)
-            ->orderBy('posts.created_at', 'desc')
-            ->paginate(get_posts_per_page());
+                if (empty($postIds)) {
+                    return $this->postRepository->gridData()
+                        ->whereRaw('1 = 0') // Return empty result
+                        ->paginate(get_posts_per_page());
+                }
+
+                // Get posts with this hashtag
+                return $this->postRepository->gridData()
+                    ->where('posts.status', 'published')
+                    ->whereNull('posts.deleted_at')
+                    ->where(function ($q) {
+                        $q->whereNull('posts.scheduled_at')
+                            ->orWhere('posts.scheduled_at', '<=', now());
+                    })
+                    ->whereIn('posts.id', $postIds)
+                    ->orderBy('posts.created_at', 'desc')
+                    ->paginate(get_posts_per_page());
+            }
+        );
 
         // SEO Data for hashtag page
         $seoModel = new SEOData(

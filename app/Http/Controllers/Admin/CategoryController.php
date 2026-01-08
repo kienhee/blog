@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Category\UpdateOrderRequest;
 use App\Http\Requests\Admin\Category\UpdateRequest;
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
+use App\Support\ClientCacheHelper;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -71,13 +72,17 @@ class CategoryController extends Controller
     public function store(StoreRequest $request)
     {
         try {
-            $this->categoryRepository->createWithOrder([
+            $category = $this->categoryRepository->createWithOrder([
                 'name' => $request->input('name'),
                 'slug' => $request->input('slug'),
                 'description' => $request->input('description'),
                 'parent_id' => $request->input('parent_id'),
                 'thumbnail' => $request->input('thumbnail'),
             ]);
+
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache();
+            ClientCacheHelper::clearHomeCache();
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
@@ -100,6 +105,10 @@ class CategoryController extends Controller
                 'parent_id' => null,
                 'thumbnail' => null,
             ]);
+
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache();
+            ClientCacheHelper::clearHomeCache();
 
             return response()->json([
                 'status' => true,
@@ -142,6 +151,10 @@ class CategoryController extends Controller
                 'thumbnail' => $request->input('thumbnail'),
             ]);
 
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache($id);
+            ClientCacheHelper::clearHomeCache();
+
             return back()->with('success', 'Cập nhật thành công');
         } catch (\Throwable $e) {
             return back()->with('error', 'Có lỗi xảy ra');
@@ -156,6 +169,10 @@ class CategoryController extends Controller
                 $request->input('parent_id'),
                 $request->input('position')
             );
+
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache();
+            ClientCacheHelper::clearHomeCache();
 
             return response()->json([
                 'status' => true,
@@ -207,6 +224,10 @@ class CategoryController extends Controller
         try {
             $result = $this->categoryRepository->deleteCategory($id);
 
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache($id);
+            ClientCacheHelper::clearHomeCache();
+
             return response()->json($result);
         } catch (\Throwable $e) {
             return response()->json([
@@ -228,6 +249,10 @@ class CategoryController extends Controller
             }
 
             $this->categoryRepository->restore($id);
+
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache($id);
+            ClientCacheHelper::clearHomeCache();
 
             return response()->json([
                 'status' => true,
@@ -254,6 +279,10 @@ class CategoryController extends Controller
 
             $this->categoryRepository->forceDelete($id);
 
+            // Clear client cache
+            ClientCacheHelper::clearCategoryCache($id);
+            ClientCacheHelper::clearHomeCache();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa vĩnh viễn danh mục thành công',
@@ -278,6 +307,12 @@ class CategoryController extends Controller
             }
 
             $count = $this->categoryRepository->bulkDelete($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearCategoryCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
 
             return response()->json([
                 'status' => true,
@@ -305,6 +340,12 @@ class CategoryController extends Controller
 
             $count = $this->categoryRepository->bulkRestore($ids);
 
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearCategoryCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
+
             return response()->json([
                 'status' => true,
                 'message' => "Đã khôi phục {$count} danh mục thành công",
@@ -330,6 +371,12 @@ class CategoryController extends Controller
             }
 
             $count = $this->categoryRepository->bulkForceDelete($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearCategoryCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
 
             return response()->json([
                 'status' => true,

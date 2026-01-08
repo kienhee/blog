@@ -8,6 +8,7 @@ use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
 use App\Repositories\SavedPostRepository;
+use App\Support\ClientCacheHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,34 +36,69 @@ class PostController extends Controller
 
     public function post($slug)
     {
-        $post = $this->postRepository->getPostBySlug($slug);
+        // Lấy post detail (cached)
+        $post = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_DETAIL . 'slug:' . $slug,
+            function () use ($slug) {
+                return $this->postRepository->getPostBySlug($slug);
+            }
+        );
 
         if (! $post) {
             abort(404, 'Bài viết không tồn tại');
         }
 
-        // Ghi nhận lượt xem
+        // Ghi nhận lượt xem (không cache vì cần real-time)
         $postModel = $this->postRepository->findById($post->id);
         if ($postModel) {
             $this->postViewRepository->recordView($postModel);
         }
 
-        // Lấy số lượt xem
+        // Lấy số lượt xem (không cache vì cần real-time)
         $viewCount = $this->postViewRepository->getViewCount($post->id);
 
         // Tính thời gian đọc
         $readingTime = calculateReadingTime($post->content ?? '');
 
-        // Lấy bài viết trước và sau
-        $prevPost = $this->postRepository->getPrevPost($post);
-        $nextPost = $this->postRepository->getNextPost($post);
+        // Lấy bài viết trước và sau (cached)
+        $prevPost = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_PREV . $post->id,
+            function () use ($post) {
+                return $this->postRepository->getPrevPost($post);
+            }
+        );
 
-        // Lấy bài viết liên quan
-        $relatedPosts = $this->postRepository->getRelatedPosts($post);
+        $nextPost = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_NEXT . $post->id,
+            function () use ($post) {
+                return $this->postRepository->getNextPost($post);
+            }
+        );
 
-        // Lấy categories và hashtags cho sidebar
-        $allCategories = $this->categoryRepository->getCategoryByType();
-        $allHashtags = $this->hashTagRepository->getHashTagByType();
+        // Lấy bài viết liên quan (cached)
+        $relatedPosts = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_RELATED . $post->id,
+            function () use ($post) {
+                return $this->postRepository->getRelatedPosts($post);
+            }
+        );
+
+        // Lấy categories và hashtags cho sidebar (cached - TTL dài hơn)
+        $allCategories = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_CATEGORIES,
+            function () {
+                return $this->categoryRepository->getCategoryByType();
+            },
+            ClientCacheHelper::TTL_LONG
+        );
+
+        $allHashtags = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_POST_HASHTAGS,
+            function () {
+                return $this->hashTagRepository->getHashTagByType();
+            },
+            ClientCacheHelper::TTL_LONG
+        );
 
         // Lấy hashtags của bài viết hiện tại
         $hashtags = [];

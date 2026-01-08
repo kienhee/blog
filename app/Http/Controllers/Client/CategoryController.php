@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
+use App\Support\ClientCacheHelper;
 
 class CategoryController extends Controller
 {
@@ -20,27 +21,48 @@ class CategoryController extends Controller
 
     public function category($slug)
     {
-        $category = $this->categoryRepository->getCategoryBySlug($slug);
+        // Lấy category detail (cached - TTL dài hơn)
+        $category = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_CATEGORY_DETAIL . 'slug:' . $slug,
+            function () use ($slug) {
+                return $this->categoryRepository->getCategoryBySlug($slug);
+            },
+            ClientCacheHelper::TTL_LONG
+        );
 
         if (! $category) {
             abort(404, 'Danh mục không tồn tại');
         }
 
-        // Get all child category IDs (recursive)
-        $allChildrenIds = $this->categoryRepository->getAllChildrenIds($category->id);
+        // Get all child category IDs (recursive) - cached
+        $allChildrenIds = ClientCacheHelper::remember(
+            ClientCacheHelper::KEY_CATEGORY_DETAIL . $category->id . ':children',
+            function () use ($category) {
+                return $this->categoryRepository->getAllChildrenIds($category->id);
+            },
+            ClientCacheHelper::TTL_LONG
+        );
         $categoryIds = array_merge([$category->id], $allChildrenIds);
 
-        // Get posts from this category and all its children
-        $posts = $this->postRepository->gridData()
-            ->where('posts.status', 'published')
-            ->whereNull('posts.deleted_at')
-            ->where(function ($q) {
-                $q->whereNull('posts.scheduled_at')
-                    ->orWhere('posts.scheduled_at', '<=', now());
-            })
-            ->whereIn('categories.id', $categoryIds)
-            ->orderBy('posts.created_at', 'desc')
-            ->paginate(get_posts_per_page());
+        // Get posts from this category and all its children (cached per page)
+        $page = request()->get('page', 1);
+        $cacheKey = ClientCacheHelper::getCategoryPostsKey($category->id, (string) $page);
+        
+        $posts = ClientCacheHelper::remember(
+            $cacheKey,
+            function () use ($categoryIds) {
+                return $this->postRepository->gridData()
+                    ->where('posts.status', 'published')
+                    ->whereNull('posts.deleted_at')
+                    ->where(function ($q) {
+                        $q->whereNull('posts.scheduled_at')
+                            ->orWhere('posts.scheduled_at', '<=', now());
+                    })
+                    ->whereIn('categories.id', $categoryIds)
+                    ->orderBy('posts.created_at', 'desc')
+                    ->paginate(get_posts_per_page());
+            }
+        );
 
         // Pass model for SEO
         $seoModel = $category;

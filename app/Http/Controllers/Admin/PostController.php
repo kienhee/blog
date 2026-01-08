@@ -11,6 +11,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\HashTagRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\PostViewRepository;
+use App\Support\ClientCacheHelper;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -101,7 +102,16 @@ class PostController extends Controller
                 $data['scheduled_at'] = null;
             }
 
-            $this->postRepository->createWithHashtags($data, $request->input('hashtags'));
+            $post = $this->postRepository->createWithHashtags($data, $request->input('hashtags'));
+
+            // Clear client cache
+            if ($post) {
+                ClientCacheHelper::clearPostCache($post->id);
+                ClientCacheHelper::clearHomeCache();
+                if ($post->category_id) {
+                    ClientCacheHelper::clearCategoryCache($post->category_id);
+                }
+            }
 
             return back()->with('success', 'Thêm mới thành công');
         } catch (\Throwable $e) {
@@ -183,10 +193,24 @@ class PostController extends Controller
                 }
             }
 
+            $oldCategoryId = $existingPost->category_id ?? null;
+            
             $post = $this->postRepository->updateWithHashtags($id, $data, $request->input('hashtags'));
 
             if (! $post) {
                 return back()->with('error', 'Bài viết không tồn tại');
+            }
+
+            // Clear client cache
+            ClientCacheHelper::clearPostCache($id);
+            ClientCacheHelper::clearHomeCache();
+            
+            // Clear old and new category cache if category changed
+            if ($oldCategoryId) {
+                ClientCacheHelper::clearCategoryCache($oldCategoryId);
+            }
+            if ($post->category_id && $post->category_id != $oldCategoryId) {
+                ClientCacheHelper::clearCategoryCache($post->category_id);
             }
 
             return back()->with('success', 'Cập nhật thành công');
@@ -208,6 +232,13 @@ class PostController extends Controller
 
             // Xóa post (sử dụng SoftDeletes)
             $this->postRepository->delete($id);
+
+            // Clear client cache
+            ClientCacheHelper::clearPostCache($id);
+            ClientCacheHelper::clearHomeCache();
+            if ($post->category_id) {
+                ClientCacheHelper::clearCategoryCache($post->category_id);
+            }
 
             return response()->json([
                 'status' => true,
@@ -234,6 +265,13 @@ class PostController extends Controller
 
             $this->postRepository->restore($id);
 
+            // Clear client cache
+            ClientCacheHelper::clearPostCache($id);
+            ClientCacheHelper::clearHomeCache();
+            if ($post->category_id) {
+                ClientCacheHelper::clearCategoryCache($post->category_id);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Khôi phục bài viết thành công',
@@ -257,7 +295,16 @@ class PostController extends Controller
                 ], 404);
             }
 
+            $categoryId = $post->category_id;
+            
             $this->postRepository->forceDelete($id);
+
+            // Clear client cache
+            ClientCacheHelper::clearPostCache($id);
+            ClientCacheHelper::clearHomeCache();
+            if ($categoryId) {
+                ClientCacheHelper::clearCategoryCache($categoryId);
+            }
 
             return response()->json([
                 'status' => true,
@@ -283,6 +330,13 @@ class PostController extends Controller
             }
 
             $count = $this->postRepository->bulkDelete($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearPostCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
+            ClientCacheHelper::clearPostsListCache();
 
             return response()->json([
                 'status' => true,
@@ -310,6 +364,13 @@ class PostController extends Controller
 
             $count = $this->postRepository->bulkRestore($ids);
 
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearPostCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
+            ClientCacheHelper::clearPostsListCache();
+
             return response()->json([
                 'status' => true,
                 'message' => "Đã khôi phục {$count} bài viết thành công",
@@ -335,6 +396,13 @@ class PostController extends Controller
             }
 
             $count = $this->postRepository->bulkForceDelete($ids);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearPostCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
+            ClientCacheHelper::clearPostsListCache();
 
             return response()->json([
                 'status' => true,
@@ -381,6 +449,14 @@ class PostController extends Controller
             }
 
             $count = $this->postRepository->bulkMoveCategory($ids, $categoryId);
+
+            // Clear client cache
+            foreach ($ids as $id) {
+                ClientCacheHelper::clearPostCache($id);
+            }
+            ClientCacheHelper::clearHomeCache();
+            ClientCacheHelper::clearPostsListCache();
+            ClientCacheHelper::clearCategoryCache($categoryId);
 
             return response()->json([
                 'status' => true,
