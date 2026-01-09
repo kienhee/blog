@@ -57,7 +57,7 @@
                         <div class="position-relative ms-auto" style="max-width: 500px;">
                             <div class="mx-auto  overflow-hidden border border-white border-opacity-50"
                                 style="width: 100%; height: 100%; border-width: 5px !important;">
-                                <img src="{{ asset_client_url('images/author.jpg') }}" alt="Developer Profile"
+                                <img src="{{ asset_client_url('images/about.jpg') }}" alt="Developer Profile"
                                     class="w-100 h-100 rounded-3" style="object-fit: cover;" />
                             </div>
                         </div>
