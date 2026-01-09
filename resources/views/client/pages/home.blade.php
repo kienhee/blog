@@ -9,8 +9,13 @@
     <div data-bs-spy="scroll" class="scrollspy-example">
         <!-- Hero Search: Start -->
         <section id="hero-search" class="section-py landing-hero position-relative">
-            <img src="{{ asset_admin_url('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
-                class="position-absolute top-0 start-50 translate-middle-x object-fit-contain w-100 h-100" data-speed="1" />
+            <img src="{{ asset_admin_url('assets/img/front-pages/backgrounds/hero-bg.png') }}" 
+                 alt="hero background"
+                 class="position-absolute top-0 start-50 translate-middle-x object-fit-contain w-100 h-100" 
+                 data-speed="1"
+                 loading="eager"
+                 decoding="async"
+                 fetchpriority="low" />
             <div class="container">
                 <div class="hero-text-box text-center">
                     <h1 class="text-primary hero-title display-4 fw-bold mb-3">
@@ -82,8 +87,14 @@
                     <div class="card border-0 shadow-lg position-relative overflow-hidden">
                         @if ($featuredPost->thumbnail)
                             <div class="position-relative" style="height: 500px; overflow: hidden;">
-                                <img src="{{ $featuredPost->thumbnail }}" alt="{{ $featuredPost->title }}"
-                                    class="w-100 h-100" style="object-fit: cover;">
+                                <img src="{{ $featuredPost->thumbnail }}" 
+                                     alt="{{ $featuredPost->title }}"
+                                     class="w-100 h-100" 
+                                     style="object-fit: cover;"
+                                     loading="eager"
+                                     decoding="async"
+                                     fetchpriority="high"
+                                     onerror="this.style.display='none';">
                                 <div class="position-absolute top-0 start-0 end-0 bottom-0 bg-dark bg-opacity-50"></div>
                                 <div class="position-absolute bottom-0 start-0 end-0 p-4 p-md-5 text-white">
                                     @if ($featuredPost->category_name)
@@ -206,6 +217,8 @@
                                                                 <img src="{{ $post->thumbnail }}"
                                                                      alt="{{ $post->title }}" 
                                                                      class="img-fluid rounded"
+                                                                     loading="lazy"
+                                                                     decoding="async"
                                                                      style="height: 80px; width: 100%; object-fit: cover;">
                                                             </a>
                                                         @endif
@@ -301,7 +314,7 @@
                                 <div class="card h-100">
                                     ${thumbnail ? `
                                                                     <a href="/bai-viet/${post.slug}">
-                                                                        <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                                                                        <img src="${thumbnail}" alt="${post.title}" class="card-img-top" style="height: 250px; object-fit: cover; width: 100%;" loading="lazy" decoding="async">
                                                                     </a>
                                                                 ` : ''}
                                     <div class="card-body d-flex flex-column">
@@ -329,4 +342,7 @@
             }
         });
     </script>
+    
+    <!-- Landing page specific JS -->
+    <script src="{{ asset_admin_url('assets/js/front-page-landing.js') }}"></script>
 @endpush

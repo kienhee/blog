@@ -16,8 +16,13 @@
     {{-- Post Thumbnail --}}
     @if ($post->thumbnail ?? null)
         <a href="{{ route('client.post', $post->slug) }}">
-            <img class="card-img-top" src="{{ $post->thumbnail }}" alt="{{ $post->title ?? '' }}"
-                style="height: {{ $thumbnailHeight }}; object-fit: cover;">
+            <img class="card-img-top" 
+                 src="{{ $post->thumbnail }}" 
+                 alt="{{ $post->title ?? '' }}"
+                 loading="lazy"
+                 decoding="async"
+                 style="height: {{ $thumbnailHeight }}; object-fit: cover; width: 100%;"
+                 onerror="this.style.display='none';">
         </a>
     @endif
 

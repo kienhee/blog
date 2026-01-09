@@ -301,7 +301,10 @@
                             <div class="col-lg-4 d-none d-lg-block">
                                 <div class="bg-body nav-img-col p-2">
                                     <img src="{{ asset_admin_url('assets/img/front-pages/misc/nav-item-col-img.png') }}"
-                                        alt="nav item col image" class="w-100" />
+                                        alt="nav item col image" 
+                                        class="w-100"
+                                        loading="lazy"
+                                        decoding="async" />
                                 </div>
                             </div>
                         </div>
@@ -347,7 +350,10 @@
                     <a class="nav-link dropdown-toggle hide-arrow" href="#" data-bs-toggle="dropdown">
                         <div class="avatar avatar-online">
                             <img src="{{ $user && $user->avatar ? thumb_path($user->avatar) : asset_shared_url('images/default.png') }}"
-                                alt="avatar" class="w-px-40 h-auto rounded-circle" />
+                                alt="avatar" 
+                                class="w-px-40 h-auto rounded-circle"
+                                loading="lazy"
+                                decoding="async" />
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -357,7 +363,10 @@
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar avatar-online">
                                             <img src="{{ $user && $user->avatar ? thumb_path($user->avatar) : asset_shared_url('images/default.png') }}"
-                                                alt="avatar" class="w-px-40 h-auto rounded-circle" />
+                                                alt="avatar" 
+                                                class="w-px-40 h-auto rounded-circle"
+                                                loading="lazy"
+                                                decoding="async" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">

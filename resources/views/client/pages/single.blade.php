@@ -9,8 +9,9 @@
 @push('styles')
     <!-- Unified CSS for Article Content -->
     <link rel="stylesheet" href="{{ asset_shared_url('css/article-content.css') }}">
-    <!-- Highlight.js Theme CSS -->
-    <link rel="stylesheet" href="{{ asset_shared_url('vendor/highlight/styles/atom-one-dark.min.css') }}">
+    <!-- Highlight.js Theme CSS - Defer loading -->
+    <link rel="preload" href="{{ asset_shared_url('vendor/highlight/styles/atom-one-dark.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="{{ asset_shared_url('vendor/highlight/styles/atom-one-dark.min.css') }}" /></noscript>
 @endpush
 
 @section('content')

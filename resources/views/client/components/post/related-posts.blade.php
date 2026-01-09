@@ -8,7 +8,10 @@
                     <div class="related-post-item" style="border: none; padding: 0;">
                         @if (isset($relatedPost->thumbnail) && $relatedPost->thumbnail)
                             <img src="{{ thumb_path($relatedPost->thumbnail) }}"
-                                alt="{{ $relatedPost->title }}" class="related-post-thumb" />
+                                alt="{{ $relatedPost->title }}" 
+                                class="related-post-thumb"
+                                loading="lazy"
+                                decoding="async" />
                         @else
                             <div class="related-post-thumb"
                                 style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">

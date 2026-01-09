@@ -7,7 +7,10 @@
             <span class="meta-item author-meta">
                 @if (isset($post->avatar) && $post->avatar)
                     <img src="{{ $post->avatar ? thumb_path($post->avatar) : asset_shared_url('images/default.png') }}"
-                        alt="{{ $post->full_name }}" class="author-avatar-small" />
+                        alt="{{ $post->full_name }}" 
+                        class="author-avatar-small"
+                        loading="lazy"
+                        decoding="async" />
                 @else
                     <i class="bx bx-user"></i>
                 @endif

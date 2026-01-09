@@ -5,7 +5,10 @@
              alt="footer bg"
              class="footer-bg banner-bg-img z-n1" 
              data-app-light-img="front-pages/backgrounds/footer-bg-light.png"
-             data-app-dark-img="front-pages/backgrounds/footer-bg-dark.png" />
+             data-app-dark-img="front-pages/backgrounds/footer-bg-dark.png"
+             loading="lazy"
+             decoding="async"
+             fetchpriority="low" />
         
         <div class="container">
             <div class="row gx-0 gy-4 g-md-5">
@@ -213,7 +216,9 @@
                                 <img src="{{ asset_admin_url('assets/img/' . $social['config']['img_light']) }}"
                                      alt="{{ $social['config']['alt'] }} icon"
                                      data-app-light-img="{{ $social['config']['img_light'] }}"
-                                     data-app-dark-img="{{ $social['config']['img_dark'] }}" />
+                                     data-app-dark-img="{{ $social['config']['img_dark'] }}"
+                                     loading="lazy"
+                                     decoding="async" />
                             @else
                                 <i class="bx {{ $social['config']['class'] }} fs-4"></i>
                             @endif

@@ -11,7 +11,9 @@
                 <img src="{{ thumb_path($comment->user->avatar) }}" 
                     alt="{{ $comment->user->full_name ?? $comment->user->email }}" 
                     class="rounded-circle me-2 me-md-3 comment-avatar" 
-                    style="width: 36px; height: 36px; min-width: 36px; object-fit: cover;">
+                    style="width: 36px; height: 36px; min-width: 36px; object-fit: cover;"
+                    loading="lazy"
+                    decoding="async" />
             @else
                 <div class="rounded-circle bg-label-secondary d-flex align-items-center justify-content-center me-2 me-md-3 comment-avatar" 
                     style="width: 36px; height: 36px; min-width: 36px;">
@@ -59,7 +61,9 @@
                                     <img src="{{ thumb_path(auth()->user()->avatar) }}" 
                                         alt="{{ auth()->user()->full_name ?? auth()->user()->email }}" 
                                         class="rounded-circle me-2 me-md-3 comment-avatar" 
-                                        style="width: 28px; height: 28px; min-width: 28px; object-fit: cover;">
+                                        style="width: 28px; height: 28px; min-width: 28px; object-fit: cover;"
+                                        loading="lazy"
+                                        decoding="async" />
                                 @else
                                     <div class="rounded-circle bg-label-secondary d-flex align-items-center justify-content-center me-2 me-md-3 comment-avatar" 
                                         style="width: 28px; height: 28px; min-width: 28px;">

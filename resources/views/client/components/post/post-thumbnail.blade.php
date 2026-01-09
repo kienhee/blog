@@ -7,7 +7,9 @@
             <img src="{{ $post->thumbnail }}" 
                  alt="{{ $post->title ?? 'Thumbnail bài viết' }}" 
                  title="{{ $post->title ?? '' }}"
-                 loading="lazy" />
+                 loading="lazy"
+                 decoding="async"
+                 onerror="this.style.display='none';" />
         </a>
     </div>
 @endif

@@ -8,6 +8,11 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
+    {{-- Resource Hints for Performance --}}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="{{ config('app.url') }}" crossorigin />
+
     {{-- SEO Meta Tags --}}
     @if (isset($seoModel) && $seoModel)
         {!! seo()->for($seoModel) !!}
@@ -24,9 +29,6 @@
 </head>
 
 <body>
-    <script src="{{ asset_admin_url('assets/vendor/js/dropdown-hover.js') }}"></script>
-    <script src="{{ asset_admin_url('assets/vendor/js/mega-dropdown.js') }}"></script>
-
     <!-- Navbar: Start -->
     @include('client.layouts.sections.nav')
     <!-- Navbar: End -->

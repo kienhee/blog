@@ -3,7 +3,10 @@
     <div class="post-author">
         @if (isset($post->avatar) && $post->avatar)
             <img src="{{ $post->avatar ? thumb_path($post->avatar) : asset_shared_url('images/default.png') }}"
-                alt="{{ $post->full_name }}" class="post-author-avatar" />
+                alt="{{ $post->full_name }}" 
+                class="post-author-avatar"
+                loading="lazy"
+                decoding="async" />
         @else
             <div class="post-author-avatar"
                 style="background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999;">
