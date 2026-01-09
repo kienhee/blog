@@ -6,7 +6,7 @@
 @include('client.components.seo.breadcrumbs-schema')
 
 @section('content')
-    <section class="section-py bg-gradient">
+    <section class="section-py">
         <div class="container">
             {{-- Category Header --}}
             <header class="category-header mb-5">
