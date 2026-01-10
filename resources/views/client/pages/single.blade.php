@@ -23,6 +23,9 @@
             {{-- Floating Share Buttons --}}
             @include('client.components.post.floating-share')
 
+            {{-- Floating TOC Button (Mobile) --}}
+            @include('client.components.post.floating-toc')
+
             {{-- Main Layout: Content + Sidebar --}}
             <div class="post-layout">
                 {{-- Main Content (70%) --}}
@@ -35,6 +38,9 @@
 
                     {{-- Tags --}}
                     @include('client.components.post.post-tags')
+
+                    {{-- Mobile Share Buttons (below tags) --}}
+                    @include('client.components.post.post-share-mobile')
 
                     {{-- Author Section --}}
                     @include('client.components.post.post-author')

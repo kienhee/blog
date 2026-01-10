@@ -332,6 +332,13 @@
   }
 }
 
+// Hide TOC widget on mobile (will show in offcanvas instead)
+@include respond-to(lg) {
+  .sidebar-toc-widget {
+    display: none;
+  }
+}
+
 .sidebar-widget {
   background: $white;
   border: 1px solid $border-color;

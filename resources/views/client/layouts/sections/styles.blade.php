@@ -29,5 +29,8 @@
 <!-- Client CSS (compiled from SCSS) -->
 @vite('resources/scss/client/client.scss')
 
-<!-- Helpers - Move to footer to avoid blocking render -->
+<!-- Helpers -->
+<script src="{{ asset_admin_url('assets/vendor/js/helpers.js') }}"></script>
+<script src="{{ asset_admin_url('assets/vendor/js/template-customizer.js') }}"></script>
+<script src="{{ asset_admin_url('assets/js/front-config.js') }}"></script>
 @stack('styles')

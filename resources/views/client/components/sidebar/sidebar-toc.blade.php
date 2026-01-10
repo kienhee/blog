@@ -1,5 +1,5 @@
 {{-- Table of Contents --}}
-<div class="sidebar-widget">
+<div class="sidebar-widget sidebar-toc-widget">
     <h3 class="sidebar-widget-title d-block" onclick="toggleTOC()">
         <div class="d-flex align-items-center justify-content-between">
             <span class="sidebar-widget-title-text">

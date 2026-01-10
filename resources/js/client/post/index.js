@@ -236,17 +236,90 @@ document.addEventListener("DOMContentLoaded", function () {
     if (toggleBtn) {
         toggleBtn.classList.remove("collapsed");
     }
+
+    // Copy TOC to offcanvas for mobile
+    const tocOffcanvasList = document.getElementById("toc-offcanvas-list");
+    if (tocOffcanvasList && tocList) {
+        // Clone the TOC list
+        const clonedList = tocList.cloneNode(true);
+        tocOffcanvasList.innerHTML = clonedList.innerHTML;
+
+        // Update click handlers for offcanvas TOC links
+        const offcanvasLinks = tocOffcanvasList.querySelectorAll(".toc-link");
+        offcanvasLinks.forEach(link => {
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                const href = this.getAttribute("href");
+                const targetId = href.substring(1);
+                
+                const target = document.getElementById(targetId);
+                if (target) {
+                    // Calculate offset for navbar height
+                    const navbar = document.querySelector('.navbar');
+                    const navbarHeight = navbar ? navbar.offsetHeight : 0;
+                    
+                    const rect = target.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const targetPosition = rect.top + scrollTop - navbarHeight - 20;
+                    
+                    window.scrollTo({
+                        top: Math.max(0, targetPosition),
+                        behavior: "smooth"
+                    });
+                    
+                    window.history.pushState(null, null, href);
+                    
+                    // Close offcanvas after clicking
+                    const offcanvasElement = document.getElementById("tocOffcanvas");
+                    if (offcanvasElement) {
+                        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                        if (bsOffcanvas) {
+                            bsOffcanvas.hide();
+                        }
+                    }
+                }
+            });
+        });
+    }
+});
+
+// Floating TOC Button Handler
+document.addEventListener("DOMContentLoaded", function() {
+    const floatingTocBtn = document.getElementById("floatingTocBtn");
+    const tocOffcanvas = document.getElementById("tocOffcanvas");
+    const tocList = document.getElementById("toc-list");
+    
+    // Only show floating button if TOC has items
+    if (floatingTocBtn && tocOffcanvas) {
+        // Check if TOC has items
+        if (tocList && tocList.children.length > 0) {
+            floatingTocBtn.style.display = "flex";
+        } else {
+            floatingTocBtn.style.display = "none";
+        }
+        
+        floatingTocBtn.addEventListener("click", function() {
+            const bsOffcanvas = new bootstrap.Offcanvas(tocOffcanvas);
+            bsOffcanvas.show();
+        });
+    }
 });
 
 // Saved Post functionality - AJAX implementation (using vanilla JS)
 document.addEventListener("DOMContentLoaded", function() {
     const saveBtn = document.getElementById('savePostBtn');
+    const saveBtnMobile = document.getElementById('savePostBtnMobile');
     
-    if (!saveBtn) {
+    // Handle both desktop and mobile save buttons
+    const buttons = [saveBtn, saveBtnMobile].filter(btn => btn !== null);
+    
+    if (buttons.length === 0) {
         return;
     }
     
-    const postId = saveBtn.getAttribute('data-post-id');
+    // Get postId from first available button
+    const firstButton = buttons[0];
+    const postId = firstButton.getAttribute('data-post-id');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     
     if (!postId) {
@@ -257,44 +330,64 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
     
-    saveBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const icon = saveBtn.querySelector('i');
-        const isCurrentlySaved = saveBtn.classList.contains('saved');
-        
-        // Disable button during request to prevent double clicks
-        saveBtn.disabled = true;
-        
-        // Add loading state
-        saveBtn.classList.add('loading');
-        
-        // Store original state for potential revert
-        const originalState = {
-            saved: isCurrentlySaved,
-            title: saveBtn.getAttribute('title'),
-            iconClass: icon ? icon.className : ''
-        };
-        
-        // Optimistic UI update - update immediately for better UX
-        if (isCurrentlySaved) {
-            // Remove saved state immediately
-            saveBtn.classList.remove('saved');
-            saveBtn.setAttribute('title', 'Lưu bài viết');
-            if (icon) {
-                icon.classList.remove('bxs-bookmark');
-                icon.classList.add('bx-bookmark');
-            }
-        } else {
-            // Add saved state immediately
-            saveBtn.classList.add('saved');
-            saveBtn.setAttribute('title', 'Bỏ lưu bài viết');
-            if (icon) {
-                icon.classList.remove('bx-bookmark');
-                icon.classList.add('bxs-bookmark');
-            }
-        }
+    /**
+     * Handle save button click
+     */
+    function handleSaveButtonClick(button) {
+        return function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const icon = button.querySelector('i');
+            const span = button.querySelector('span');
+            const isCurrentlySaved = button.classList.contains('saved');
+            
+            // Disable all save buttons during request to prevent double clicks
+            buttons.forEach(btn => {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('loading');
+                }
+            });
+            
+            // Store original state for potential revert
+            const originalState = {
+                saved: isCurrentlySaved,
+                title: button.getAttribute('title'),
+                iconClass: icon ? icon.className : '',
+                spanText: span ? span.textContent : ''
+            };
+            
+            // Optimistic UI update - update immediately for better UX (both buttons)
+            buttons.forEach(btn => {
+                if (!btn) return;
+                const btnIcon = btn.querySelector('i');
+                const btnSpan = btn.querySelector('span');
+                
+                if (isCurrentlySaved) {
+                    // Remove saved state immediately
+                    btn.classList.remove('saved');
+                    btn.setAttribute('title', 'Lưu bài viết');
+                    if (btnIcon) {
+                        btnIcon.classList.remove('bxs-bookmark');
+                        btnIcon.classList.add('bx-bookmark');
+                    }
+                    if (btnSpan) {
+                        btnSpan.textContent = 'Lưu';
+                    }
+                } else {
+                    // Add saved state immediately
+                    btn.classList.add('saved');
+                    btn.setAttribute('title', 'Bỏ lưu bài viết');
+                    if (btnIcon) {
+                        btnIcon.classList.remove('bx-bookmark');
+                        btnIcon.classList.add('bxs-bookmark');
+                    }
+                    if (btnSpan) {
+                        btnSpan.textContent = 'Đã lưu';
+                    }
+                }
+            });
         
         // Make AJAX request using Fetch API
         fetch(`/saved-posts/${postId}/toggle`, {
@@ -315,35 +408,55 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(data => {
             if (data && data.success !== undefined) {
-                // Update button state based on server response
-                if (data.saved) {
-                    saveBtn.classList.add('saved');
-                    saveBtn.setAttribute('title', 'Bỏ lưu bài viết');
-                    if (icon) {
-                        icon.classList.remove('bx-bookmark');
-                        icon.classList.add('bxs-bookmark');
+                // Update all button states based on server response
+                buttons.forEach(btn => {
+                    if (!btn) return;
+                    const btnIcon = btn.querySelector('i');
+                    const btnSpan = btn.querySelector('span');
+                    
+                    if (data.saved) {
+                        btn.classList.add('saved');
+                        btn.setAttribute('title', 'Bỏ lưu bài viết');
+                        if (btnIcon) {
+                            btnIcon.classList.remove('bx-bookmark');
+                            btnIcon.classList.add('bxs-bookmark');
+                        }
+                        if (btnSpan) {
+                            btnSpan.textContent = 'Đã lưu';
+                        }
+                    } else {
+                        btn.classList.remove('saved');
+                        btn.setAttribute('title', 'Lưu bài viết');
+                        if (btnIcon) {
+                            btnIcon.classList.remove('bxs-bookmark');
+                            btnIcon.classList.add('bx-bookmark');
+                        }
+                        if (btnSpan) {
+                            btnSpan.textContent = 'Lưu';
+                        }
                     }
-                } else {
-                    saveBtn.classList.remove('saved');
-                    saveBtn.setAttribute('title', 'Lưu bài viết');
-                    if (icon) {
-                        icon.classList.remove('bxs-bookmark');
-                        icon.classList.add('bx-bookmark');
-                    }
-                }
+                });
                 
                 // Show success notification using toastr
                 const message = data.message || (data.saved ? 'Đã lưu bài viết thành công.' : 'Đã bỏ lưu bài viết.');
                 showSuccess(message);
             } else {
-                // Invalid response, revert
-                revertButtonState(saveBtn, icon, originalState);
+                // Invalid response, revert all buttons
+                buttons.forEach(btn => {
+                    if (btn) {
+                        revertButtonState(btn, btn.querySelector('i'), originalState);
+                    }
+                });
                 showError('Phản hồi không hợp lệ từ server');
             }
         })
         .catch(error => {
-            // Revert optimistic update on error
-            revertButtonState(saveBtn, icon, originalState);
+            // Revert optimistic update on error for all buttons
+            buttons.forEach(btn => {
+                if (btn) {
+                    revertButtonState(btn, btn.querySelector('i'), originalState);
+                }
+            });
             
             let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
             
@@ -371,27 +484,47 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .finally(() => {
-            // Re-enable button and remove loading state
-            saveBtn.disabled = false;
-            saveBtn.classList.remove('loading');
+            // Re-enable all buttons and remove loading state
+            buttons.forEach(btn => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                }
+            });
         });
+        };
+    }
+    
+    // Attach event listeners to all buttons
+    buttons.forEach(button => {
+        if (button) {
+            button.addEventListener('click', handleSaveButtonClick(button));
+        }
     });
     
     /**
      * Revert button to original state
      */
     function revertButtonState(btn, iconElement, originalState) {
+        const span = btn.querySelector('span');
+        
         if (originalState.saved) {
             btn.classList.add('saved');
             if (iconElement) {
                 iconElement.classList.remove('bx-bookmark');
                 iconElement.classList.add('bxs-bookmark');
             }
+            if (span) {
+                span.textContent = 'Đã lưu';
+            }
         } else {
             btn.classList.remove('saved');
             if (iconElement) {
                 iconElement.classList.remove('bxs-bookmark');
                 iconElement.classList.add('bx-bookmark');
+            }
+            if (span) {
+                span.textContent = 'Lưu';
             }
         }
         btn.setAttribute('title', originalState.title);

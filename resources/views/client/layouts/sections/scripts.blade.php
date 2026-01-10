@@ -16,6 +16,8 @@
 <!-- Main JS -->
 <script src="{{ asset_admin_url('assets/js/front-main.js') }}"></script>
 
+<!-- Page JS -->
+<script src="{{ asset_admin_url('assets/js/front-page-landing.js') }}"></script>
 <!-- Toastr JS -->
 <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
 <!-- Fancybox JS - Load async (non-critical) -->
