@@ -84,7 +84,18 @@ if (! function_exists('thumb_path')) {
 if (! function_exists('isOpenMenu')) {
     function isOpenMenu($child)
     {
-        return route($child['url']) == url()->current();
+        $url = $child['url'] ?? null;
+        
+        // Xử lý URL đặc biệt cho tháng hiện tại
+        if ($url === 'current_month_expense') {
+            $url = getCurrentMonthExpenseUrl();
+        } elseif ($url) {
+            $url = route($url);
+        } else {
+            return false;
+        }
+        
+        return $url == url()->current();
     }
 }
 if (! function_exists('hasActiveChild')) {
@@ -240,5 +251,30 @@ if (! function_exists('get_posts_per_page')) {
     function get_posts_per_page(): int
     {
         return (int) \App\Models\Setting::getValue('posts_per_page', 15);
+    }
+}
+
+if (! function_exists('getCurrentMonthExpenseUrl')) {
+    /**
+     * Lấy URL của tháng hiện tại để thêm chi tiêu
+     *
+     * @return string
+     */
+    function getCurrentMonthExpenseUrl(): string
+    {
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+        
+        // Tìm hoặc tạo năm hiện tại
+        $financeYearRepository = app(\App\Repositories\FinanceYearRepository::class);
+        $year = $financeYearRepository->firstOrCreate(
+            ['year' => $currentYear],
+            ['target' => []]
+        );
+        
+        return route('admin.finance.years.months.show', [
+            'yearId' => $year->id,
+            'month' => $currentMonth
+        ]);
     }
 }

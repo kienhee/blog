@@ -135,9 +135,21 @@ return [
         'permission' => 'account.read',
     ],
     [
-        'title' => 'Danh sách chi tiêu',
+        'title' => 'Quản lý chi tiêu',
         'icon' => 'bx-wallet',
-        'url' => 'admin.finance.years.list',
+        'permission' => 'finance.read',
+        'children' => [
+            [
+                'title' => 'Danh sách',
+                'url' => 'admin.finance.years.list',
+                'permission' => 'finance.read',
+            ],
+            [
+                'title' => 'Thêm chi tiêu',
+                'url' => 'current_month_expense',
+                'permission' => 'finance.create',
+            ],
+        ],
     ],
     [
         'title' => 'Cài đặt',

@@ -53,8 +53,19 @@
                         <ul class="menu-sub">
                             @foreach ($item['children'] as $child)
                                 @if (empty($child['permission']) || auth()->user()->can($child['permission']))
+                                    @php
+                                        // Xử lý URL đặc biệt cho tháng hiện tại
+                                        $childUrl = $child['url'] ?? null;
+                                        if ($childUrl === 'current_month_expense') {
+                                            $childUrl = getCurrentMonthExpenseUrl();
+                                        } elseif ($childUrl) {
+                                            $childUrl = route($childUrl);
+                                        } else {
+                                            $childUrl = 'javascript:void(0);';
+                                        }
+                                    @endphp
                                     <li class="menu-item {{ isOpenMenu($child) ? 'active' : '' }}">
-                                        <a href="{{ $child['url'] ? route($child['url']) : 'javascript:void(0);' }}"
+                                        <a href="{{ $childUrl }}"
                                             class="menu-link">
                                             <div class="text-truncate">{{ $child['title'] }}</div>
                                             @if (!empty($child['badgeId']))
