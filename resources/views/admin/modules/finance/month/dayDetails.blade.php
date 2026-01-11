@@ -4,6 +4,56 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
     <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+    <style>
+        /* Responsive buttons cho mobile */
+        @media (max-width: 768px) {
+            /* Container của buttons */
+            .d-flex.gap-2 {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.75rem !important;
+            }
+            
+            /* Buttons full width trên mobile */
+            .d-flex.gap-2 > .btn,
+            .d-flex.gap-2 > a.btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.625rem 1rem;
+                font-size: 0.875rem;
+                white-space: nowrap;
+            }
+            
+            /* Icon trong button */
+            .d-flex.gap-2 .btn i,
+            .d-flex.gap-2 a.btn i {
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+            
+            /* Heading section responsive */
+            .d-flex.flex-wrap.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .d-flex.flex-wrap.justify-content-between > div:first-child {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .d-flex.flex-wrap.justify-content-between > div:last-child {
+                width: 100%;
+            }
+        }
+        
+        /* Tablet và desktop - giữ nguyên */
+        @media (min-width: 769px) {
+            .d-flex.gap-2 {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
