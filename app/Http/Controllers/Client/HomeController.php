@@ -123,6 +123,7 @@ class HomeController extends Controller
         $seoModel = new SEOData(
             title: 'Trang chủ',
             description: 'Khám phá các bài viết mới nhất về lập trình, công nghệ và cuộc sống. Chia sẻ kiến thức và kinh nghiệm từ cộng đồng.',
+            image: asset_shared_url_v2('images/background-callback.jpg'),
             url: route('client.home', [], false),
             type: 'website',
         );

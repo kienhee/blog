@@ -45,6 +45,21 @@ class System
     }
 
     /**
+     * Get public asset URL with versioning for resources/shared files
+     * This is a safer version that correctly handles paths relative to resources/shared directory
+     *
+     * @param string $path  file path relative to resources/shared directory (e.g., 'images/favicon.png')
+     * @return string
+     */
+    public static function asset_shared_url_v2($path)
+    {
+        $filePath = public_path("resources/shared/$path");
+        $version = file_exists($filePath) ? filemtime($filePath) : self::$version_view;
+
+        return asset("resources/shared/$path?v=".$version);
+    }
+
+    /**
      * Summary of handle SeedVersion
      * @param mixed $tableName
      * @param mixed $version

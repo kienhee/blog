@@ -39,6 +39,20 @@ if (! function_exists('asset_shared_url')) {
     }
 }
 
+if (! function_exists('asset_shared_url_v2')) {
+    /**
+     * Get public asset URL with versioning for resources/shared files
+     * This is a safer version that correctly handles paths relative to resources/shared directory
+     *
+     * @param  string  $path  file path relative to resources/shared directory (e.g., 'images/favicon.png')
+     * @return string
+     */
+    function asset_shared_url_v2($path)
+    {
+        return \App\System::asset_shared_url_v2($path);
+    }
+}
+
 if (! function_exists('seed_version')) {
     /**
      * Handle SeedVersion

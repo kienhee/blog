@@ -22,6 +22,7 @@ class PageController extends Controller
         $seoModel = new SEOData(
             title: 'Về chúng tôi',
             description: 'Tìm hiểu về chúng tôi và sứ mệnh chia sẻ kiến thức, kinh nghiệm về lập trình và công nghệ đến cộng đồng.',
+            image: asset_shared_url_v2('images/background-callback.jpg'),
             url: route('client.about', [], false),
             type: 'website',
         );

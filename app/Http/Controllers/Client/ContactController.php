@@ -23,6 +23,7 @@ class ContactController extends Controller
         $seoModel = new SEOData(
             title: 'Liên hệ',
             description: 'Liên hệ với chúng tôi để được hỗ trợ, đặt câu hỏi hoặc chia sẻ ý kiến của bạn. Chúng tôi luôn sẵn sàng lắng nghe!',
+            image: asset_shared_url_v2('images/background-callback.jpg'),
             url: route('client.contact', [], false),
             type: 'website',
             robots: 'noindex, follow',
