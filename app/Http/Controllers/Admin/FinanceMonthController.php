@@ -436,6 +436,8 @@ class FinanceMonthController extends Controller
                 }),
                 'total' => $dayGroup->sum('money'),
             ];
+        })->sortByDesc(function($dayData) {
+            return $dayData['date']->timestamp;
         })->values();
 
         // Tên tháng
@@ -445,7 +447,13 @@ class FinanceMonthController extends Controller
             9 => 'Tháng 9', 10 => 'Tháng 10', 11 => 'Tháng 11', 12 => 'Tháng 12',
         ];
 
-        return view('admin.modules.finance.month.dayDetails', compact('financeMonth', 'year', 'monthNames', 'daysGrouped'));
+        // Lấy danh sách loại chi tiêu
+        $financeTypes = $this->financeMonthRepository->getFinanceTypes();
+
+        // Tính tổng tiền đã chi tiêu trong tháng (tổng của tất cả các ngày)
+        $totalExpenses = $financeDays->sum('money');
+
+        return view('admin.modules.finance.month.dayDetails', compact('financeMonth', 'year', 'monthNames', 'daysGrouped', 'financeTypes', 'totalExpenses'));
     }
 
     /**

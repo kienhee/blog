@@ -10,6 +10,13 @@
             'extraButtons' => !$financeMonth->isLocked() ? [
                 [
                     'type' => 'button',
+                    'text' => 'Thêm chi phí',
+                    'icon' => 'bx-plus',
+                    'class' => 'btn-primary',
+                    'id' => 'btnAddExpense'
+                ],
+                [
+                    'type' => 'button',
                     'text' => 'Khóa tháng',
                     'icon' => 'bx-lock',
                     'class' => 'btn-warning',
@@ -57,9 +64,9 @@
                             @endphp
                             <div class="accordion-item">
                                 <h2 class="accordion-header {{ $bgClass }}" id="heading{{ $index }}">
-                                    <button class="accordion-button {{ $index !== 0 ? 'collapsed' : '' }} {{ $bgClass }}" type="button" 
+                                    <button class="accordion-button collapsed {{ $bgClass }}" type="button" 
                                             data-bs-toggle="collapse" data-bs-target="#{{ $accordionId }}" 
-                                            aria-expanded="{{ $index === 0 ? 'true' : 'false' }}" 
+                                            aria-expanded="false" 
                                             aria-controls="{{ $accordionId }}">
                                         <span class="badge badge-dot {{ $dotColor }} me-2"></span>
                                         <strong>{{ $dayData['date']->format('d/m/Y') }}</strong>
@@ -68,7 +75,7 @@
                                         </span>
                                     </button>
                                 </h2>
-                                <div id="{{ $accordionId }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}" 
+                                <div id="{{ $accordionId }}" class="accordion-collapse collapse" 
                                      aria-labelledby="heading{{ $index }}" data-bs-parent="#accordionDays">
                                     <div class="accordion-body {{ $bgClass }}">
                                         <div class="table-responsive">
@@ -96,6 +103,14 @@
                             </div>
                         @endforeach
                     </div>
+                    
+                    <!-- Tổng tiền đã chi tiêu trong tháng -->
+                    <div class="mt-4 pt-3 border-top">
+                        <p class="mb-0">
+                            <strong>Số tiền đã chi tiêu đến thời điểm hiện tại</strong> 
+                            <span class="text-primary fw-bold">({{ number_format($totalExpenses, 0, ',', '.') }}đ):</span>
+                        </p>
+                    </div>
                 @else
                     <div class="alert alert-info">
                         <i class="bx bx-info-circle me-2"></i>
@@ -104,15 +119,177 @@
                 @endif
             </div>
         </div>
+
+        <!-- Offcanvas để thêm chi phí -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="addExpenseSidebar"
+            aria-labelledby="addExpenseSidebarLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title mb-2" id="addExpenseSidebarLabel">Thêm chi tiêu</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <form id="expenseForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseDate">Ngày <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control date-picker" id="expenseDate" name="date" 
+                            placeholder="dd/mm/yyyy" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseType">Loại chi tiêu <span class="text-danger">*</span></label>
+                        <select class="form-select" id="expenseType" name="finance_type_id" required>
+                            <option value="">Chọn loại chi tiêu</option>
+                            @foreach($financeTypes as $type)
+                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseMoney">Số tiền chi tiêu <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control format-money" id="expenseMoney" name="money" 
+                            placeholder="Nhập số tiền" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="expenseNote">Ghi chú</label>
+                        <textarea class="form-control" id="expenseNote" name="note" rows="3" 
+                            placeholder="Nhập ghi chú (nếu có)"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between my-4">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="btnSaveExpense">
+                                <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                                Lưu
+                            </button>
+                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </section>
 @endsection
 
 @push('scripts')
     <script src="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script>
+        // Helper function để unformat số (bỏ dấu chấm)
+        function unformatNumber(value) {
+            if (!value) return '';
+            return value.toString().replace(/\./g, '');
+        }
+
         $(document).ready(function() {
+            const monthId = {{ $financeMonth->id }};
+            const isLocked = {{ $financeMonth->isLocked() ? 'true' : 'false' }};
             const lockUrl = '{{ route("admin.finance.months.lock", $financeMonth->id) }}';
+            const expenseStoreUrl = '{{ route("admin.finance.months.expenses.store", $financeMonth->id) }}';
             
+            // Khởi tạo flatpickr cho date picker
+            $('#expenseDate').flatpickr({
+                dateFormat: 'd/m/Y',
+                allowInput: true,
+                locale: {
+                    firstDayOfWeek: 1
+                }
+            });
+            
+            // Format money khi nhập
+            $('.format-money').on('input', function() {
+                let val = this.value;
+                val = val.replace(/\D/g, '');
+                val = val.replace(/^0+(?!$)/, '');
+                val = val.substring(0, 15);
+                val = val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                this.value = val;
+            });
+
+            // Khởi tạo offcanvas
+            let expenseSidebar = new bootstrap.Offcanvas(document.getElementById('addExpenseSidebar'));
+            
+            // Button thêm chi tiêu
+            $('#btnAddExpense').on('click', function() {
+                if (isLocked) {
+                    toastr.warning('Tháng này đã bị khóa, không thể thêm chi tiêu', "Thông báo");
+                    return;
+                }
+                const today = moment().format('DD/MM/YYYY');
+                $('#expenseDate').val(today);
+                $('#expenseType').val('').trigger('change');
+                $('#expenseMoney').val('');
+                $('#expenseNote').val('');
+                $('#addExpenseSidebarLabel').text('Thêm chi tiêu');
+                expenseSidebar.show();
+            });
+            
+            // Submit form
+            $('#expenseForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const $btn = $('#btnSaveExpense');
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true).find('.spinner-border').removeClass('d-none');
+                
+                // Convert date từ d/m/Y sang Y-m-d
+                const dateValue = $('#expenseDate').val();
+                let dateFormatted = dateValue;
+                if (dateValue) {
+                    const dateParts = dateValue.split('/');
+                    if (dateParts.length === 3) {
+                        dateFormatted = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                    }
+                }
+                
+                const formData = {
+                    date: dateFormatted,
+                    finance_type_id: $('#expenseType').val(),
+                    money: unformatNumber($('#expenseMoney').val()),
+                    note: $('#expenseNote').val()
+                };
+                
+                $.ajax({
+                    url: expenseStoreUrl,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    data: formData,
+                    success: function(response) {
+                        if (response.status) {
+                            toastr.success(response.message, "Thông báo");
+                            expenseSidebar.hide();
+                            // Reload page sau 1 giây để cập nhật dữ liệu
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            toastr.error(response.message || 'Có lỗi xảy ra', "Đã có lỗi xảy ra");
+                            $btn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = 'Có lỗi xảy ra khi thêm chi tiêu.';
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                message = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON.errors) {
+                                const errors = Object.values(xhr.responseJSON.errors).flat();
+                                message = errors.join('<br>');
+                            }
+                        }
+                        toastr.error(message, "Đã có lỗi xảy ra");
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+            
+            // Lock month
             $('#btnLockMonth').on('click', function() {
                 if (!confirm('Bạn có chắc chắn muốn khóa tháng này? Sau khi khóa, bạn sẽ không thể chỉnh sửa dữ liệu nữa.')) {
                     return;
@@ -132,7 +309,6 @@
                     success: function(response) {
                         if (response.status) {
                             toastr.success(response.message, "Thông báo");
-                            // Reload page sau 1 giây để cập nhật UI
                             setTimeout(function() {
                                 window.location.reload();
                             }, 1000);
