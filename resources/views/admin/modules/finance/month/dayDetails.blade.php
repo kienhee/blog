@@ -1,6 +1,11 @@
 @extends('admin.layouts.master')
 @section('title', 'Chi tiết ' . $monthNames[$financeMonth->month] . '/' . $year->year)
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/toastr/toastr.css') }}" />
+    <link rel="stylesheet" href="{{ asset_admin_url('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+@endpush
+
 @section('content')
     <section>
         @include('admin.components.headingPage', [
@@ -190,13 +195,16 @@
             const expenseStoreUrl = '{{ route("admin.finance.months.expenses.store", $financeMonth->id) }}';
             
             // Khởi tạo flatpickr cho date picker
-            $('#expenseDate').flatpickr({
-                dateFormat: 'd/m/Y',
-                allowInput: true,
-                locale: {
-                    firstDayOfWeek: 1
-                }
-            });
+            const $expenseDate = $('#expenseDate');
+            if ($expenseDate.length && typeof flatpickr !== 'undefined') {
+                $expenseDate.flatpickr({
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    locale: {
+                        firstDayOfWeek: 1
+                    }
+                });
+            }
             
             // Format money khi nhập
             $('.format-money').on('input', function() {
