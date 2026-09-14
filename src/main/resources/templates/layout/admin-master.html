@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CSRF token for AJAX writes (e.g. the MediaExplorer component, which has no server-rendered form to read it from). -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="kh-posts-per-page" th:content="${postsPerPage}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+    <title layout:title-pattern="$CONTENT_TITLE — $LAYOUT_TITLE">Kienhee Admin</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/styles/main.css}">
+    <link rel="stylesheet" th:href="@{/styles/lib/dataTables.min.css}">
+    <!-- Lightbox2: any <a href="full.jpg" data-lightbox="group"><img …></a> opens a zoom viewer. -->
+    <link rel="stylesheet" th:href="@{/styles/lib/lightbox.min.css}">
+    <link rel="stylesheet" th:href="@{/styles/admin.css}">
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body>
+<div class="scrim"></div>
+<div class="admin">
+    <aside th:replace="~{fragments/admin/sidebar :: sidebar}"></aside>
+    <div class="main">
+        <div th:replace="~{fragments/admin/topbar :: topbar}"></div>
+        <div class="content" layout:fragment="content"></div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/admin/dialog :: dialog}"></div>
+
+<div class="toast"><span>✓</span><span class="msg"></span></div>
+
+<script th:src="@{/scripts/lib/jquery.min.js}"></script>
+<script th:src="@{/scripts/lib/jquery.validate.min.js}"></script>
+<script th:src="@{/scripts/lib/dataTables.min.js}"></script>
+<script th:src="@{/scripts/lib/lightbox.min.js}"></script>
+<script th:src="@{/scripts/core/admin.js}"></script>
+<script th:src="@{/scripts/core/datatable.js}"></script>
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>
+

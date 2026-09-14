@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title th:text="${postId != null ? 'Edit post' : 'New post'}">New post</title>
+    <link rel="stylesheet" th:href="@{/styles/lib/flatpickr.min.css}">
+    <link rel="stylesheet" th:href="@{/styles/flatpickr-theme.css}">
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/posts}" class="dim">Posts</a><span style="color:var(--line)">/</span><strong th:text="${postId != null ? 'Edit post' : 'New post'}">New post</strong>
+</div>
+
+<div layout:fragment="content">
+      <form id="post-form" method="post"
+            th:action="${postId != null} ? @{'/admin/post/' + ${postId} + '/edit'} : @{/admin/post/new}"
+            th:object="${postForm}">
+
+        <input type="hidden" th:if="${postId != null}" name="id" th:value="${postId}">
+
+        <div class="page-head" style="border-bottom:2px solid var(--rule)">
+          <div><a class="kicker" th:href="@{/admin/posts}">&larr; Posts</a><h1 style="margin-top:10px" th:text="${postId != null ? 'Edit post' : 'New post'}">New post</h1></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" type="submit" id="post-submit-btn">Save post</button>
+          </div>
+        </div>
+
+        <div th:if="${successMessage}" style="margin:18px 0;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" style="margin:18px 0;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+        <div th:if="${#fields.hasGlobalErrors()}" style="margin:18px 0;padding:10px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+        </div>
+
+        <div class="editor-grid">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <label class="field" id="field-title" th:classappend="${#fields.hasErrors('title')} ? 'has-error' : ''">
+              <span>Title<span class="req"> *</span></span>
+              <input class="input" id="post-title" name="title" th:value="*{title}" data-slug-source="#post-slug" style="height:52px;font-size:20px;font-weight:600" placeholder="Enter title…">
+              <span class="err show" id="err-title" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title is required.</span>
+              <span class="err" id="err-title" th:unless="${#fields.hasErrors('title')}">Title is required.</span>
+            </label>
+
+            <div class="field" id="field-slug" th:classappend="${#fields.hasErrors('slug')} ? 'has-error' : ''">
+              <span>Slug<span class="req"> *</span></span>
+              <span style="display:flex;align-items:center;border:1px solid var(--line);background:var(--surf)">
+                <span class="dim" style="padding:0 12px;font-size:13px;border-right:1px solid var(--line);height:44px;display:flex;align-items:center">kienhee.com/</span>
+                <input class="input" id="post-slug" name="slug" th:value="*{slug}" style="border:none;background:transparent;height:44px;font-size:14px" placeholder="enter-slug">
+              </span>
+              <span class="err show" id="err-slug" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}">Slug is required.</span>
+              <span class="err" id="err-slug" th:unless="${#fields.hasErrors('slug')}">Slug is required.</span>
+            </div>
+
+            <label class="field" id="field-coverImage" th:classappend="${#fields.hasErrors('coverImage')} ? 'has-error' : ''">
+              <span>Cover image URL</span>
+              <span style="display:flex;gap:8px">
+                <input class="input" id="post-coverImage" name="coverImage" th:value="*{coverImage}" placeholder="https://example.com/cover.jpg" style="flex:1">
+                <button type="button" class="btn btn-ghost" id="btn-open-media-picker">Choose from library</button>
+              </span>
+              <img id="post-coverImage-preview" class="ph" alt="" style="height:160px;object-fit:cover;margin-top:10px"
+                   th:src="${postForm.coverImage != null and !postForm.coverImage.isEmpty()} ? @{${postForm.coverImage}} : ''"
+                   th:hidden="${postForm.coverImage == null or postForm.coverImage.isEmpty()}">
+              <span class="err show" id="err-coverImage" th:if="${#fields.hasErrors('coverImage')}" th:errors="*{coverImage}"></span>
+              <span class="err" id="err-coverImage" th:unless="${#fields.hasErrors('coverImage')}"></span>
+              <span class="dim" style="font-size:12px">Optional. Paste a URL or pick an image already uploaded to the Media library.</span>
+            </label>
+
+            <label class="field" id="field-excerpt" th:classappend="${#fields.hasErrors('excerpt')} ? 'has-error' : ''">
+              <span>Description</span>
+              <textarea class="textarea" id="post-excerpt" name="excerpt" placeholder="Enter a brief summary or excerpt…" th:text="*{excerpt}"></textarea>
+              <span class="err show" id="err-excerpt" th:if="${#fields.hasErrors('excerpt')}" th:errors="*{excerpt}"></span>
+              <span class="err" id="err-excerpt" th:unless="${#fields.hasErrors('excerpt')}"></span>
+            </label>
+
+            <div class="field" id="field-content" th:classappend="${#fields.hasErrors('content')} ? 'has-error' : ''">
+              <span>Content<span class="req"> *</span></span>
+              <div class="rte">
+                <div class="bar">
+                  <button type="button" data-cmd="bold" title="bold">B</button>
+                  <button type="button" data-cmd="italic" title="italic">I</button>
+                  <button type="button" data-cmd="underline" title="underline">U</button>
+                  <button type="button" data-cmd="h2" title="h2">H2</button>
+                  <button type="button" data-cmd="h3" title="h3">H3</button>
+                  <button type="button" data-cmd="blockquote" title="blockquote">&ldquo; &rdquo;</button>
+                  <button type="button" data-cmd="insertUnorderedList" title="insertUnorderedList">&bull; List</button>
+                  <button type="button" data-cmd="link" title="link">Link</button>
+                  <button type="button" data-cmd="image" title="image">Image</button>
+                  <button type="button" data-cmd="pre" title="pre">&lt;/&gt;</button>
+                </div>
+                <div class="area" id="post-content-area" contenteditable="true" th:utext="*{content}"></div>
+                <div class="foot"><span>Rich text</span><span id="post-word-count">0 words</span></div>
+              </div>
+              <textarea id="post-content" name="content" style="display:none" th:text="*{content}"></textarea>
+              <span class="err show" id="err-content" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Content is required.</span>
+              <span class="err" id="err-content" th:unless="${#fields.hasErrors('content')}">Content is required.</span>
+            </div>
+          </div>
+
+          <div class="meta-col">
+            <div class="meta-block">
+              <span class="kicker">Status<span class="req"> *</span></span>
+              <select class="select" id="post-status" name="status" style="margin-top:8px">
+                <option value="DRAFT" th:selected="${postForm.status != null and postForm.status.name() == 'DRAFT'}">Draft</option>
+                <option value="SCHEDULED" th:selected="${postForm.status != null and postForm.status.name() == 'SCHEDULED'}">Scheduled</option>
+                <option value="PUBLISHED" th:selected="${postForm.status != null and postForm.status.name() == 'PUBLISHED'}">Published</option>
+                <option value="ARCHIVED" th:selected="${postForm.status != null and postForm.status.name() == 'ARCHIVED'}">Archived</option>
+              </select>
+              <span class="err show" id="err-status" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
+            </div>
+
+            <div class="meta-block">
+              <span class="kicker">Category<span class="req"> *</span></span>
+              <select class="select" id="post-categoryId" name="categoryId" style="margin-top:10px">
+                <option value="">— Select category —</option>
+                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${postForm.categoryId != null and postForm.categoryId == c.id}"></option>
+              </select>
+              <span class="err show" id="err-categoryId" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></span>
+            </div>
+
+            <div class="meta-block">
+              <span class="kicker">Hashtags</span>
+              <div id="post-hashtag-picker" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+                <button type="button" class="tag-toggle" th:each="h : ${hashtags}"
+                        th:data-id="${h.id}"
+                        th:attr="aria-pressed=${postForm.hashtagIds != null and postForm.hashtagIds.contains(h.id)}"
+                        th:text="'#' + ${h.slug}"></button>
+              </div>
+            </div>
+
+            <div class="meta-block" style="border-bottom:none">
+              <span class="kicker">Search engine</span>
+              <label class="field" style="margin-top:12px" id="field-seoTitle" th:classappend="${#fields.hasErrors('seoTitle')} ? 'has-error' : ''">
+                <span class="dim" style="font-size:12px;letter-spacing:0;text-transform:none">SEO title</span>
+                <input class="input" id="post-seoTitle" name="seoTitle" th:value="*{seoTitle}" placeholder="Enter SEO title (up to 60 characters)">
+                <span class="err show" id="err-seoTitle" th:if="${#fields.hasErrors('seoTitle')}" th:errors="*{seoTitle}"></span>
+              </label>
+              <label class="field" style="margin-top:16px" id="field-seoDescription" th:classappend="${#fields.hasErrors('seoDescription')} ? 'has-error' : ''">
+                <span class="dim" style="font-size:12px;letter-spacing:0;text-transform:none">SEO description</span>
+                <textarea class="textarea" id="post-seoDescription" name="seoDescription" style="min-height:84px" placeholder="Enter SEO description (up to 160 characters)" th:text="*{seoDescription}"></textarea>
+                <span class="err show" id="err-seoDescription" th:if="${#fields.hasErrors('seoDescription')}" th:errors="*{seoDescription}"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Media picker: the shared MediaExplorer component in "pick" mode (scripts/media/media-explorer.js),
+           i.e. the same explorer as the Media library page. post-editor.js mounts it when the modal opens. -->
+      <div class="media-picker" id="media-picker">
+        <div class="box mx-picker-box">
+          <div class="h">
+            <span class="t">Choose a cover image</span>
+            <button type="button" class="icon-btn" id="btn-close-media-picker" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="mx-picker-body" id="media-picker-explorer"></div>
+        </div>
+      </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <!-- The cover image picker is the shared MediaExplorer component (same as the Media library page). -->
+    <script th:src="@{/scripts/lib/flatpickr.min.js}"></script>
+    <script th:src="@{/scripts/media/media-explorer.js}"></script>
+    <script th:src="@{/scripts/post/post-editor.js}"></script>
+</th:block>
+
+</body>
+</html>

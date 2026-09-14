@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title>News &amp; Guides</title>
+</head>
+<body>
+<main layout:fragment="content">
+  <section class="wrap" style="padding-top:56px">
+    <h1 style="font-size:64px;line-height:1">News &amp; Guides</h1>
+    <p class="dim" style="margin-top:16px;font-size:17px;max-width:60ch" th:text="|Everything published on ${site['site.domain'] ?: 'this site'}, newest first.|">Everything published, newest first.</p>
+    <div class="chips" th:if="${!categories.isEmpty()}">
+      <a class="chip" th:href="@{/news}" aria-pressed="true">All<span class="bar"></span></a>
+      <a class="chip" th:each="c : ${categories}" th:href="@{/category/{slug}(slug=${c.category.slug})}" aria-pressed="false"><span th:text="${c.category.name}">Category</span><span class="bar"></span></a>
+    </div>
+    <div th:if="${posts.isEmpty()}" th:replace="~{fragments/public/pagination :: empty('No articles on this page.')}"></div>
+    <th:block th:each="p : ${posts}"><a th:replace="~{fragments/public/pagination :: thumbRow(${p})}"></a></th:block>
+    <nav th:replace="~{fragments/public/pagination :: pager(${posts}, '/news', null)}"></nav>
+  </section>
+</main>
+</body>
+</html>

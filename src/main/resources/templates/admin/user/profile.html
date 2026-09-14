@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Profile</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Profile</strong>
+</div>
+
+<div layout:fragment="content">
+      <h1 style="font-size:34px;margin-bottom:20px">My profile</h1>
+      <div th:if="${errorMessage}" style="margin-bottom:20px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600;max-width:900px">
+          <span th:text="${errorMessage}">Error message</span>
+      </div>
+      <div class="tabs">
+        <button type="button" data-tab="info" th:attr="aria-pressed=${activeTab == null or activeTab == 'info' ? 'true' : 'false'}">Info</button>
+        <button type="button" data-tab="security" th:attr="aria-pressed=${activeTab == 'security' ? 'true' : 'false'}">Security</button>
+      </div>
+
+      <!-- Info Panel -->
+      <div data-panel="info" class="profile-grid" th:style="${activeTab == 'security'} ? 'display:none;padding-top:28px;max-width:900px' : 'padding-top:28px;max-width:900px'">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <img class="ph" id="avatar-preview"
+               th:src="${currentUser != null and currentUser.avatarUrl != null and !currentUser.avatarUrl.isEmpty()} ? @{${currentUser.avatarUrl}} : @{/images/placeholder.svg}"
+               alt="" style="height:260px;object-fit:cover">
+          <form id="avatar-form" method="post" th:action="@{/admin/profile/avatar}" enctype="multipart/form-data">
+            <input type="file" id="avatar-file-input" name="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" style="display:none">
+            <button type="button" class="btn btn-ghost" id="btn-replace-photo">Replace photo</button>
+          </form>
+        </div>
+
+        <form id="profile-info-form" method="post" th:action="@{/admin/profile}" th:object="${profileRequest}" style="display:flex;flex-direction:column;gap:20px">
+          <div th:if="${profileSuccess}" style="padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${profileSuccess}">Profile updated successfully.</span>
+          </div>
+          <div th:if="${#fields.hasGlobalErrors()}" style="padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error updating profile.</span>
+          </div>
+
+          <label class="field" th:classappend="${#fields.hasErrors('fullName')} ? 'has-error' : ''">
+            <span>Display name<span class="req"> *</span></span>
+            <input class="input" type="text" th:field="*{fullName}" placeholder="Enter display name">
+            <span class="err show" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Display name is required.</span>
+          </label>
+
+          <label class="field">
+            <span>Email</span>
+            <input class="input" type="email" th:field="*{email}" placeholder="Enter email address" readonly style="opacity:0.75;cursor:not-allowed">
+          </label>
+
+          <label class="field" th:classappend="${#fields.hasErrors('phone')} ? 'has-error' : ''">
+            <span>Phone number</span>
+            <input class="input" type="text" th:field="*{phone}" placeholder="Enter phone number">
+            <span class="err show" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+          </label>
+
+          <label class="field" th:classappend="${#fields.hasErrors('address')} ? 'has-error' : ''">
+            <span>Address</span>
+            <input class="input" type="text" th:field="*{address}" placeholder="Enter address">
+            <span class="err show" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+          </label>
+
+          <label class="field" th:classappend="${#fields.hasErrors('bio')} ? 'has-error' : ''">
+            <span>Bio</span>
+            <textarea class="textarea" th:field="*{bio}" style="min-height:110px" placeholder="Write a short bio..."></textarea>
+            <span class="err show" th:if="${#fields.hasErrors('bio')}" th:errors="*{bio}"></span>
+          </label>
+
+          <button class="btn" type="submit" style="align-self:flex-start">Save profile</button>
+        </form>
+      </div>
+
+      <!-- Security Panel -->
+      <div data-panel="security" th:style="${activeTab == 'security'} ? 'display:block;padding-top:28px;max-width:900px' : 'display:none;padding-top:28px;max-width:900px'">
+        <form id="profile-password-form" method="post" th:action="@{/admin/profile/password}" th:object="${changePasswordRequest}">
+          <h2 style="font-size:20px;font-weight:700">Change password</h2>
+          <p class="dim" style="margin:4px 0 18px;font-size:14px">At least 6 characters. You stay signed in on this device.</p>
+
+          <div th:if="${passwordSuccess}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${passwordSuccess}">Password updated successfully.</span>
+          </div>
+          <div th:if="${#fields.hasGlobalErrors()}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error changing password.</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+            <label class="field" th:classappend="${#fields.hasErrors('currentPassword')} ? 'has-error' : ''">
+              <span>Current password<span class="req"> *</span></span>
+              <input class="input" type="password" th:field="*{currentPassword}" placeholder="Current password">
+              <span class="err show" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}">Current password is required.</span>
+            </label>
+
+            <label class="field" th:classappend="${#fields.hasErrors('newPassword')} ? 'has-error' : ''">
+              <span>New password<span class="req"> *</span></span>
+              <input class="input" type="password" id="pw-next" th:field="*{newPassword}" placeholder="New password">
+              <span class="err show" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}">New password is required.</span>
+            </label>
+
+            <label class="field" th:classappend="${#fields.hasErrors('confirmPassword')} ? 'has-error' : ''">
+              <span>Confirm new password<span class="req"> *</span></span>
+              <input class="input" type="password" th:field="*{confirmPassword}" placeholder="Confirm new password">
+              <span class="err show" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}">Passwords do not match.</span>
+            </label>
+          </div>
+          <button class="btn" type="submit" style="margin-top:18px">Update password</button>
+        </form>
+
+        <div style="margin-top:40px">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:18px">Signed-in devices</h2>
+          <div class="table-wrap">
+            <table class="dt" style="min-width:0">
+              <thead><tr style="background:var(--surf)"><th><span class="kicker">Device</span></th><th><span class="kicker">Location</span></th><th><span class="kicker">Last active</span></th><th style="text-align:right"><span class="kicker">Session</span></th></tr></thead>
+              <tbody>
+                <tr><td class="strong">MacBook Pro · Chrome</td><td class="dim">Hanoi, VN</td><td class="dim">Now</td><td class="right"><span class="kicker" style="color:var(--accent)">This device</span></td></tr>
+                <tr><td class="strong">iPhone 15 · Safari</td><td class="dim">Hanoi, VN</td><td class="dim">3 hours ago</td><td class="right"><button class="btn btn-ghost btn-xs btn-danger" data-toast="Session revoked">Revoke</button></td></tr>
+                <tr><td class="strong">Windows PC · Edge</td><td class="dim">Ho Chi Minh City, VN</td><td class="dim">Sep 04, 2026</td><td class="right"><button class="btn btn-ghost btn-xs btn-danger" data-toast="Session revoked">Revoke</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/user/profile.js}"></script>
+</th:block>
+
+</body>
+</html>

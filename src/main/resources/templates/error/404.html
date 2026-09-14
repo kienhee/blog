@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title>404 — Page Not Found</title>
+</head>
+<body>
+<main layout:fragment="content">
+
+    <section class="rule" style="min-height: 55vh; display: flex; align-items: center;">
+        <div class="wrap" style="text-align: center; max-width: 640px; margin: 0 auto; padding: 60px 0;">
+            <div style="font-size: 80px; font-weight: 800; letter-spacing: -0.04em; color: var(--accent); line-height: 1;">404</div>
+            <h1 style="font-size: 32px; margin: 16px 0 12px; letter-spacing: -0.02em;">Page not found</h1>
+            <p class="dim" style="font-size: 16px; line-height: 1.6; margin-bottom: 28px;">
+                The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <a class="btn" th:href="@{/}">Back to home</a>
+                <a class="btn btn-ghost" th:href="@{/news}">Latest news</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+</body>
+</html>
+

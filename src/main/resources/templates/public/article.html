@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title th:text="${post.seoTitle != null and !post.seoTitle.isBlank()} ? ${post.seoTitle} : ${post.title}">Article</title>
+</head>
+<body>
+<main layout:fragment="content">
+  <div class="wrap article-head">
+    <a class="kicker" th:href="@{/news}">← Back to news</a>
+    <p class="kicker" style="margin-top:24px">
+      <a th:if="${post.category.visible}" style="color:var(--accent)" th:href="@{/category/{slug}(slug=${post.category.slug})}" th:text="${post.category.name}">Category</a>
+      <span th:unless="${post.category.visible}" style="color:var(--accent)" th:text="${post.category.name}">Category</span>
+      <span th:text="| / ${@publicView.date(post.publishedAt)} / ${@publicView.readMinutes(post)} min read|"> / Sep 11, 2026 / 9 min read</span>
+    </p>
+    <h1 th:text="${post.title}">Title</h1>
+    <p class="dim" style="margin:24px 0 40px;font-size:21px;line-height:1.5;max-width:66ch" th:text="${@publicView.dek(post)}">Summary</p>
+  </div>
+  <div class="article-hero" th:if="${@publicView.hasCover(post)}"><img th:src="${post.coverImage}" th:alt="${post.title}" style="width:100%;height:100%;object-fit:cover"></div>
+  <div class="wrap">
+    <div class="article-grid">
+      <div class="share-rail"><div class="sticky">
+        <span class="lbl">Share</span>
+        <button class="share-btn" data-share="link" title="Copy link" aria-label="Copy link"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg></button>
+        <button class="share-btn" data-share="x" title="Share on X" aria-label="Share on X"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16"/><path d="M20 4L4 20"/></svg></button>
+        <button class="share-btn" data-share="in" title="Share on LinkedIn" aria-label="Share on LinkedIn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9v11"/><path d="M6 5v.01"/><path d="M11 20V9"/><path d="M11 13a4 4 0 0 1 8 0v7"/></svg></button>
+        <button class="share-btn" data-share="mail" title="Email this" aria-label="Email this"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></button>
+        <span class="share-note"></span>
+      </div></div>
+
+      <!-- Content is admin-authored HTML, cleaned by PublicViewHelper.safeHtml (Jsoup safelist). -->
+      <article class="prose" data-article th:with="body=${@publicView.safeHtml(post.content)}" th:utext="${body}"></article>
+
+      <aside class="aside"><div class="sticky">
+        <!-- Filled from the article's h2 headings by main.js; stays hidden when there are none. -->
+        <div class="toc" data-toc hidden>
+          <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">On this page</p>
+        </div>
+        <div th:if="${!post.hashtags.isEmpty()}">
+          <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Tags</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:14px">
+            <span class="badge" th:each="h : ${post.hashtags}" th:if="${h.active}" th:text="|#${h.name}|">#tag</span>
+          </div>
+        </div>
+        <div>
+          <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Written by</p>
+          <a th:href="@{/author/{id}(id=${post.author.id})}" style="display:flex;gap:14px;align-items:center;padding-top:14px">
+            <img class="ph" th:src="${post.author.avatarUrl != null and !post.author.avatarUrl.isBlank()} ? ${post.author.avatarUrl} : @{/images/placeholder.svg}" th:alt="${post.author.fullName}" style="width:52px;height:52px;min-height:0;object-fit:cover">
+            <span><span style="display:block;font-size:15px;font-weight:700" th:text="${post.author.fullName}">Author</span><span class="dim" style="font-size:13px" th:text="${post.author.bio != null and !post.author.bio.isBlank()} ? ${#strings.abbreviate(post.author.bio, 60)} : 'Author'">Bio</span></span>
+          </a>
+        </div>
+      </div></aside>
+    </div>
+
+    <nav class="pager" th:if="${previous != null or next != null}">
+      <a th:if="${previous != null}" th:href="@{/article/{slug}(slug=${previous.slug})}"><span class="kicker">← Previous</span><span class="t" th:text="${previous.title}">Older</span><span class="c" th:text="${previous.category.name}">Category</span></a>
+      <span th:if="${previous == null}"></span>
+      <a th:if="${next != null}" th:href="@{/article/{slug}(slug=${next.slug})}"><span class="kicker">Next →</span><span class="t" th:text="${next.title}">Newer</span><span class="c" th:text="${next.category.name}">Category</span></a>
+    </nav>
+
+    <section class="comments" id="comments">
+      <div>
+        <div class="section-head"><h2>Comments</h2><span class="dim" style="font-size:13px" th:text="|${commentCount} ${commentCount == 1 ? 'comment' : 'comments'}|">0 comments</span></div>
+
+        <div th:if="${commentSuccess}" class="cmt-flash ok" role="status" th:text="${commentSuccess}">Thanks!</div>
+        <div th:if="${commentError}" class="cmt-flash err" role="alert" th:text="${commentError}">Error</div>
+
+        <form class="cmt" style="padding:28px 0;border-bottom:1px solid var(--line)" method="post"
+              th:action="@{/article/{slug}/comments(slug=${post.slug})}" th:object="${commentForm}" data-comment-form>
+          <div class="av"></div>
+          <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+            <div style="display:flex;align-items:center;gap:14px">
+              <span class="kicker" data-reply-label>Join the discussion</span>
+              <button type="button" class="cmt-cancel" data-reply-cancel hidden>Cancel reply</button>
+            </div>
+            <input type="hidden" th:field="*{parentId}" data-reply-parent>
+            <!-- Honeypot: invisible to people; bots that fill it are dropped. -->
+            <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+            <th:block th:if="${currentUser == null}">
+              <div class="cmt-fields">
+                <input class="input" type="text" th:field="*{authorName}" placeholder="Name" maxlength="100" required autocomplete="name">
+                <input class="input" type="email" th:field="*{authorEmail}" placeholder="Email (never shown)" maxlength="150" required autocomplete="email">
+              </div>
+            </th:block>
+            <p th:if="${currentUser != null}" class="dim" style="font-size:13px">Commenting as <strong th:text="${currentUser.fullName}">You</strong></p>
+            <textarea class="textarea" th:field="*{content}" data-reply-target maxlength="2000" required placeholder="Add your comment"></textarea>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <button class="btn" type="submit">Post comment</button>
+              <span class="dim" style="font-size:12px" th:if="${currentUser == null and moderation}">Comments are reviewed before they appear.</span>
+            </div>
+          </div>
+        </form>
+
+        <p th:if="${comments.isEmpty()}" class="dim" style="padding:28px 0">No comments yet. Start the discussion.</p>
+
+        <div class="cmt-item" th:each="t : ${comments}" th:id="|comment-${t.comment.id}|">
+          <div class="cmt">
+            <div class="av"></div>
+            <div>
+              <div class="cmt-head">
+                <span class="name" th:text="${t.comment.authorName}">Name</span>
+                <span class="tag" th:if="${t.comment.user != null and t.comment.user.id == post.author.id}">Author</span>
+                <span class="time" th:title="${@publicView.date(t.comment.createdAt)}" th:text="${@publicView.ago(t.comment.createdAt)}">2 days ago</span>
+              </div>
+              <p class="cmt-body" th:text="${t.comment.content}">Comment</p>
+              <div class="cmt-acts"><button type="button" th:data-reply-to="${t.comment.id}" th:data-reply-name="${t.comment.authorName}">Reply</button></div>
+            </div>
+          </div>
+          <div class="cmt-reply" th:each="r : ${t.replies}" th:id="|comment-${r.id}|">
+            <div class="av"></div>
+            <div>
+              <div class="cmt-head">
+                <span class="name" th:text="${r.authorName}">Name</span>
+                <span class="tag" th:if="${r.user != null and r.user.id == post.author.id}">Author</span>
+                <span class="time" th:title="${@publicView.date(r.createdAt)}" th:text="${@publicView.ago(r.createdAt)}">1 day ago</span>
+              </div>
+              <p class="cmt-body" th:text="${r.content}">Reply</p>
+              <div class="cmt-acts"><button type="button" th:data-reply-to="${t.comment.id}" th:data-reply-name="${r.authorName}">Reply</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div></div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

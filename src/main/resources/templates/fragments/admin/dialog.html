@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="dialog" class="dialog">
+    <div class="box">
+        <div class="h">
+            <div class="t">Delete this record?</div>
+            <!-- Default only: each caller passes a description of what this particular delete does (khDialog's 3rd argument). -->
+            <p class="dim" style="font-size:14px;line-height:1.55" data-dialog-desc>This cannot be undone.</p>
+        </div>
+        <div class="a">
+            <button class="btn btn-delete" data-dialog-confirm>Delete</button>
+            <button class="btn btn-ghost" data-dialog-close>Keep it</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

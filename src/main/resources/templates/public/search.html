@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title>Search</title>
+</head>
+<body>
+<main layout:fragment="content">
+  <section class="wrap" style="padding-top:56px">
+    <h1 style="font-size:64px;line-height:1">Search</h1>
+    <form method="get" th:action="@{/search}" role="search" style="display:flex;gap:12px;margin:28px 0 0;max-width:680px">
+      <input class="input" type="search" name="q" th:value="${q}" placeholder="Search guides and news" maxlength="100" autofocus>
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <th:block th:if="${!q.isEmpty()}">
+      <p class="kicker" style="padding:28px 0 12px" th:if="${q.length() < 2}">Type at least 2 characters.</p>
+      <p class="kicker" style="padding:28px 0 12px" th:if="${q.length() >= 2}"
+         th:text="|${posts.totalElements} ${posts.totalElements == 1 ? 'result' : 'results'} for “${q}”|">3 results for “prompt”</p>
+      <th:block th:each="p : ${posts}"><a th:replace="~{fragments/public/pagination :: thumbRow(${p})}"></a></th:block>
+      <nav th:replace="~{fragments/public/pagination :: pager(${posts}, '/search', ${q})}"></nav>
+    </th:block>
+  </section>
+</main>
+</body>
+</html>

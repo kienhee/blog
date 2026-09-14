@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="site-foot">
+    <div class="cols">
+        <div class="col">
+            <span style="font-size:26px;font-weight:800;letter-spacing:-.02em" th:text="${siteTitle} ?: 'Kienhee'">Kienhee</span>
+            <span class="dim" style="max-width:30ch" th:text="${siteDescription} ?: ''">AI guides and news, written and tested by one person.</span>
+            <span class="dim" style="font-size:13px;margin-top:12px">© <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> <span th:text="${site != null and site['site.domain'] != null} ? ${site['site.domain']} : 'kienhee.com'">kienhee.com</span></span>
+        </div>
+        <div class="col">
+            <span class="kicker">Site</span>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/news}">News</a>
+            <a th:href="@{/categories}">Categories</a>
+        </div>
+        <div class="col">
+            <span class="kicker">More</span>
+            <a th:href="${mainAuthorId != null} ? @{/author/{id}(id=${mainAuthorId})} : @{/author}">Author</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/subscribe}">Subscribe</a>
+        </div>
+        <div class="col">
+            <span class="kicker">Elsewhere</span>
+            <a href="#">X / Twitter</a>
+            <a href="#">YouTube</a>
+            <a href="#">RSS</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

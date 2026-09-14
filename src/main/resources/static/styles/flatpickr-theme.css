@@ -1,0 +1,64 @@
+/* Kienhee theme for flatpickr (the date picker used by the MediaExplorer date filters).
+   Replaces flatpickr's own dark theme so the calendar matches the admin: design tokens from
+   main.css (so it follows data-theme="light" too), square corners, Archivo, accent for the
+   selected day. Load it right AFTER styles/lib/flatpickr.min.css. */
+
+.flatpickr-calendar{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:0;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif;
+}
+.flatpickr-calendar.arrowTop:before{border-bottom-color:var(--line)}
+.flatpickr-calendar.arrowTop:after{border-bottom-color:var(--bg)}
+.flatpickr-calendar.arrowBottom:before{border-top-color:var(--line)}
+.flatpickr-calendar.arrowBottom:after{border-top-color:var(--bg)}
+.flatpickr-calendar.animate.open{animation:khFadeIn .18s ease}
+
+/* ---- header: month / year / prev-next ---- */
+.flatpickr-months{border-bottom:1px solid var(--line);padding:4px 0}
+.flatpickr-months .flatpickr-month{background:transparent;color:var(--ink);fill:var(--ink);height:38px}
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month{color:var(--dim);fill:var(--dim);top:4px;padding:12px}
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg{fill:var(--accent)}
+.flatpickr-current-month{font-size:13px;font-weight:700;letter-spacing:.02em;padding-top:9px}
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year{color:var(--ink);font-family:inherit;font-weight:700}
+.flatpickr-current-month .flatpickr-monthDropdown-months{background:var(--bg);border-radius:0}
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
+.flatpickr-current-month .numInputWrapper:hover{background:var(--surf2)}
+.flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month{background:var(--bg);color:var(--ink)}
+.numInputWrapper span{border-color:var(--line)}
+.numInputWrapper span:hover{background:var(--surf2)}
+.numInputWrapper span.arrowUp:after{border-bottom-color:var(--dim)}
+.numInputWrapper span.arrowDown:after{border-top-color:var(--dim)}
+
+/* ---- weekday labels: same treatment as .kicker ---- */
+.flatpickr-weekdays{background:transparent;height:30px;margin-top:6px}
+span.flatpickr-weekday{background:transparent;color:var(--dim);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+
+/* ---- days ---- */
+.flatpickr-day{color:var(--ink);border:1px solid transparent;border-radius:0;font-size:13px;font-weight:500}
+.flatpickr-day:hover,
+.flatpickr-day:focus{background:var(--surf2);border-color:var(--line);color:var(--ink)}
+.flatpickr-day.today{border-color:var(--accent)}
+.flatpickr-day.today:hover,
+.flatpickr-day.today:focus{background:var(--surf2);border-color:var(--accent);color:var(--ink)}
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected:focus,
+.flatpickr-day.selected.today{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:700}
+.flatpickr-day.inRange{background:var(--surf2);border-color:var(--surf2);box-shadow:-5px 0 0 var(--surf2),5px 0 0 var(--surf2)}
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay{color:var(--dim);opacity:.55}
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover{background:transparent;border-color:transparent;color:var(--dim);opacity:.3;cursor:not-allowed}
+
+@media (prefers-reduced-motion: reduce){
+  .flatpickr-calendar.animate.open{animation:none}
+}

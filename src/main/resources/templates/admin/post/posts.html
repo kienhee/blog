@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Posts</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Posts</strong>
+</div>
+
+<div layout:fragment="content">
+      <div class="dt-root">
+        <div class="page-head">
+          <div>
+            <h1>Posts</h1>
+            <p class="dim" style="margin-top:6px" th:text="${posts != null ? posts.size() + ' articles' : '0 articles'}">0 articles</p>
+          </div>
+          <a class="btn" th:href="@{/admin/post/new}">New post</a>
+        </div>
+
+        <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <div class="bulk">
+          <span class="n">0 selected</span>
+          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
+          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
+          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
+                <th style="width:72px">Cover</th>
+                <th style="width:28%">Title</th>
+                <th style="width:14%">Slug</th>
+                <th style="width:130px">Category</th>
+                <th style="width:110px">Status</th>
+                <th style="width:130px">Updated</th>
+                <th style="width:96px;text-align:right"><span class="kicker">Actions</span></th>
+              </tr>
+              <tr class="filters">
+                <th></th>
+                <th></th>
+                <th><input class="input" data-col="2" placeholder="Filter…"></th>
+                <th><input class="input" data-col="3" placeholder="Filter…"></th>
+                <th>
+                  <select class="select" data-col="4">
+                    <option value="">All</option>
+                    <option th:each="c : ${categories}" th:value="${c.name}" th:text="${c.name}"></option>
+                  </select>
+                </th>
+                <th>
+                  <select class="select" data-col="5">
+                    <option value="">All</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Published">Published</option>
+                    <option value="Archived">Archived</option>
+                  </select>
+                </th>
+                <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row" th:each="p : ${posts}">
+                <td><input class="checkbox rowcheck" type="checkbox" th:value="${p.id}"></td>
+                <td>
+                  <span class="thumb" th:if="${p.coverImage == null or p.coverImage.isEmpty()}"></span>
+                  <a th:if="${p.coverImage != null and !p.coverImage.isEmpty()}" th:href="${p.coverImage}"
+                     data-lightbox="posts" th:data-title="${p.title}" style="display:inline-block;cursor:zoom-in">
+                    <img th:src="${p.coverImage}" th:alt="${p.title}" style="width:48px;height:48px;object-fit:cover;display:block">
+                  </a>
+                </td>
+                <td class="strong" th:text="${p.title}">Post title</td>
+                <td class="dim" th:text="${p.slug}">post-slug</td>
+                <td class="dim" th:text="${p.category != null ? p.category.name : '—'}">—</td>
+                <td>
+                  <span class="badge"
+                        th:style="${p.status.name() == 'PUBLISHED' ? 'color:#5ee38a' : (p.status.name() == 'DRAFT' ? 'color:#a0a0a0' : (p.status.name() == 'SCHEDULED' ? 'color:#ffc94d' : 'color:#7d7979'))}"
+                        th:text="${#strings.capitalize(#strings.toLowerCase(p.status.name()))}">Published</span>
+                </td>
+                <td class="dim" th:text="${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
+                <td class="right">
+                  <span style="display:inline-flex;gap:6px">
+                    <a class="btn btn-ghost btn-xs" th:href="@{'/admin/post/' + ${p.id} + '/edit'}">Edit</a>
+                    <button type="button" class="btn btn-ghost btn-xs btn-danger btn-del-post"
+                            th:data-id="${p.id}"
+                            th:data-name="${p.title}">Del</button>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Hidden form for deleting post -->
+      <form id="delete-post-form" method="post" th:action="@{/admin/post/0/delete}" style="display:none"></form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/post/post-list.js}"></script>
+</th:block>
+
+</body>
+</html>

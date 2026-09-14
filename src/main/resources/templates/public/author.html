@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title th:text="${author.fullName}">Author</title>
+</head>
+<body>
+<main layout:fragment="content">
+  <section class="wrap" style="padding-top:56px">
+    <div class="author-grid" style="display:grid;grid-template-columns:340px minmax(0,1fr);gap:56px;padding-bottom:48px;border-bottom:2px solid var(--rule)">
+      <img class="ph" th:src="${author.avatarUrl != null and !author.avatarUrl.isBlank()} ? ${author.avatarUrl} : @{/images/placeholder.svg}" th:alt="${author.fullName}" style="height:400px;object-fit:cover">
+      <div style="display:flex;flex-direction:column;gap:20px;justify-content:center">
+        <span class="kicker" style="color:var(--accent)">Author</span>
+        <h1 style="font-size:64px;line-height:1" th:text="${author.fullName}">Author</h1>
+        <p th:if="${author.bio != null and !author.bio.isBlank()}" style="font-size:19px;line-height:1.6;color:var(--body);max-width:58ch" th:text="${author.bio}">Bio</p>
+        <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));border-left:none;border-top:1px solid var(--line)">
+          <div class="stat" style="border-bottom:none"><div class="kicker">Articles</div><div class="v" th:text="${stats.articles}">12</div></div>
+          <div class="stat" style="border-bottom:none;border-right:none"><div class="kicker">Categories</div><div class="v" th:text="${stats.categories}">4</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-head" style="margin-top:48px;border-bottom:1px solid var(--line)"><h2>Posts</h2></div>
+    <a class="post-row" th:each="p, st : ${posts}" th:href="@{/article/{slug}(slug=${p.slug})}">
+      <span class="num" th:text="${#numbers.formatInteger(posts.number * posts.size + st.count, 2)}">01</span>
+      <span class="cat" th:text="${p.category.name}">Category</span>
+      <span><span class="ttl" th:text="${p.title}">Title</span><span class="dek" th:text="${@publicView.dek(p)}">Summary</span></span>
+      <span class="meta"><span th:text="${@publicView.date(p.publishedAt)}">Sep 11, 2026</span><br><span th:text="|${@publicView.readMinutes(p)} min read|">9 min read</span></span>
+    </a>
+    <nav th:replace="~{fragments/public/pagination :: pager(${posts}, |/author/${author.id}|, null)}"></nav>
+  </section>
+</main>
+</body>
+</html>

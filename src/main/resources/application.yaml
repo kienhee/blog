@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: blog
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password:
+
+  # ===== Flyway =====
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  # ===== JPA / Hibernate =====
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  # ===== Thymeleaf =====
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false   # false khi dev, true khi prod
+
+  # ===== DevTools =====
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  # ===== File upload =====
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 40MB
+
+# ===== Media library =====
+app:
+  upload:
+    dir: ./uploads
+  media:
+    trash:
+      # Files/folders are soft-deleted into a trash. They still occupy the owner's quota
+      # until they are purged - only a purge frees disk and quota.
+      retention-days: 30
+      # Off by default on purpose: starting the app must never destroy trashed files by
+      # itself. Turn on per environment.
+      auto-purge-enabled: false
+      purge-cron: "0 30 3 * * *"
+
+tinify:
+  api-key: ${TINIFY_API_KEY:}

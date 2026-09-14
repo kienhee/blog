@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Users</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Users</strong>
+</div>
+
+<div layout:fragment="content">
+      <div class="dt-root">
+        <div class="page-head">
+          <div>
+            <h1>Users</h1>
+            <p class="dim" style="margin-top:6px" th:text="${users != null ? users.size() + ' accounts' : '0 accounts'}">0 accounts</p>
+          </div>
+          <button th:if="${perms.contains('users:create')}" type="button" class="btn" id="btn-create-user" data-oc-open>New user</button>
+        </div>
+
+        <!-- Notification alerts -->
+        <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <div class="bulk">
+          <span class="n">0 selected</span>
+          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
+          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
+          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
+                <th style="width:22%">Name</th>
+                <th style="width:22%">Email</th>
+                <th style="width:120px">Role</th>
+                <th style="width:130px">Phone</th>
+                <th style="width:18%">Address</th>
+                <th style="width:140px">Created</th>
+                <th style="width:110px;text-align:right"><span class="kicker">Actions</span></th>
+              </tr>
+              <tr class="filters">
+                <th></th>
+                <th><input class="input" data-col="1" placeholder="Filter…"></th>
+                <th><input class="input" data-col="2" placeholder="Filter…"></th>
+                <th>
+                  <select class="select" data-col="3">
+                    <option value="">All</option>
+                    <option th:each="r : ${roles}" th:value="${r.name}" th:text="${r.name}"></option>
+                  </select>
+                </th>
+                <th><input class="input" data-col="4" placeholder="Filter…"></th>
+                <th><input class="input" data-col="5" placeholder="Filter…"></th>
+                <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row" th:each="u : ${users}">
+                <td><input class="checkbox rowcheck" type="checkbox" th:value="${u.id}"></td>
+                <td class="strong" th:text="${u.fullName}">User Name</td>
+                <td class="dim" th:text="${u.email}">user@email.com</td>
+                <td>
+                  <span class="badge" th:if="${u.role != null}" th:text="${u.role.name}"
+                        th:style="${u.role.systemRole} ? 'color:#5ee38a' : 'color:#a0a0a0'">Owner</span>
+                  <span class="dim" th:if="${u.role == null}">— none —</span>
+                </td>
+                <td th:text="${u.phone != null and !u.phone.isEmpty() ? u.phone : '—'}">—</td>
+                <td class="dim" th:text="${u.address != null and !u.address.isEmpty() ? u.address : '—'}">—</td>
+                <td class="dim" th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
+                <td class="right">
+                  <span style="display:inline-flex;gap:6px">
+                    <button th:if="${perms.contains('users:edit')}" type="button" class="btn btn-ghost btn-xs btn-edit-user"
+                            th:data-id="${u.id}"
+                            th:data-name="${u.fullName}"
+                            th:data-email="${u.email}"
+                            th:data-phone="${u.phone}"
+                            th:data-address="${u.address}"
+                            th:data-role="${u.role != null ? u.role.id : ''}"
+                            th:data-bio="${u.bio}">Edit</button>
+                    <button th:if="${perms.contains('users:delete')}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-user"
+                            th:data-id="${u.id}"
+                            th:data-name="${u.fullName}">Del</button>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Offcanvas Drawer for Create / Edit User -->
+      <div class="offcanvas" th:classappend="${openOffcanvas != null ? 'open' : ''}">
+        <div class="panel" id="oc-user-panel">
+          <div class="oc-head">
+            <div>
+              <div class="kicker" id="oc-kicker" th:text="${openOffcanvas == 'edit' ? 'Update' : 'Create'}">Create</div>
+              <div class="t" id="oc-title" th:text="${openOffcanvas == 'edit' ? 'Edit User' : 'New User'}">New User</div>
+            </div>
+            <button type="button" class="icon-btn" data-oc-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+
+          <form id="user-form" method="post" th:action="@{/admin/users}" th:object="${userCreateRequest}">
+            <input type="hidden" id="user-form-mode" value="create">
+            <input type="hidden" id="user-id" name="id">
+
+            <div class="oc-body">
+              <div th:if="${#fields.hasGlobalErrors()}" style="margin-bottom:14px;padding:10px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+                <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+              </div>
+
+              <label class="field" id="field-fullName" th:classappend="${#fields.hasErrors('fullName')} ? 'has-error' : ''">
+                <span>Full name<span class="req"> *</span></span>
+                <input class="input" id="user-fullName" name="fullName" th:value="*{fullName}" placeholder="Enter full name">
+                <span class="err show" id="err-fullName" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full name is required.</span>
+                <span class="err" id="err-fullName" th:unless="${#fields.hasErrors('fullName')}">Full name is required.</span>
+              </label>
+
+              <label class="field" id="field-email" th:classappend="${#fields.hasErrors('email')} ? 'has-error' : ''">
+                <span>Email<span class="req"> *</span></span>
+                <input class="input" type="email" id="user-email" name="email" th:value="*{email}" placeholder="Enter email address">
+                <span class="err show" id="err-email" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email is required.</span>
+                <span class="err" id="err-email" th:unless="${#fields.hasErrors('email')}">Email is required.</span>
+              </label>
+
+              <label class="field" id="field-password" th:classappend="${#fields.hasErrors('password')} ? 'has-error' : ''">
+                <span>Password<span class="req" id="user-pw-req"> *</span></span>
+                <input class="input" type="password" id="user-password" name="password" placeholder="Enter password">
+                <span class="dim" style="font-size:12px" id="user-pw-hint">At least 6 characters.</span>
+                <span class="err show" id="err-password" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password is required.</span>
+                <span class="err" id="err-password" th:unless="${#fields.hasErrors('password')}">Password is required.</span>
+              </label>
+
+              <label class="field" id="field-roleId" th:classappend="${#fields.hasErrors('roleId')} ? 'has-error' : ''">
+                <span>Role</span>
+                <select class="select" id="user-roleId" name="roleId">
+                  <option value="">— No role (no access) —</option>
+                  <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"
+                          th:selected="${userCreateRequest.roleId != null and userCreateRequest.roleId == r.id}"></option>
+                </select>
+                <span class="dim" style="font-size:12px">A user without a role can sign in but can't do anything.</span>
+                <span class="err show" id="err-roleId" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}"></span>
+              </label>
+
+              <label class="field" id="field-phone" th:classappend="${#fields.hasErrors('phone')} ? 'has-error' : ''">
+                <span>Phone number</span>
+                <input class="input" id="user-phone" name="phone" th:value="*{phone}" placeholder="Enter phone number">
+                <span class="err show" id="err-phone" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                <span class="err" id="err-phone" th:unless="${#fields.hasErrors('phone')}"></span>
+              </label>
+
+              <label class="field" id="field-address" th:classappend="${#fields.hasErrors('address')} ? 'has-error' : ''">
+                <span>Address</span>
+                <input class="input" id="user-address" name="address" th:value="*{address}" placeholder="Enter address">
+                <span class="err show" id="err-address" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+                <span class="err" id="err-address" th:unless="${#fields.hasErrors('address')}"></span>
+              </label>
+
+              <label class="field" id="field-bio" th:classappend="${#fields.hasErrors('bio')} ? 'has-error' : ''">
+                <span>Bio</span>
+                <textarea class="textarea" id="user-bio" name="bio" style="min-height:90px" placeholder="Enter short bio..." th:text="*{bio}"></textarea>
+                <span class="err show" id="err-bio" th:if="${#fields.hasErrors('bio')}" th:errors="*{bio}"></span>
+                <span class="err" id="err-bio" th:unless="${#fields.hasErrors('bio')}"></span>
+              </label>
+            </div>
+
+            <div class="oc-foot">
+              <button class="btn" type="submit" id="user-submit-btn">Create user</button>
+              <button type="button" class="btn btn-ghost" data-oc-close>Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hidden form for deleting user -->
+      <form id="delete-user-form" method="post" th:action="@{/admin/users/0/delete}" style="display:none"></form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/user/user.js}"></script>
+</th:block>
+
+</body>
+</html>

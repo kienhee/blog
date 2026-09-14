@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Categories</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Categories</strong>
+</div>
+
+<div layout:fragment="content">
+      <div class="dt-root">
+        <div class="page-head">
+          <div>
+            <h1>Categories</h1>
+            <p class="dim" style="margin-top:6px" th:text="${categories != null ? categories.size() + ' categories' : '0 categories'}">0 categories</p>
+          </div>
+          <button th:if="${perms.contains('categories:create')}" type="button" class="btn" id="btn-create-category" data-oc-open>New category</button>
+        </div>
+
+        <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <div class="bulk">
+          <span class="n">0 selected</span>
+          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
+          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
+          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
+                <th style="width:18%">Name</th>
+                <th style="width:16%">Slug</th>
+                <th style="width:26%">Description</th>
+                <th style="width:14%">Parent</th>
+                <th style="width:110px">Visibility</th>
+                <th style="width:140px">Created</th>
+                <th style="width:96px;text-align:right"><span class="kicker">Actions</span></th>
+              </tr>
+              <tr class="filters">
+                <th></th>
+                <th><input class="input" data-col="1" placeholder="Filter…"></th>
+                <th><input class="input" data-col="2" placeholder="Filter…"></th>
+                <th><input class="input" data-col="3" placeholder="Filter…"></th>
+                <th><input class="input" data-col="4" placeholder="Filter…"></th>
+                <th>
+                  <select class="select" data-col="5">
+                    <option value="">All</option>
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </th>
+                <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row" th:each="c : ${categories}">
+                <td><input class="checkbox rowcheck" type="checkbox" th:value="${c.id}"></td>
+                <td class="strong" th:text="${c.name}">Category name</td>
+                <td class="dim" th:text="${c.slug}">category-slug</td>
+                <td class="dim" th:text="${c.description != null and !c.description.isEmpty() ? c.description : '—'}">—</td>
+                <td class="dim" th:text="${c.parent != null ? c.parent.name : '—'}">—</td>
+                <td>
+                  <span class="badge" th:style="${c.visible ? 'color:#5ee38a' : 'color:#a0a0a0'}" th:text="${c.visible ? 'Published' : 'Draft'}">Published</span>
+                </td>
+                <td class="dim" th:text="${c.createdAt != null ? #temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
+                <td class="right">
+                  <span style="display:inline-flex;gap:6px">
+                    <button th:if="${perms.contains('categories:edit')}" type="button" class="btn btn-ghost btn-xs btn-edit-category"
+                            th:data-id="${c.id}"
+                            th:data-name="${c.name}"
+                            th:data-slug="${c.slug}"
+                            th:data-description="${c.description}"
+                            th:data-parent-id="${c.parent != null ? c.parent.id : ''}"
+                            th:data-visible="${c.visible}">Edit</button>
+                    <button th:if="${perms.contains('categories:delete')}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-category"
+                            th:data-id="${c.id}"
+                            th:data-name="${c.name}">Del</button>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Offcanvas Drawer for Create / Edit Category -->
+      <div class="offcanvas" th:classappend="${openOffcanvas != null ? 'open' : ''}">
+        <div class="panel" id="oc-category-panel">
+          <div class="oc-head">
+            <div>
+              <div class="kicker" id="oc-kicker" th:text="${openOffcanvas == 'edit' ? 'Update' : 'Create'}">Create</div>
+              <div class="t" id="oc-title" th:text="${openOffcanvas == 'edit' ? 'Edit Category' : 'New Category'}">New Category</div>
+            </div>
+            <button type="button" class="icon-btn" data-oc-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+
+          <form id="category-form" method="post" th:action="@{/admin/categories}" th:object="${categoryCreateRequest}">
+            <input type="hidden" id="category-form-mode" value="create">
+            <input type="hidden" id="category-id" name="id">
+
+            <div class="oc-body">
+              <div th:if="${#fields.hasGlobalErrors()}" style="margin-bottom:14px;padding:10px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+                <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+              </div>
+
+              <label class="field" id="field-name" th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
+                <span>Name<span class="req"> *</span></span>
+                <input class="input" id="category-name" name="name" th:value="*{name}" data-slug-source="#category-slug" placeholder="Enter category name">
+                <span class="err show" id="err-name" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name is required.</span>
+                <span class="err" id="err-name" th:unless="${#fields.hasErrors('name')}">Name is required.</span>
+              </label>
+
+              <label class="field" id="field-slug" th:classappend="${#fields.hasErrors('slug')} ? 'has-error' : ''">
+                <span>Slug<span class="req"> *</span></span>
+                <input class="input" id="category-slug" name="slug" th:value="*{slug}" placeholder="enter-category-slug">
+                <span class="err show" id="err-slug" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}">Slug is required.</span>
+                <span class="err" id="err-slug" th:unless="${#fields.hasErrors('slug')}">Slug is required.</span>
+                <span class="dim" style="font-size:12px">Lowercase letters, numbers and hyphens only.</span>
+              </label>
+
+              <label class="field" id="field-description" th:classappend="${#fields.hasErrors('description')} ? 'has-error' : ''">
+                <span>Description</span>
+                <textarea class="textarea" id="category-description" name="description" placeholder="Enter category description..." th:text="*{description}"></textarea>
+                <span class="err show" id="err-description" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                <span class="err" id="err-description" th:unless="${#fields.hasErrors('description')}"></span>
+              </label>
+
+              <label class="field" id="field-parentId" th:classappend="${#fields.hasErrors('parentId')} ? 'has-error' : ''">
+                <span>Parent category</span>
+                <select class="select" id="category-parentId" name="parentId">
+                  <option value="">— None —</option>
+                  <option th:each="p : ${categories}" th:value="${p.id}" th:text="${p.name}" th:selected="${categoryCreateRequest.parentId != null and categoryCreateRequest.parentId == p.id}"></option>
+                </select>
+                <span class="err show" id="err-parentId" th:if="${#fields.hasErrors('parentId')}" th:errors="*{parentId}"></span>
+                <span class="err" id="err-parentId" th:unless="${#fields.hasErrors('parentId')}"></span>
+              </label>
+
+              <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
+                <input type="hidden" name="_visible" value="on">
+                <input class="checkbox" type="checkbox" id="category-visible" name="visible" th:checked="*{visible}"> Show in main navigation
+              </label>
+            </div>
+
+            <div class="oc-foot">
+              <button class="btn" type="submit" id="category-submit-btn">Create category</button>
+              <button type="button" class="btn btn-ghost" data-oc-close>Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hidden form for deleting category -->
+      <form id="delete-category-form" method="post" th:action="@{/admin/categories/0/delete}" style="display:none"></form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/category/category.js}"></script>
+</th:block>
+
+</body>
+</html>

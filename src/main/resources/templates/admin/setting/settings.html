@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Settings</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Settings</strong>
+</div>
+
+<!--
+    Adding a setting: add a field named settings[<key>] (lowercase, digits, . _ -) with
+    th:value="${settings['<key>']}". It is saved on submit — no Java or migration change needed.
+    Validation: data-rule-* / data-msg-* attributes (jQuery Validate).
+-->
+<div layout:fragment="content" th:with="canEdit=${perms.contains('settings:edit')}">
+    <form id="settings-form" method="post" th:action="@{/admin/settings}" style="max-width:760px" novalidate>
+        <h1 style="font-size:34px">Settings</h1>
+        <p class="dim" style="margin:6px 0 28px">Site-wide configuration for kienhee.com</p>
+
+        <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:22px">
+            <label class="field"><span>Site title<span class="req"> *</span></span>
+                <input class="input" name="settings[site.title]" th:value="${settings['site.title']}" th:readonly="${!canEdit}"
+                       data-rule-required="true" data-msg-required="✕ Site title is required." maxlength="120"></label>
+            <label class="field"><span>Domain<span class="req"> *</span></span>
+                <input class="input" name="settings[site.domain]" th:value="${settings['site.domain']}" th:readonly="${!canEdit}"
+                       data-rule-required="true" data-msg-required="✕ Domain is required." maxlength="255"></label>
+            <label class="field"><span>Meta description</span>
+                <textarea class="textarea" name="settings[site.meta_description]" th:text="${settings['site.meta_description']}" th:readonly="${!canEdit}" maxlength="500"></textarea></label>
+            <label class="field" style="max-width:220px"><span>Posts per page</span>
+                <input class="input" type="number" min="1" max="100" name="settings[blog.posts_per_page]" th:value="${settings['blog.posts_per_page']}" th:readonly="${!canEdit}"
+                       data-rule-digits="true" data-rule-min="1" data-rule-max="100" data-msg="✕ Enter a whole number from 1 to 100."></label>
+            <!-- Checkbox pattern: the hidden "false" is posted first, the checked box's "true" wins (last value). -->
+            <div class="field">
+                <span>Comments</span>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                    <input type="hidden" name="settings[comments.moderation]" value="false">
+                    <input class="checkbox" type="checkbox" name="settings[comments.moderation]" value="true"
+                           th:checked="${settings['comments.moderation'] != 'false'}" th:disabled="${!canEdit}">
+                    <span class="dim">Hold guest comments for approval before they appear</span>
+                </label>
+            </div>
+            <button th:if="${canEdit}" type="submit" class="btn" style="align-self:flex-start">Save settings</button>
+        </div>
+    </form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/setting/settings.js}"></script>
+</th:block>
+
+</body>
+</html>

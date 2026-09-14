@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body>
+
+<div th:fragment="topbar" class="topbar">
+    <button class="side-toggle" data-side-toggle aria-label="Menu" aria-expanded="false">☰</button>
+    <div class="crumb" layout:fragment="breadcrumb">
+        <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong th:text="${pageTitle} ?: 'Dashboard'">Dashboard</strong>
+    </div>
+    <div class="head-actions">
+        <input class="input" style="width:260px;height:36px;font-size:13px" placeholder="Search everything…">
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">☀</button>
+        <a class="btn btn-sm" th:href="@{/admin/post/new}">New post</a>
+    </div>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,590 @@
+/* Kienhee admin — sidebar layout, datatable, offcanvas */
+.admin{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;border-right:2px solid var(--rule);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side .top{height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:2px solid var(--rule)}
+.side .top .b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.side nav{flex:1;padding:16px 0;display:flex;flex-direction:column}
+.side nav a{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;height:44px;padding:0 20px;font-size:14px;font-weight:600}
+.side nav a:hover{background:var(--surf)}
+.side nav a .l{display:flex;align-items:center;gap:12px}
+.side nav a .ico{width:18px;display:flex;color:var(--dim)}
+.side nav a .c{font-size:11px;color:var(--dim)}
+.side nav a[aria-current="page"]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.side .foot{border-top:1px solid var(--line);padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.side .foot .av{width:34px;height:34px;background:var(--surf);border:1px solid var(--line)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:64px;flex:0 0 64px;border-bottom:2px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 28px;position:sticky;top:0;background:var(--bg);z-index:40}
+.crumb{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.content{flex:1;padding:28px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:20px}
+.page-head h1{font-size:34px}
+
+.bulk{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border:2px solid var(--accent);margin-bottom:-2px}
+.bulk.show{display:flex}
+.bulk .n{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-right:8px}
+.table-wrap{border:1px solid var(--line);overflow-x:auto}
+table.dt{width:100%;min-width:640px;border-collapse:collapse}
+table.dt thead tr:first-child{border-bottom:2px solid var(--rule)}
+table.dt th{padding:12px 14px;text-align:left}
+table.dt th button{display:flex;align-items:center;gap:6px;background:transparent;border:none;padding:0;color:var(--ink);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+table.dt th button:hover{color:var(--accent)}
+table.dt th button .ar{color:var(--accent)}
+table.dt tr.filters{background:var(--surf);border-bottom:1px solid var(--line)}
+table.dt tr.filters th{padding:8px 14px}
+table.dt tr.filters .input,table.dt tr.filters .select{height:32px;padding:0 8px;font-size:12px;background:var(--bg)}
+table.dt td{padding:14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+table.dt tbody tr:hover{background:var(--surf)}
+table.dt td.strong{font-size:14px;font-weight:700}
+table.dt td.dim{color:var(--dim)}
+table.dt td.right{text-align:right}
+table.dt td .thumb{width:64px;height:40px;background:var(--surf);border:1px solid var(--line)}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border:1px solid currentColor;white-space:nowrap}
+.pagination{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0}
+.pagination .pages{display:flex;gap:6px}
+.pagination .pages button{width:34px;height:34px;background:transparent;border:1px solid var(--line);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer}
+.pagination .pages button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
+.empty{display:none;padding:72px 24px;text-align:center}
+.empty.show{display:table-cell}
+.empty .box{display:inline-flex;flex-direction:column;gap:14px;align-items:center}
+.empty .mark{width:52px;height:52px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:22px}
+.skeleton td{padding:18px 14px}
+.skeleton span{display:block;height:14px;background:var(--surf2);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.7}}
+
+.offcanvas{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);display:none;justify-content:flex-end}
+.offcanvas.open{display:flex}
+.offcanvas .panel{width:min(520px,94vw);height:100%;background:var(--bg);border-left:2px solid var(--rule);display:flex;flex-direction:column}
+.offcanvas{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);display:flex;justify-content:flex-end;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility .3s ease}
+.offcanvas.open{opacity:1;visibility:visible;pointer-events:auto}
+.offcanvas .panel{width:min(520px,94vw);height:100%;background:var(--bg);border-left:2px solid var(--rule);display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.35);transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);will-change:transform}
+.offcanvas.open .panel{transform:translateX(0)}
+.offcanvas .oc-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:2px solid var(--rule)}
+.offcanvas .oc-head .t{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+.offcanvas .oc-body{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.offcanvas .oc-foot{display:flex;gap:10px;padding:20px 24px;border-top:2px solid var(--rule)}
+.dialog{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:32px}
+.dialog.open{display:flex}
+.dialog .box{width:min(440px,100%);background:var(--bg);border:2px solid var(--rule)}
+.dialog .box .h{padding:24px;border-bottom:1px solid var(--line)}
+.dialog .box .h .t{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.dialog .box .a{display:flex;gap:10px;padding:20px 24px}
+/* New-folder modal (media library). Same look as .dialog, separate class so khDialog's .dialog bindings never touch it. */
+.folder-modal{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:32px}
+.folder-modal.open{display:flex}
+.folder-modal .box{width:min(440px,100%);background:var(--bg);border:2px solid var(--rule)}
+.folder-modal .box .h{padding:24px;border-bottom:1px solid var(--line)}
+.folder-modal .box .h .t{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.folder-modal .box .a{display:flex;gap:10px;padding:20px 24px}
+.btn-delete{background:var(--err);color:#0a0a0a}
+.toast{position:fixed;right:24px;bottom:24px;z-index:95;display:none;align-items:center;gap:12px;padding:14px 18px;background:var(--accent);color:#0a0a0a;border:2px solid #0a0a0a;font-size:14px;font-weight:600}
+.toast.show{display:flex}
+
+.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;padding-top:24px}
+.meta-col{border-left:1px solid var(--line);padding-left:28px}
+.meta-block{padding:20px 0;border-bottom:1px solid var(--line)}
+.meta-block:first-child{padding-top:0}
+.rte{border:1px solid var(--line);background:var(--surf)}
+.rte .bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-bottom:1px solid var(--line)}
+.rte .bar button{min-width:34px;height:34px;padding:0 9px;background:transparent;border:1px solid transparent;color:var(--ink);font-size:13px;cursor:pointer}
+.rte .bar button:hover{border-color:var(--accent);color:var(--accent)}
+.rte .area{min-height:300px;padding:18px;font-size:16px;line-height:1.7;color:var(--body);outline:none}
+.rte .foot{display:flex;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--line);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.pick-list{border:1px solid var(--line);background:var(--surf);max-height:172px;overflow-y:auto}
+.pick-list label{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.pick-list label:hover{background:var(--surf2)}
+.tag-toggle{height:30px;padding:0 10px;background:transparent;border:1px solid var(--line);color:var(--dim);font-size:12px;cursor:pointer}
+.tag-toggle[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+
+.roles-grid{display:grid;grid-template-columns:300px minmax(0,1fr);border:1px solid var(--line)}
+.roles-list button{position:relative;display:flex;flex-direction:column;gap:4px;align-items:flex-start;width:100%;padding:16px 20px;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}
+.roles-list button:hover{background:var(--surf2)}
+.roles-list button[aria-pressed="true"]{background:var(--surf)}
+.roles-list button[aria-pressed="true"]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.tabs{display:flex;border-bottom:2px solid var(--rule)}
+.tabs button{position:relative;background:transparent;border:none;padding:12px 18px;color:var(--ink);font-size:14px;font-weight:600;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{color:var(--accent)}
+.tabs button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:4px;background:var(--accent)}
+.auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
+.auth-card{width:min(460px,100%);border:2px solid var(--rule)}
+.auth-card .h{padding:28px 32px;border-bottom:2px solid var(--rule);display:flex;align-items:baseline;justify-content:space-between}
+.auth-card .b{padding:32px;display:flex;flex-direction:column;gap:18px}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding-top:24px}
+.media-grid .tile{border:1px solid var(--line)}
+.media-grid .tile .ph{height:150px;min-height:0}
+.media-grid .tile .f{padding:10px 12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.side-toggle{display:none;align-items:center;justify-content:center;width:40px;height:40px;background:transparent;border:1px solid var(--line);color:var(--ink);font-size:18px;cursor:pointer}
+.side-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+.media-picker{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:32px}
+.media-picker.open{display:flex}
+.media-picker .box{width:min(880px,100%);max-height:86vh;overflow-y:auto;background:var(--bg);border:2px solid var(--rule)}
+.media-picker .h{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:2px solid var(--rule)}
+.media-picker .h .t{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.media-picker .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:24px}
+.media-picker .grid .item{border:1px solid var(--line);cursor:pointer;background:transparent;padding:0;text-align:left}
+.media-picker .grid .item:hover{border-color:var(--accent)}
+.media-picker .grid img{width:100%;height:110px;object-fit:cover;display:block}
+.media-picker .grid .name{padding:6px 8px;font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.media-picker .empty{padding:40px 24px;text-align:center;color:var(--dim);font-size:13px}
+
+.dropzone{border:2px dashed var(--line);padding:32px;text-align:center;cursor:pointer;color:var(--dim);font-size:13px}
+.dropzone.drag{border-color:var(--accent);color:var(--accent)}
+.dropzone strong{color:var(--ink);font-weight:600}
+
+.media-explorer{display:flex;border:1px solid var(--line);margin-top:20px;min-height:460px}
+.media-sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--line);background:var(--surf)}
+.media-sidebar .ms-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.folder-list{list-style:none;margin:0;padding:8px 0;max-height:560px;overflow-y:auto}
+.folder-item{padding:9px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:3px solid transparent;user-select:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-item:hover{background:var(--surf2)}
+.folder-item[aria-current="true"]{background:var(--surf2);border-left-color:var(--accent);color:var(--accent);font-weight:600}
+/* Sidebar lists top-level folders only. Subfolders stay in the DOM (media.js builds its folder model
+   from these items) and are reached by opening the parent in the grid. */
+.folder-list .folder-item:not([data-depth="0"]){display:none}
+.media-content{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0}
+
+.explorer-toolbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.explorer-toolbar .btn-icon-label{display:flex;align-items:center;gap:6px;padding:7px 12px;background:transparent;border:1px solid var(--line);color:var(--ink);font-size:12px;font-weight:600;cursor:pointer}
+.explorer-toolbar .btn-icon-label:hover{border-color:var(--accent);color:var(--accent)}
+.explorer-toolbar .btn-icon-label svg{width:15px;height:15px}
+.explorer-toolbar .spacer{flex:1}
+.icon-btn-plain{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid transparent;color:var(--dim);cursor:pointer}
+.icon-btn-plain:hover{border-color:var(--line);color:var(--accent)}
+
+.explorer-breadcrumb{padding:10px 16px;font-size:12px;display:flex;align-items:center;gap:6px;color:var(--dim);border-bottom:1px solid var(--line)}
+.explorer-breadcrumb button{background:transparent;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:0}
+.explorer-breadcrumb button:hover{color:var(--accent)}
+.explorer-breadcrumb .current{color:var(--ink);font-weight:600}
+.explorer-breadcrumb .sep{color:var(--line)}
+
+.selection-bar{display:none;align-items:center;gap:2px;padding:8px 16px;border-bottom:1px solid var(--accent)}
+.selection-bar.show{display:flex}
+.selection-bar button{display:flex;align-items:center;gap:6px;padding:7px 10px;background:transparent;border:none;color:var(--ink);font-size:12px;font-weight:600;cursor:pointer}
+.selection-bar button svg{width:15px;height:15px}
+.selection-bar button:hover{color:var(--accent)}
+.selection-bar button.danger:hover{color:var(--err)}
+.selection-bar .count{font-size:12px;font-weight:700;color:var(--accent);margin-right:10px;white-space:nowrap}
+.selection-bar .spacer{flex:1}
+.selection-bar .close-x{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.selection-bar .close-x:hover{color:var(--accent)}
+
+.explorer-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:2px;padding:16px;flex:1;align-content:start}
+.icon-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border:1px solid transparent;border-radius:2px;cursor:pointer;text-align:center;position:relative;user-select:none}
+.icon-tile:hover{background:var(--surf2)}
+.icon-tile.selected{border-color:var(--accent);background:rgba(255,190,110,.08)}
+.icon-tile .icon-wrap{width:60px;height:60px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.icon-tile .icon-wrap img{width:100%;height:100%;object-fit:cover}
+.icon-tile .icon-wrap svg{width:42px;height:42px;color:var(--dim)}
+.icon-tile.folder-tile .icon-wrap svg{color:#e8b84b}
+.icon-tile .name{font-size:11px;color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.icon-tile .sub{font-size:10px;color:var(--dim)}
+.icon-tile .tile-check{position:absolute;top:4px;left:4px;z-index:2;opacity:0;transition:opacity .1s}
+.icon-tile:hover .tile-check,.icon-tile.selected .tile-check{opacity:1}
+.icon-tile .badge-mini{position:absolute;top:4px;right:4px;font-size:8px;letter-spacing:.04em;padding:1px 5px;background:var(--surf);border:1px solid var(--line);color:var(--dim)}
+
+.context-menu{position:fixed;z-index:200;background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35);min-width:170px;padding:6px 0;display:none}
+.context-menu.open{display:block}
+.context-menu button{display:flex;align-items:center;width:100%;text-align:left;padding:8px 14px;background:transparent;border:none;color:var(--ink);font-size:13px;cursor:pointer}
+.context-menu button:hover{background:var(--surf2);color:var(--accent)}
+.context-menu button.danger:hover{color:var(--err)}
+.context-menu hr{border:none;border-top:1px solid var(--line);margin:6px 0}
+.context-menu .cm-label{padding:6px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+
+.rename-popover{position:fixed;z-index:200;background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35);padding:12px;display:none}
+.rename-popover.open{display:block}
+.scrim{display:none;position:fixed;inset:0;z-index:44;background:rgba(0,0,0,.6)}
+body.side-open .scrim{display:block}
+
+@media (max-width:1180px){
+  .editor-grid{grid-template-columns:minmax(0,1fr) 300px;gap:24px}
+  .roles-grid{grid-template-columns:240px minmax(0,1fr)}
+}
+@media (max-width:1000px){
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:45;transform:translateX(-100%);transition:transform .22s ease;background:var(--bg)}
+  body.side-open .side{transform:none}
+  .side-toggle{display:flex}
+  .main{width:100%}
+  .topbar{padding:0 16px;gap:12px}
+  .topbar .input{display:none}
+  .content{padding:20px 16px}
+  .page-head{flex-direction:column;align-items:flex-start;gap:14px}
+  .page-head h1{font-size:clamp(24px,4.4vw,34px)}
+  .editor-grid,.roles-grid{grid-template-columns:minmax(0,1fr)}
+  .meta-col{border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:20px}
+  .roles-list{border-right:none;border-bottom:1px solid var(--line);display:flex;overflow-x:auto}
+  .roles-list button{min-width:200px;border-bottom:none;border-right:1px solid var(--line)}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .offcanvas .panel{width:min(520px,100%)}
+  .media-explorer{flex-direction:column}
+  .media-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--line)}
+  .folder-list{display:flex;max-height:none;overflow-x:auto;padding:8px}
+  .folder-item{border-left:none;border-bottom:3px solid transparent}
+}
+@media (max-width:760px){
+  /* datatable becomes a stack of cards; labels injected by admin.js */
+  table.dt{min-width:0}
+  .table-wrap{overflow:visible}
+  table.dt thead tr:first-child{display:none}
+  table.dt tr.filters{display:block;padding:10px}
+  table.dt tr.filters th{display:block;padding:5px 0}
+  table.dt tr.filters th:empty{display:none}
+  table.dt tbody tr.row{display:block;border-bottom:2px solid var(--line);padding:12px 0}
+  table.dt tbody tr.row td{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;align-items:center;border-bottom:none;padding:6px 12px}
+  table.dt tbody tr.row td::before{content:attr(data-label);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  table.dt tbody tr.row td.right{justify-items:start}
+  table.dt td.strong{font-size:15px}
+  .pagination{flex-direction:column;align-items:flex-start;gap:12px}
+  .bulk{gap:6px}
+  .profile-grid{grid-template-columns:minmax(0,1fr)!important}
+  #pw-form > div{grid-template-columns:minmax(0,1fr)!important}
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .dashboard-split{grid-template-columns:minmax(0,1fr)!important;gap:32px!important}
+  .dashboard-split .bar-row{grid-template-columns:110px minmax(0,1fr) 60px!important}
+  .auth-shell{padding:16px}
+  .auth-card .b{padding:22px}
+}
+
+/* jQuery Validation & form error styles */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 40px;
+}
+.field.has-error .input,
+.field.has-error .textarea,
+.input.error,
+.textarea.error {
+  border-color: #ff4d4d !important;
+  background-color: rgba(255, 77, 77, 0.05);
+}
+.field .err,
+span.err {
+  display: none;
+  font-size: 12px;
+  color: #ff4d4d !important;
+  margin-top: 6px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.field.has-error .err,
+.field .err.show,
+span.err.show,
+span.err[style*="display: block"],
+span.err[style*="display:block"] {
+  display: block !important;
+}
+
+/* ---- DataTables.net Custom Theme Integration ---- */
+.dt-root .table-wrap {
+  border: none;
+  overflow: visible;
+}
+
+.dt-container {
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dt-container .dt-layout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.dt-container .dt-layout-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  margin: 0;
+}
+
+.dt-container .dt-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dt-container .dt-search label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.dt-container .dt-search input {
+  height: 38px;
+  min-width: 220px;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 0;
+  outline: none;
+  transition: border-color .15s ease;
+}
+
+.dt-container .dt-search input:focus {
+  border-color: var(--accent);
+}
+
+.dt-container .dt-length {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.dt-container .dt-length select {
+  height: 38px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+
+.dt-container .dt-length select:focus {
+  border-color: var(--accent);
+}
+
+.dt-container .dt-info {
+  color: var(--dim);
+  font-size: 13px;
+}
+
+.dt-container .dt-paging {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dt-container .dt-paging .dt-paging-button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  background: transparent !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.dt-container .dt-paging .dt-paging-button:hover:not(.disabled):not(.current) {
+  background: var(--surf) !important;
+  border-color: var(--rule) !important;
+  color: var(--ink) !important;
+}
+
+.dt-container .dt-paging .dt-paging-button.current {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+.dt-container .dt-paging .dt-paging-button.disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+  border-color: var(--line) !important;
+}
+
+.dt-container table.dataTable {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 0 !important;
+  background: var(--bg);
+}
+
+.dt-container table.dataTable thead tr:first-child th {
+  border-bottom: 2px solid var(--rule) !important;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 12px 14px;
+  background: var(--bg);
+}
+
+.dt-container table.dataTable thead tr.filters th {
+  border-bottom: 1px solid var(--line) !important;
+  background: var(--surf);
+  padding: 8px 14px;
+}
+
+.dt-container table.dataTable thead tr.filters .input {
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 0;
+  width: 100%;
+}
+
+.dt-container table.dataTable thead tr.filters .input:focus {
+  border-color: var(--accent);
+}
+
+.dt-container table.dataTable tbody td {
+  border-bottom: 1px solid var(--line) !important;
+  padding: 14px;
+  font-size: 13px;
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.dt-container table.dataTable tbody tr:hover {
+  background: var(--surf) !important;
+}
+
+.dt-container table.dataTable tbody td.dt-empty {
+  text-align: center !important;
+  padding: 48px 24px !important;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+
+
+/* ---- Fade transitions -------------------------------------------------------------------
+   Dialogs, the new-folder modal, toast, context menu and rename popover used to snap between
+   display:none and visible. They now stay laid out and fade via opacity/visibility (visibility
+   keeps hidden ones out of the tab order and away from clicks). Placed last so it overrides
+   the display rules above.
+   Visibility is NOT faded: it flips instantly on open (0s, no delay) and only after the fade on close
+   (0s, delayed by the fade length). A transitioned visibility stays 'hidden' for the first frame of an
+   open, so a quick click would fall through the menu or dialog to whatever is underneath. */
+@keyframes khFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dialog,.folder-modal{display:flex;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility 0s linear .2s}
+.dialog.open,.folder-modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s ease,visibility 0s linear 0s}
+.dialog .box,.folder-modal .box{transform:translateY(8px) scale(.98);transition:transform .2s ease}
+.dialog.open .box,.folder-modal.open .box{transform:none}
+.toast{display:flex;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,visibility 0s linear .2s,transform .2s ease}
+.toast.show{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .2s ease,visibility 0s linear 0s,transform .2s ease}
+.context-menu,.rename-popover{display:block;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s ease,visibility 0s linear .15s}
+.context-menu.open,.rename-popover.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .15s ease,visibility 0s linear 0s}
+.selection-bar.show{animation:khFadeIn .2s ease}
+.icon-tile{animation:khFadeIn .2s ease}
+.folder-modal .field-err{display:block;margin-top:6px}
+.flatpickr-calendar{font-family:inherit}
+@media (prefers-reduced-motion: reduce){
+  .dialog,.folder-modal,.dialog .box,.folder-modal .box,.toast,.context-menu,.rename-popover{transition:none}
+  .selection-bar.show,.icon-tile{animation:none}
+}
+
+/* ---- MediaExplorer component (scripts/media/media-explorer.js) --------------------------
+   Layout rules that used to be inline styles in media.html, plus the picker (pick mode) chrome. */
+.mx .mx-hint{padding:0 12px 8px;font-size:11px}
+.mx .mx-trash-link{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--ink);text-decoration:none}
+.mx .mx-trash-count{margin-left:auto}
+.mx .mx-trash-note{padding:0 12px 10px;font-size:11px}
+.mx .mx-count{font-size:12px;color:var(--dim);margin-right:4px}
+.mx .mx-dropzone{margin:14px 16px 0;padding:16px}
+.mx .mx-dropzone-sub{margin-top:4px}
+.mx .mx-move-select{max-width:150px;height:30px;font-size:12px}
+.mx .explorer-filters .input,.mx .explorer-filters .select{height:32px}
+.mx .mx-f-search{max-width:200px}
+.mx .mx-f-kind{max-width:130px}
+.mx .mx-f-type{max-width:150px}
+.mx .mx-f-usage{max-width:140px}
+.mx .mx-f-uploader{max-width:160px}
+.mx .mx-f-date{max-width:140px}
+.mx .mx-f-sort{max-width:160px}
+.mx .mx-empty{padding:40px 16px;display:none}
+.mx .mx-loading{grid-column:1/-1;padding:40px 16px}
+.mx .mx-pagination{padding:12px 16px}
+.mx .mx-pagination .info{font-size:13px}
+.mx .mx-sentinel{height:1px}
+.mx .mx-popover-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.mx .mx-rename-input{width:200px}
+.mx .mx-popover-actions{display:flex;gap:6px;margin-top:10px}
+.mx .mx-folder-location{font-size:13px}
+.mx .mx-folder-body{padding:20px 24px 0}
+.mx .mx-folder-input{width:100%}
+.mx .mx-detail-preview{height:220px;object-fit:cover}
+.mx .mx-detail-preview-file{height:220px;display:none;align-items:center;justify-content:center;background:var(--surf)}
+.mx .mx-detail-ext{font-size:22px;padding:10px 20px;color:var(--accent);border:1px solid var(--accent)}
+.mx .mx-detail-meta{font-size:12px;display:flex;flex-direction:column;gap:4px}
+.mx .mx-url-row{display:flex;gap:8px}
+.mx .mx-url-row .input{flex:1}
+.mx .mx-pick-foot{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:var(--bg);position:sticky;bottom:0;z-index:3}
+.mx .mx-pick-foot .spacer{flex:1}
+.mx .mx-pick-foot .btn[disabled]{opacity:.45;cursor:not-allowed}
+.mx[data-mode="pick"]{min-height:0;margin-top:0;border:none}
+.mx[data-mode="pick"] .icon-tile.selected{box-shadow:inset 0 0 0 1px var(--accent)}
+
+/* Picker modal hosting the explorer: a large, fixed-height box whose body scrolls. */
+.media-picker .box.mx-picker-box{width:min(1180px,100%);height:min(86vh,860px);max-height:none;overflow:hidden;display:flex;flex-direction:column}
+.media-picker .mx-picker-body{flex:1;min-height:0;overflow:auto}
+
+/* ---- MediaExplorer: fill the available height ---------------------------------------------
+   The explorer takes the whole height it is given and scrolls inside (.mx-scroll for the grid,
+   the folder list for the sidebar) instead of stretching the page. */
+.mx.media-explorer{min-height:0;overflow:hidden}
+.mx .media-sidebar{display:flex;flex-direction:column;min-height:0}
+.mx .folder-list{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto}
+.mx .media-content{min-height:0;overflow:hidden}
+.mx .mx-scroll{flex:1 1 auto;min-height:0;overflow-y:auto}
+.mx .mx-scroll .icon-grid{flex:none}
+
+/* Media library page: the content area becomes a full-height column (viewport minus the 64px
+   sticky topbar) and the explorer fills what the page head leaves. Scoped with :has() so no other
+   admin page changes. min-height keeps it usable on very short windows (the page scrolls then). */
+.content:has(> #media-library){flex:0 0 auto;display:flex;flex-direction:column;box-sizing:border-box;height:calc(100vh - 64px);height:calc(100dvh - 64px)}
+#media-library{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+#media-library > .mx{flex:1 1 auto;min-height:460px}
+
+/* Picker modal: full viewport height with a small margin; the explorer fills the modal body. */
+.media-picker:has(.mx-picker-box){padding:16px}
+.media-picker .box.mx-picker-box{width:min(1280px,100%);height:100%;max-height:none}
+.media-picker .mx-picker-body{display:flex;flex-direction:column;overflow:hidden}
+.media-picker .mx-picker-body > .mx{flex:1 1 auto;min-height:0}
+.mx[data-mode="pick"] .mx-pick-foot{position:static}
+
+@media (max-width: 760px){
+  .mx .media-sidebar{flex:0 0 auto}
+  .mx .folder-list{flex:0 0 auto}
+}
+
+/* ---- MediaExplorer pager (page numbers + files per page) ---------------------------------- */
+.mx .mx-pager{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;padding:10px 16px;border-top:1px solid var(--line);background:var(--bg)}
+.mx .mx-pager-info{font-size:12px;margin-right:auto}
+.mx .mx-pager-size{display:flex;align-items:center;gap:8px;font-size:12px}
+.mx .mx-pager-size .select{height:30px;font-size:12px;width:auto;min-width:64px;padding-right:24px}
+.mx .mx-pages{display:flex;align-items:center;gap:4px}
+.mx .mx-pages button{min-width:30px;height:30px;padding:0 8px;background:transparent;border:1px solid var(--line);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer}
+.mx .mx-pages button:hover:not(:disabled):not([aria-current]){border-color:var(--accent);color:var(--accent)}
+.mx .mx-pages button[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:#0a0a0a;cursor:default}
+.mx .mx-pages button:disabled{opacity:.35;cursor:default}
+.mx .mx-gap{padding:0 4px;font-size:12px}
+@media (max-width: 760px){
+  .mx .mx-pager-info{width:100%;margin-right:0}
+}

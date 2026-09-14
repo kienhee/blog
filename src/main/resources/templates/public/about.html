@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title>About</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="wrap" style="padding-top:56px">
+        <h1 style="font-size:64px;line-height:1;max-width:20ch" th:text="|About ${site['site.domain'] ?: siteTitle}|">About</h1>
+        <div class="about-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;margin-top:48px;padding-top:40px;border-top:2px solid var(--rule)">
+            <div style="font-size:19px;line-height:1.65;color:var(--body);display:flex;flex-direction:column;gap:24px">
+                <p th:text="${siteDescription}">Site description</p>
+                <p>Two kinds of posts: step-by-step guides you can follow in an afternoon, and short news notes on what changed in the tools you already use.</p>
+                <p>Written for beginners, developers, and people who use AI at work.</p>
+            </div>
+            <div style="border-top:1px solid var(--line)">
+                <div style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)"><span class="kicker">Site</span><span th:text="${siteTitle}">Kienhee</span></div>
+                <div th:if="${site['site.domain'] != null and !site['site.domain'].isBlank()}" style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)"><span class="kicker">Domain</span><span th:text="${site['site.domain']}">kienhee.com</span></div>
+                <div style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)"><span class="kicker">Language</span><span>English</span></div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

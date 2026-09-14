@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in — Kienhee Admin</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" th:href="@{/styles/main.css}">
+<link rel="stylesheet" th:href="@{/styles/admin.css}">
+</head>
+<body>
+<div class="auth-shell">
+  <form class="auth-card" id="auth-form" method="post" th:action="@{/auth/login}">
+    <div class="h"><span style="font-size:22px;font-weight:800;letter-spacing:-.02em">Kienhee.com</span> </div>
+    <div class="b">
+      <div>
+        <h1 style="font-size:32px;line-height:1.05">Sign in</h1>
+        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5">Manage posts, categories and hashtags for kienhee.com.</p>
+      </div>
+
+      <div th:if="${errorMessage}" style="padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+        <span th:text="${errorMessage}">Error message</span>
+      </div>
+      <div th:if="${successMessage}" style="padding:12px 14px;background:rgba(94,227,138,0.12);border:1px solid #5ee38a;color:#5ee38a;border-radius:6px;font-size:13px;font-weight:600">
+        <span th:text="${successMessage}">Success message</span>
+      </div>
+
+      <label class="field"><span>Email<span class="req"> *</span></span>
+        <input class="input" type="text" name="email" data-required placeholder="Enter your email">
+      </label>
+      <label class="field"><span>Password<span class="req"> *</span></span>
+        <input class="input" type="password" name="password" data-required placeholder="Enter your password">
+      </label>
+      <button class="btn" type="submit" style="height:50px">Sign in</button>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding-top:18px;border-top:1px solid var(--line)">
+        <a class="dim" style="font-size:13px" th:href="@{/auth/register}">Create an account</a>
+        <a class="dim" style="font-size:13px" th:href="@{/auth/forgot}">Forgot password?</a>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="toast"><span>✓</span><span class="msg"></span></div>
+<script th:src="@{/scripts/lib/jquery.min.js}"></script>
+<script th:src="@{/scripts/lib/jquery.validate.min.js}"></script>
+<script th:src="@{/scripts/core/admin.js}"></script>
+<script th:src="@{/scripts/auth/auth.js}"></script>
+</body>
+</html>

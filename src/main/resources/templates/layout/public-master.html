@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title layout:title-pattern="$CONTENT_TITLE — $LAYOUT_TITLE" th:text="${siteTitle} ?: 'Kienhee'">Kienhee</title>
+    <meta name="description" th:content="${pageDescription} ?: (${siteDescription} ?: 'AI guides and news')">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/styles/main.css}">
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body>
+
+<div th:replace="~{fragments/public/header :: header}"></div>
+
+<main layout:fragment="content"></main>
+
+<div th:replace="~{fragments/public/footer :: footer}"></div>
+
+<script th:src="@{/scripts/lib/jquery.min.js}"></script>
+<script th:src="@{/scripts/public/main.js}"></script>
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

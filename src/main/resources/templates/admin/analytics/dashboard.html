@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Dashboard</strong>
+</div>
+
+<div layout:fragment="content">
+    <h1 style="font-size:34px">Overview</h1>
+    <p class="dim" style="margin:4px 0 28px">Last 30 days on kienhee.com</p>
+    <div class="stats">
+        <div class="stat"><div class="kicker">Views</div><div class="v">48.2k</div><div class="d">+12.4% vs last 30d</div></div>
+        <div class="stat"><div class="kicker">Posts published</div><div class="v">11</div><div class="d">+3 vs last 30d</div></div>
+        <div class="stat"><div class="kicker">Subscribers</div><div class="v">9,412</div><div class="d">+284 new</div></div>
+        <div class="stat"><div class="kicker">Comments</div><div class="v">146</div><div class="d">7 awaiting review</div></div>
+    </div>
+    <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;margin-top:32px">
+        <div>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Views by category</p>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">AI news</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:92%"></span></span><span class="dim" style="font-size:13px;text-align:right">16.4k</span></div>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Prompting</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:63%"></span></span><span class="dim" style="font-size:13px;text-align:right">11.2k</span></div>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Getting started</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:50%"></span></span><span class="dim" style="font-size:13px;text-align:right">8.9k</span></div>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Tools</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:34%"></span></span><span class="dim" style="font-size:13px;text-align:right">6.1k</span></div>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Automation</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:19%"></span></span><span class="dim" style="font-size:13px;text-align:right">3.4k</span></div>
+            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">For developers</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:12%"></span></span><span class="dim" style="font-size:13px;text-align:right">2.2k</span></div>
+        </div>
+        <div>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Needs attention</p>
+            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Comments pending review</span><span style="font-size:13px;font-weight:700;color:var(--accent)">7</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Drafts older than 30 days</span><span style="font-size:13px;font-weight:700;color:var(--accent)">4</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Posts missing SEO title</span><span style="font-size:13px;font-weight:700;color:var(--accent)">3</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Redirect loops</span><span style="font-size:13px;font-weight:700;color:var(--accent)">2</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

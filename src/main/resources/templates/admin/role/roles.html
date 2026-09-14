@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Roles</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Roles</strong>
+</div>
+
+<div layout:fragment="content">
+      <h1 style="font-size:34px">Roles &amp; permissions</h1>
+      <p class="dim" style="margin:6px 0 24px">Pick a role on the left, set what it can do, then save.</p>
+
+      <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+          <span th:text="${successMessage}">Success message</span>
+      </div>
+      <div th:if="${errorMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+          <span th:text="${errorMessage}">Error message</span>
+      </div>
+
+      <div class="roles-grid">
+        <div class="roles-list" style="border-right:1px solid var(--line)">
+          <a th:each="r : ${roles}"
+             th:href="@{/admin/roles(roleId=${r.id})}"
+             th:attr="aria-pressed=${selectedRole != null and selectedRole.id == r.id} ? 'true' : 'false'"
+             style="position:relative;display:flex;flex-direction:column;gap:4px;align-items:flex-start;width:100%;padding:16px 20px;border-bottom:1px solid var(--line);text-align:left">
+            <span style="font-size:16px;font-weight:700" th:text="${r.name}">Owner</span>
+            <span class="dim" style="font-size:12px">
+              <span th:text="${userCounts != null and userCounts.containsKey(r.id) ? userCounts.get(r.id) : 0}">0</span>
+              <span th:text="${userCounts != null and userCounts.get(r.id) == 1 ? ' user' : ' users'}"> users</span>
+              <span th:if="${r.systemRole}"> · system role</span>
+              <span th:unless="${r.systemRole}" th:text="' · ' + ${r.permissions.size()} + ' permissions'"></span>
+            </span>
+          </a>
+
+          <form th:if="${perms.contains('users:create')}" method="post" th:action="@{/admin/roles}"
+                style="display:flex;flex-direction:column;gap:8px;padding:16px 20px">
+            <input class="input" name="name" placeholder="New role name" required minlength="2" style="height:34px;font-size:13px">
+            <input class="input" name="description" placeholder="Short description (optional)" style="height:34px;font-size:13px">
+            <button class="btn btn-ghost btn-xs" type="submit">Add role</button>
+          </form>
+        </div>
+
+        <div th:if="${selectedRole == null}" style="padding:40px 20px" class="dim">No roles yet. Create one to get started.</div>
+
+        <div th:if="${selectedRole != null}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:2px solid var(--rule)">
+            <span style="font-size:18px;font-weight:700" data-role-title
+                  th:text="${selectedRole.name} + ' permissions'">Editor permissions</span>
+            <span style="display:flex;gap:8px">
+              <button th:if="${perms.contains('users:edit') and !selectedRole.systemRole}"
+                      class="btn btn-sm" type="submit" form="permissions-form">Save changes</button>
+              <button th:if="${perms.contains('users:delete') and !selectedRole.systemRole}"
+                      type="button" class="btn btn-ghost btn-sm btn-danger" id="btn-delete-role"
+                      th:data-id="${selectedRole.id}" th:data-name="${selectedRole.name}">Delete role</button>
+            </span>
+          </div>
+
+          <p th:if="${selectedRole.systemRole}" class="dim" style="padding:14px 20px;font-size:13px;border-bottom:1px solid var(--line)">
+            This is a system role with full access. It can't be edited or deleted, so you can never lock yourself out.
+          </p>
+          <p th:if="${selectedRole.description != null}" class="dim" style="padding:14px 20px;font-size:13px;border-bottom:1px solid var(--line)"
+             th:text="${selectedRole.description}">Description</p>
+
+          <form id="permissions-form" method="post" th:action="@{'/admin/roles/' + ${selectedRole.id} + '/permissions'}">
+            <table class="dt" style="min-width:0">
+              <thead>
+                <tr class="filters" style="background:var(--surf)">
+                  <th style="padding:10px 20px"><span class="kicker">Resource</span></th>
+                  <th style="width:110px;text-align:center"><span class="kicker">View</span></th>
+                  <th style="width:110px;text-align:center"><span class="kicker">Create</span></th>
+                  <th style="width:110px;text-align:center"><span class="kicker">Edit</span></th>
+                  <th style="width:110px;text-align:center"><span class="kicker">Delete</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="row : ${permissionMatrix}">
+                  <td style="padding:12px 20px;font-size:14px;font-weight:600" th:text="${row.label}">Posts</td>
+                  <td th:each="cell : ${row.cells}" style="text-align:center">
+                    <input class="checkbox" type="checkbox" name="permissionIds"
+                           th:value="${cell.id}"
+                           th:checked="${cell.granted}"
+                           th:disabled="${selectedRole.systemRole or !perms.contains('users:edit')}">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hidden form for deleting a role -->
+      <form id="delete-role-form" method="post" th:action="@{/admin/roles/0/delete}" style="display:none"></form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/role/role.js}"></script>
+</th:block>
+
+</body>
+</html>

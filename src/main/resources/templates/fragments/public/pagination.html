@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+    Numbered pager for a Spring Data Page.
+    base: path without query string (e.g. '/news'); q: search query or null.
+-->
+<nav th:fragment="pager(page, base, q)" class="page-nav" th:if="${page.totalPages > 1}" aria-label="Pagination"
+     th:with="current=${page.number + 1}, total=${page.totalPages}">
+    <a th:if="${page.hasPrevious()}" class="btn btn-ghost btn-sm"
+       th:href="${q != null} ? @{${base}(q=${q},page=${current - 1})} : @{${base}(page=${current - 1})}">← Newer</a>
+    <span class="dim page-count" th:text="|Page ${current} of ${total}|">Page 1 of 3</span>
+    <a th:if="${page.hasNext()}" class="btn btn-ghost btn-sm"
+       th:href="${q != null} ? @{${base}(q=${q},page=${current + 1})} : @{${base}(page=${current + 1})}">Older →</a>
+</nav>
+
+<!-- One post row with thumbnail (news, search). -->
+<!-- th:src / th:utext run in Thymeleaf's restricted mode (no @bean calls), so helper results go through th:with. -->
+<a th:fragment="thumbRow(p)" class="post-row with-thumb" th:href="@{/article/{slug}(slug=${p.slug})}" th:with="cover=${@publicView.hasCover(p)}">
+    <img class="ph" th:src="${cover} ? ${p.coverImage} : @{/images/placeholder.svg}" alt="" style="object-fit:cover">
+    <span><span class="cat" style="padding:0" th:text="${p.category.name}">Category</span><span class="ttl" style="font-size:28px;margin-top:10px" th:text="${p.title}">Title</span><span class="dek" th:text="${@publicView.dek(p)}">Summary</span></span>
+    <span class="meta" style="padding-top:0"><span th:text="${@publicView.date(p.publishedAt)}">Sep 11, 2026</span><br><span th:text="|${@publicView.readMinutes(p)} min read|">9 min read</span></span>
+</a>
+
+<p th:fragment="empty(message)" class="dim empty-state" style="padding:48px 0;font-size:17px" th:text="${message}">Nothing here yet.</p>
+
+</body>
+</html>

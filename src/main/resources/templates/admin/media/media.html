@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Media library</title>
+    <link rel="stylesheet" th:href="@{/styles/lib/flatpickr.min.css}">
+    <link rel="stylesheet" th:href="@{/styles/flatpickr-theme.css}">
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Media library</strong>
+</div>
+
+<div layout:fragment="content">
+      <div class="page-head" style="border-bottom:2px solid var(--rule)">
+        <div>
+          <h1>Media library</h1>
+          <p class="dim" style="margin-top:6px">Upload, organise and reuse files across the site.</p>
+        </div>
+      </div>
+
+      <div th:if="${successMessage}" style="margin:18px 0;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+          <span th:text="${successMessage}">Success message</span>
+      </div>
+      <div th:if="${errorMessage}" style="margin:18px 0;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+          <span th:text="${errorMessage}">Error message</span>
+      </div>
+
+      <!-- The whole explorer is the shared MediaExplorer component (scripts/media/media-explorer.js),
+           rendered from the JSON API under /admin/api/media. Pickers elsewhere (e.g. the post cover
+           image) mount the very same component in "pick" mode, so both always stay in sync. -->
+      <div id="media-library"
+           th:attr="data-initial-folder=${currentFolderId}"
+           th:data-trash-url="@{/admin/media/trash}">
+        <noscript><p class="dim" style="padding:24px">The media library needs JavaScript.</p></noscript>
+      </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/lib/flatpickr.min.js}"></script>
+    <script th:src="@{/scripts/media/media-explorer.js}"></script>
+    <script th:src="@{/scripts/media/media.js}"></script>
+</th:block>
+
+</body>
+</html>
