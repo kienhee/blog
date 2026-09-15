@@ -80,6 +80,7 @@
                     <button th:if="${canEdit and c.status.name() != 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="APPROVED">Approve</button>
                     <button th:if="${canEdit and c.status.name() == 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="PENDING">Unapprove</button>
                     <button th:if="${canEdit and c.status.name() != 'SPAM'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="SPAM">Spam</button>
+                    <button th:if="${canEdit}" type="button" class="btn btn-ghost btn-xs btn-reply-comment" th:data-id="${c.id}" th:data-name="${c.authorName}" th:data-post="${c.post.title}">Reply</button>
                     <button th:if="${canDelete}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-comment" th:data-id="${c.id}" th:data-name="${c.authorName}">Del</button>
                   </span>
                 </td>
@@ -87,6 +88,26 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Reply from the moderation page (comments.js). Reuses the folder-modal look from admin.css. -->
+      <div class="folder-modal" id="comment-reply-modal" role="dialog" aria-modal="true" aria-labelledby="reply-title">
+        <form class="box" id="comment-reply-form" method="post" th:action="@{/admin/comments/0/reply}" style="width:min(560px,100%)">
+          <div class="h">
+            <div class="t" id="reply-title">Reply</div>
+            <p class="dim" id="reply-context" style="font-size:13px;line-height:1.4"></p>
+          </div>
+          <div style="padding:20px 24px">
+            <label class="kicker" for="reply-content">Your reply</label>
+            <textarea class="textarea" id="reply-content" name="content" maxlength="2000" rows="5" style="width:100%;margin-top:8px"
+                      placeholder="Write your reply"></textarea>
+            <p class="dim" style="font-size:12px;margin-top:8px">Posted under your name and shown right away. A pending comment is approved when you reply.</p>
+          </div>
+          <div class="a">
+            <button class="btn" type="submit">Post reply</button>
+            <button class="btn btn-ghost" type="button" id="reply-cancel">Cancel</button>
+          </div>
+        </form>
       </div>
 
       <!-- Hidden forms; comments.js sets the action and ids. th:action adds the CSRF token. -->

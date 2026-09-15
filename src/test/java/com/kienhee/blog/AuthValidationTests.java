@@ -7,6 +7,8 @@ import com.kienhee.blog.dto.RegisterRequest;
 import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.AuthService;
+import com.kienhee.blog.service.MailService;
+import com.kienhee.blog.service.RegistrationPolicy;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -39,6 +42,14 @@ public class AuthValidationTests {
     @Autowired
     private WebApplicationContext wac;
 
+    /** Forgot-password requests must never send real email from tests. */
+    @MockitoBean
+    private MailService mailService;
+
+    /** The dev database already has accounts, which closes sign-up; these tests exercise the form itself. */
+    @MockitoBean
+    private RegistrationPolicy registrationPolicy;
+
     @Autowired
     private Validator validator;
 
@@ -55,11 +66,12 @@ public class AuthValidationTests {
 
     @BeforeEach
     void setUp() {
+        org.mockito.Mockito.when(registrationPolicy.isFirstAccount()).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .apply(springSecurity())
                 .build();
 
-        userRepository.findByEmail("admin@kienhee.com").ifPresentOrElse(
+        userRepository.findByEmail("test-owner@kienhee.test").ifPresentOrElse(
                 u -> {
                     u.setPassword(passwordEncoder.encode("admin123"));
                     userRepository.save(u);
@@ -67,7 +79,7 @@ public class AuthValidationTests {
                 () -> {
                     User admin = User.builder()
                             .fullName("Admin Kienhee")
-                            .email("admin@kienhee.com")
+                            .email("test-owner@kienhee.test")
                             .password(passwordEncoder.encode("admin123"))
                             .build();
                     userRepository.save(admin);
@@ -249,7 +261,7 @@ public class AuthValidationTests {
             mockMvc.perform(post("/auth/register")
                             .with(csrf())
                             .param("fullName", "Admin Duplicate")
-                            .param("email", "admin@kienhee.com")
+                            .param("email", "test-owner@kienhee.test")
                             .param("password", "newpassword123"))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Email already in use")));
@@ -293,23 +305,25 @@ public class AuthValidationTests {
         }
 
         @Test
-        @DisplayName("POST /auth/forgot: Email không tồn tại -> hiển thị thông báo không tìm thấy")
+        @DisplayName("POST /auth/forgot: Email không tồn tại -> cùng thông báo trung lập (không lộ tài khoản)")
         void testForgotEmailNotFound() throws Exception {
             mockMvc.perform(post("/auth/forgot")
                             .with(csrf())
                             .param("email", "notfound_404@kienhee.com"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().string(containsString("No account found with that email address.")));
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/auth/forgot"))
+                    .andExpect(flash().attribute("successMessage", containsString("If an account exists for that email")));
         }
 
         @Test
-        @DisplayName("POST /auth/forgot: Email hợp lệ và tồn tại -> hiển thị thông báo thành công")
+        @DisplayName("POST /auth/forgot: Email hợp lệ -> cùng thông báo trung lập, hiển thị sau redirect")
         void testForgotEmailSuccess() throws Exception {
             mockMvc.perform(post("/auth/forgot")
                             .with(csrf())
-                            .param("email", "admin@kienhee.com"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().string(containsString("A reset link or new password has been sent to your email.")));
+                            .param("email", "test-owner@kienhee.test"))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/auth/forgot"))
+                    .andExpect(flash().attribute("successMessage", containsString("If an account exists for that email")));
         }
 
         @Test
@@ -317,7 +331,7 @@ public class AuthValidationTests {
         void testLoginBadCredentials() throws Exception {
             mockMvc.perform(post("/auth/login")
                             .with(csrf())
-                            .param("email", "admin@kienhee.com")
+                            .param("email", "test-owner@kienhee.test")
                             .param("password", "wrong_password"))
                     .andExpect(status().is3xxRedirection())
                     .andExpect(redirectedUrl("/auth/login?error=true"));
@@ -339,7 +353,7 @@ public class AuthValidationTests {
         void testLoginSuccess() throws Exception {
             mockMvc.perform(post("/auth/login")
                             .with(csrf())
-                            .param("email", "admin@kienhee.com")
+                            .param("email", "test-owner@kienhee.test")
                             .param("password", "admin123"))
                     .andExpect(status().is3xxRedirection())
                     .andExpect(redirectedUrl("/admin/dashboard"));
@@ -490,13 +504,13 @@ public class AuthValidationTests {
                     .bio("Updated Bio")
                     .build();
 
-            User updated = authService.updateProfile("admin@kienhee.com", req);
+            User updated = authService.updateProfile("test-owner@kienhee.test", req);
             assertEquals("Admin Updated", updated.getFullName());
             assertEquals("0123456789", updated.getPhone());
             assertEquals("Da Nang", updated.getAddress());
             assertEquals("Updated Bio", updated.getBio());
 
-            User dbUser = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User dbUser = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
             assertEquals("Admin Updated", dbUser.getFullName());
         }
 
@@ -505,19 +519,19 @@ public class AuthValidationTests {
         void testAuthServiceChangePasswordValidation() {
             // Wrong current password
             assertThrows(IllegalArgumentException.class, () ->
-                    authService.changePassword("admin@kienhee.com", "wrongPass", "newSecret123")
+                    authService.changePassword("test-owner@kienhee.test", "wrongPass", "newSecret123")
             );
 
             // New password same as current password
             assertThrows(IllegalArgumentException.class, () ->
-                    authService.changePassword("admin@kienhee.com", "admin123", "admin123")
+                    authService.changePassword("test-owner@kienhee.test", "admin123", "admin123")
             );
 
             // Success
-            boolean result = authService.changePassword("admin@kienhee.com", "admin123", "newSecret123");
+            boolean result = authService.changePassword("test-owner@kienhee.test", "admin123", "newSecret123");
             assertTrue(result);
 
-            User dbUser = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User dbUser = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
             assertTrue(passwordEncoder.matches("newSecret123", dbUser.getPassword()));
         }
 
@@ -529,7 +543,7 @@ public class AuthValidationTests {
                     .andExpect(status().isOk())
                     .andExpect(view().name("admin/user/profile"))
                     .andExpect(model().attributeExists("profileRequest", "changePasswordRequest", "currentUser"))
-                    .andExpect(content().string(containsString("admin@kienhee.com")))
+                    .andExpect(content().string(containsString("test-owner@kienhee.test")))
                     .andExpect(content().string(containsString("jquery.validate.min.js")))
                     .andExpect(content().string(not(containsString("✕"))))
                     .andExpect(content().string(not(containsString(" required>"))))
@@ -564,7 +578,7 @@ public class AuthValidationTests {
                     .andExpect(redirectedUrl("/admin/profile?tab=info"))
                     .andExpect(flash().attributeExists("profileSuccess"));
 
-            User dbUser = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User dbUser = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
             assertEquals("Kienhee Master", dbUser.getFullName());
             assertEquals("0999888777", dbUser.getPhone());
             assertEquals("Hanoi City", dbUser.getAddress());
@@ -613,7 +627,7 @@ public class AuthValidationTests {
                     .andExpect(redirectedUrl("/admin/profile?tab=security"))
                     .andExpect(flash().attributeExists("passwordSuccess"));
 
-            User dbUser = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User dbUser = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
             assertTrue(passwordEncoder.matches("superNewPass123", dbUser.getPassword()));
         }
     }

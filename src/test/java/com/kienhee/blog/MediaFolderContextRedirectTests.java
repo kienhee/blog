@@ -56,7 +56,7 @@ class MediaFolderContextRedirectTests {
     @Autowired
     private FilesystemStorage storage;
 
-    private static final String OWNER_EMAIL = "admin@kienhee.com";
+    private static final String OWNER_EMAIL = "test-owner@kienhee.test";
 
     private MockMvc mockMvc;
     private MediaFolder folder;

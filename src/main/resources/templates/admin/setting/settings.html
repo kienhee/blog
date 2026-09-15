@@ -39,6 +39,12 @@
             <label class="field" style="max-width:220px"><span>Posts per page</span>
                 <input class="input" type="number" min="1" max="100" name="settings[blog.posts_per_page]" th:value="${settings['blog.posts_per_page']}" th:readonly="${!canEdit}"
                        data-rule-digits="true" data-rule-min="1" data-rule-max="100" data-msg="✕ Enter a whole number from 1 to 100."></label>
+            <label class="field"><span>X / Twitter link</span>
+                <input class="input" type="url" name="settings[social.x]" th:value="${settings['social.x']}" th:readonly="${!canEdit}"
+                       maxlength="255" placeholder="https://x.com/yourname" data-rule-url="true" data-msg-url="✕ Enter a full link starting with https://"></label>
+            <label class="field"><span>YouTube link</span>
+                <input class="input" type="url" name="settings[social.youtube]" th:value="${settings['social.youtube']}" th:readonly="${!canEdit}"
+                       maxlength="255" placeholder="https://youtube.com/@yourchannel" data-rule-url="true" data-msg-url="✕ Enter a full link starting with https://"></label>
             <!-- Checkbox pattern: the hidden "false" is posted first, the checked box's "true" wins (last value). -->
             <div class="field">
                 <span>Comments</span>

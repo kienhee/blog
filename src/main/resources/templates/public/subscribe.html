@@ -12,11 +12,16 @@
         <h1>The Kienhee Brief</h1>
         <p style="margin-top:20px;font-size:20px;line-height:1.5;max-width:44ch;font-weight:500">One email every Thursday: the week's releases, one guide, and what is safe to ignore.</p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <input class="input" type="email" placeholder="Enter your email">
-        <button class="btn" style="height:56px">Join 9,400 readers</button>
+      <form method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:12px">
+        <input type="hidden" name="from" value="subscribe">
+        <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+        <input class="input" type="email" name="email" th:value="${newsletterEmail}" placeholder="Enter your email" maxlength="150" aria-label="Email address">
+        <button class="btn" type="submit" style="height:56px"
+                th:text="${subscriberCount != null and subscriberCount >= 10} ? |Join ${#numbers.formatInteger(subscriberCount, 1, 'COMMA')} readers| : 'Subscribe free'">Subscribe free</button>
+        <span th:if="${newsletterSuccess}" class="cmt-flash ok" role="status" style="margin-top:0" th:text="${newsletterSuccess}">Check your inbox</span>
+        <span th:if="${newsletterError}" class="cmt-flash err" role="alert" style="margin-top:0" th:text="${newsletterError}">Enter a valid email</span>
         <span style="font-size:13px;font-weight:600">Free. No spam. One click to leave.</span>
-      </div>
+      </form>
     </div>
   </section>
 </main>

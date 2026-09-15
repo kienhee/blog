@@ -7,8 +7,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableAsync
 // Scheduling lives here too so there is exactly one place that turns these on.
-// The only scheduled job today is the media trash retention sweep, and that job is
-// itself gated by app.media.trash.auto-purge-enabled (default false).
+// Scheduled jobs: ScheduledPostPublisher (every 30 s), MediaTrashPurgeJob and TrashPurgeJob (daily,
+// both gated by their auto-purge-enabled flags, default false outside the prod profile).
 @EnableScheduling
 public class AsyncConfig {
 }

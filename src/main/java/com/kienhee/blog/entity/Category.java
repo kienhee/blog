@@ -1,5 +1,6 @@
 package com.kienhee.blog.entity;
 
+import org.hibernate.annotations.SQLRestriction;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categories")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,6 +35,10 @@ public class Category {
 
     @Column(name = "visible", nullable = false)
     private boolean visible;
+
+    /** Set while the row is in the Trash (V22). @SQLRestriction hides such rows from every JPA query. */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

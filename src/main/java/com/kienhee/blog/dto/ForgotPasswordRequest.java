@@ -15,6 +15,5 @@ public class ForgotPasswordRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    private String newPassword;
 }
 

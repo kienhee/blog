@@ -41,7 +41,7 @@
         <div style="display:flex;gap:8px;align-items:center">
             <a class="btn btn-ghost" th:href="@{/admin/media}">Back to library</a>
             <button type="button" class="btn danger" id="btn-empty-trash"
-                    th:if="${perms != null and perms.contains('media:delete') and perms.contains('settings:delete')}"
+                    th:if="${perms != null and perms.contains('media:purge')}"
                     th:disabled="${trashSummary.fileCount() + trashSummary.folderCount() == 0}">
                 Empty trash
             </button>
@@ -70,7 +70,7 @@
 
     <div class="table-wrap" style="margin-top:18px"
          th:with="canRestore=${perms != null and perms.contains('media:edit')},
-                  canPurge=${perms != null and perms.contains('media:delete') and perms.contains('settings:delete')}">
+                  canPurge=${perms != null and perms.contains('media:purge')}">
         <!-- Multi-select bar: same component as the media library's, shown while rows are checked. -->
         <div class="selection-bar" id="trash-selection-bar" th:if="${canRestore or canPurge}">
             <span class="count" id="trash-selection-count">0 selected</span>
@@ -120,7 +120,7 @@
                         <button class="btn btn-ghost btn-xs" type="submit">Restore</button>
                     </form>
                     <button type="button" class="btn btn-ghost btn-xs danger btn-purge-folder"
-                            th:if="${perms != null and perms.contains('media:delete') and perms.contains('settings:delete')}"
+                            th:if="${perms != null and perms.contains('media:purge')}"
                             th:data-purge-id="${f.id}" th:data-purge-name="${f.name}">
                         Delete permanently
                     </button>
@@ -152,7 +152,7 @@
                         <button class="btn btn-ghost btn-xs" type="submit">Restore</button>
                     </form>
                     <button type="button" class="btn btn-ghost btn-xs danger btn-purge-media"
-                            th:if="${perms != null and perms.contains('media:delete') and perms.contains('settings:delete')}"
+                            th:if="${perms != null and perms.contains('media:purge')}"
                             th:data-purge-id="${m.id}" th:data-purge-name="${m.originalFilename}">
                         Delete permanently
                     </button>

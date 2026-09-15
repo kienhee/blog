@@ -1,6 +1,26 @@
 spring:
   application:
     name: blog
+  # Local secrets (SMTP credentials) live in a git-ignored file; environment variables also work.
+  config:
+    import: optional:file:./config/secrets.yaml
+
+  # ===== Mail (Gmail SMTP by default) =====
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
   datasource:
     url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
@@ -10,7 +30,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    locations: classpath:db/migration
+    # db/demo = fake demo content + the demo admin account (dev only). The prod profile leaves it out.
+    locations: classpath:db/migration,classpath:db/demo
 
   # ===== JPA / Hibernate =====
   jpa:
@@ -40,6 +61,19 @@ spring:
 
 # ===== Media library =====
 app:
+  trash:
+    # Shared Trash (posts, categories, hashtags, comments). Off in dev; application-prod.yaml turns it on.
+    retention-days: 30
+    auto-purge-enabled: false
+    purge-cron: "0 45 3 * * *"
+  mail:
+    # Off unless config/secrets.yaml (or MAIL_ENABLED) turns it on: when off, emails are only logged.
+    # Test runs force it off (maven-surefire systemPropertyVariables).
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:no-reply@kienhee.com}
+    from-name: Kienhee
+    # Absolute links in emails (password reset) are built from this.
+    base-url: ${APP_BASE_URL:http://localhost:8080}
   upload:
     dir: ./uploads
   media:

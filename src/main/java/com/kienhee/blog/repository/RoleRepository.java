@@ -1,5 +1,9 @@
 package com.kienhee.blog.repository;
 
+import org.springframework.data.jpa.repository.Lock;
+
+import jakarta.persistence.LockModeType;
+
 import com.kienhee.blog.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +27,9 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("select distinct r from Role r left join fetch r.permissions where r.id = :id")
     Optional<Role> findWithPermissionsById(@Param("id") Long id);
+
+    /** Locks the role row until the transaction ends (serialises first-run registration). */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from Role r where r.slug = :slug")
+    Optional<Role> findBySlugForUpdate(@Param("slug") String slug);
 }

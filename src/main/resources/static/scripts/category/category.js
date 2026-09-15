@@ -73,7 +73,7 @@ $(function () {
     $('#delete-category-form').attr('action', '/admin/categories/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'category "' + name + '"' : 'this category', '#delete-category-form',
-        'This cannot be undone. A category that still has subcategories cannot be deleted.');
+        'It moves to the trash, where you can restore it.');
     }
   });
 

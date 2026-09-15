@@ -182,6 +182,14 @@ public class MediaServiceImpl implements MediaService {
                 log.debug("Could not read image dimensions for {}: {}", path, e.getMessage());
             }
         }
+        if (width == null && "image/webp".equalsIgnoreCase(contentType)) {
+            // No WebP decoder in the JDK: take the size from the header (no thumbnail is generated).
+            WebpDimensions.Size size = WebpDimensions.read(original);
+            if (size != null) {
+                width = size.width();
+                height = size.height();
+            }
+        }
 
         // The stable URL embeds the id, which only exists after the INSERT: save, then set the
         // URL (and the thumbnail, whose file name also uses the id), then save again - all in
@@ -215,6 +223,129 @@ public class MediaServiceImpl implements MediaService {
             storageTx.runAfterCommit("optimize media " + id, () -> mediaOptimizationService.optimizeAsync(id));
         }
         return saved;
+    }
+
+    @Override
+    @Transactional
+    public Media replaceImage(Long id, MultipartFile file, String editorEmail) {
+        if (!uploadRateLimiter.tryAcquire(editorEmail)) {
+            throw new IllegalArgumentException("Upload limit reached. Please wait a few minutes and try again.");
+        }
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Please choose an image.");
+        }
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+        if (media.getStatus() != Media.Status.ACTIVE) {
+            throw new IllegalArgumentException("Restore the file from the trash before editing it.");
+        }
+        if (!MediaTypeCatalog.isRasterImage(media.getContentType())) {
+            throw new IllegalArgumentException("Only JPG, PNG, WEBP and GIF images can be edited.");
+        }
+
+        byte[] bytes;
+        try {
+            bytes = file.getBytes();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not read the edited image.");
+        }
+        String contentType = MediaTypeCatalog.normalize(file.getContentType());
+        if (!media.getContentType().equalsIgnoreCase(contentType)) {
+            // Changing the format would change the file name, and with it the public URL.
+            throw new IllegalArgumentException("Replacing keeps the original format ("
+                    + MediaTypeCatalog.defaultExtension(media.getContentType()).replace(".", "").toUpperCase(Locale.ROOT)
+                    + "). Save it as a copy to change the format.");
+        }
+
+        fileValidationChain.validate(UploadValidationContext.builder()
+                .originalFilename(media.getOriginalFilename())
+                .declaredContentType(file.getContentType())
+                .sizeBytes(bytes.length)
+                .bytes(bytes)
+                .uploaderEmail(editorEmail)
+                .folderId(media.getFolder() != null ? media.getFolder().getId() : null)
+                .build());
+
+        BufferedImage decoded;
+        try {
+            decoded = ImageIO.read(new ByteArrayInputStream(bytes));
+        } catch (IOException e) {
+            decoded = null;
+        }
+        Integer newWidth = decoded != null ? decoded.getWidth() : null;
+        Integer newHeight = decoded != null ? decoded.getHeight() : null;
+        if (decoded == null && "image/webp".equalsIgnoreCase(contentType)) {
+            // No WebP decoder in the JDK: the header still gives the size; the file serves as its own thumbnail.
+            WebpDimensions.Size size = WebpDimensions.read(bytes);
+            if (size != null) {
+                newWidth = size.width();
+                newHeight = size.height();
+            }
+        }
+        if (newWidth == null) {
+            throw new IllegalArgumentException("Could not read the edited image.");
+        }
+
+        // The file's owner pays for its bytes, whoever edits it. Growth is reserved up front
+        // (and handed back on failure); shrinkage is released only once the change has committed.
+        Long ownerId = media.getUploadedBy() != null ? media.getUploadedBy().getId() : null;
+        long delta = bytes.length - media.getSizeBytes();
+        boolean reservationHeld = false;
+        if (ownerId != null && delta > 0) {
+            quotaService.ensureQuotaRow(ownerId);
+            quotaService.reserve(ownerId, delta);
+            reservationHeld = true;
+        }
+        try {
+            StoragePath path = layout.effectivePath(media);
+            // Never overwrite in place: move the original aside (moved back on rollback), write the
+            // new bytes (deleted on rollback), and drop the old copy only after commit.
+            StoragePath backup = StoragePath.of(path + ".edit-" + System.nanoTime() + ".bak");
+            storageTx.moveFile(path, backup);
+            storageTx.writeFile(path, bytes);
+            storageTx.deleteFileAfterCommit(backup);
+
+            StoragePath oldThumb = layout.existingThumbnail(id);
+            if (oldThumb != null) {
+                StoragePath thumbBackup = StoragePath.of(oldThumb + ".edit-" + System.nanoTime() + ".bak");
+                storageTx.moveFile(oldThumb, thumbBackup);
+                storageTx.deleteFileAfterCommit(thumbBackup);
+            }
+            boolean hasThumb = generateThumbnail(decoded, id, contentType);
+
+            String sha256 = fileHasher.hash(bytes);
+            StorageBlob blob = media.getBlob();
+            if (blob != null) {
+                blob.setSha256(sha256);
+                blob.setSizeBytes(bytes.length);
+                storageBlobRepository.save(blob);
+            }
+            media.setSizeBytes(bytes.length);
+            media.setOriginalSizeBytes(null);
+            media.setOptimized(false);
+            media.setWidth(newWidth);
+            media.setHeight(newHeight);
+            media.setSha256(sha256);
+            media.setThumbnailUrl(hasThumb ? MediaStorageLayout.thumbnailUrl(id) : null);
+            Media saved = mediaRepository.save(media);
+
+            if (ownerId != null && delta < 0) {
+                long freed = -delta;
+                storageTx.runAfterCommit("release quota after image edit " + id, () -> quotaService.release(ownerId, freed));
+            }
+            if (tinifyProperties.isEnabled()) {
+                storageTx.runAfterCommit("optimize media " + id, () -> mediaOptimizationService.optimizeAsync(id));
+            }
+            reservationHeld = false;
+            return saved;
+        } catch (StorageException e) {
+            log.warn("Could not replace image {}: {}", id, e.getMessage());
+            throw new IllegalArgumentException("Could not save the edited image.");
+        } finally {
+            if (reservationHeld) {
+                quotaService.release(ownerId, delta);
+            }
+        }
     }
 
     /** Appends an extension derived from the content type when the client name has none. */

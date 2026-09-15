@@ -5,6 +5,8 @@
     <title>Media library</title>
     <link rel="stylesheet" th:href="@{/styles/lib/flatpickr.min.css}">
     <link rel="stylesheet" th:href="@{/styles/flatpickr-theme.css}">
+    <link rel="stylesheet" th:href="@{/styles/lib/cropper.min.css}">
+    <link rel="stylesheet" th:href="@{/styles/image-editor.css}">
 </head>
 <body>
 
@@ -39,6 +41,8 @@
 
 <th:block layout:fragment="scripts">
     <script th:src="@{/scripts/lib/flatpickr.min.js}"></script>
+    <script th:src="@{/scripts/lib/cropper.min.js}"></script>
+    <script th:src="@{/scripts/media/image-editor.js}"></script>
     <script th:src="@{/scripts/media/media-explorer.js}"></script>
     <script th:src="@{/scripts/media/media.js}"></script>
 </th:block>

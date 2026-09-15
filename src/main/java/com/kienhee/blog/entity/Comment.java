@@ -1,5 +1,6 @@
 package com.kienhee.blog.entity;
 
+import org.hibernate.annotations.SQLRestriction;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 /** A reader comment on a post. See {@code V18__Comments.sql}. */
 @Entity
 @Table(name = "comments")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -59,6 +61,10 @@ public class Comment {
 
     @Column(name = "user_agent", length = 255)
     private String userAgent;
+
+    /** Set while the row is in the Trash (V22). @SQLRestriction hides such rows from every JPA query. */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

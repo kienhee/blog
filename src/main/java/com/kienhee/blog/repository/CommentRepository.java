@@ -36,4 +36,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying(clearAutomatically = true)
     @Query("delete from Comment c where c.id in :ids")
     int deleteByIds(@Param("ids") Collection<Long> ids);
+
+    /** How many of these ids are live (not already in the trash). */
+    @Query(value = "select count(*) from comments where id in (:ids) and deleted_at is null", nativeQuery = true)
+    long countLiveByIds(@Param("ids") Collection<Long> ids);
+
+    /** Moves the comments and their replies to the Trash with one shared timestamp (restored together). */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "update comments set deleted_at = :now where deleted_at is null and (id in (:ids) or parent_id in (:ids))",
+            nativeQuery = true)
+    int moveToTrash(@Param("ids") Collection<Long> ids, @Param("now") LocalDateTime now);
 }

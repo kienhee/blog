@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New account waiting for approval</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f3f1;font-family:Arial,Helvetica,sans-serif;color:#17171a">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f3f1;padding:32px 12px">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #e2e0dc">
+        <tr><td style="padding:22px 28px;border-bottom:3px solid #17171a;font-size:20px;font-weight:bold" th:text="${siteName}">Kienhee</td></tr>
+        <tr>
+          <td style="padding:28px">
+            <p style="margin:0 0 16px;font-size:22px;font-weight:bold;line-height:1.2">New account waiting for approval</p>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.6">
+              <strong th:text="${name}">Name</strong> (<span th:text="${email}">email</span>) created an account.
+              They can't sign in until an admin approves it.
+            </p>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px">
+              <tr><td style="background:#d4401c"><a th:href="${usersUrl}" href="#" style="display:inline-block;padding:14px 22px;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none">Review on the Users page</a></td></tr>
+            </table>
+            <p style="margin:0;font-size:13px;line-height:1.5;color:#65625d">Don't recognise this person? Leave the account pending or delete it.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

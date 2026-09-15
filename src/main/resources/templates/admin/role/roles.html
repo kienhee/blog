@@ -36,7 +36,7 @@
             </span>
           </a>
 
-          <form th:if="${perms.contains('users:create')}" method="post" th:action="@{/admin/roles}"
+          <form th:if="${perms.contains('roles:create')}" method="post" th:action="@{/admin/roles}"
                 style="display:flex;flex-direction:column;gap:8px;padding:16px 20px">
             <input class="input" name="name" placeholder="New role name" required minlength="2" style="height:34px;font-size:13px">
             <input class="input" name="description" placeholder="Short description (optional)" style="height:34px;font-size:13px">
@@ -51,9 +51,9 @@
             <span style="font-size:18px;font-weight:700" data-role-title
                   th:text="${selectedRole.name} + ' permissions'">Editor permissions</span>
             <span style="display:flex;gap:8px">
-              <button th:if="${perms.contains('users:edit') and !selectedRole.systemRole}"
+              <button th:if="${perms.contains('roles:edit') and !selectedRole.systemRole}"
                       class="btn btn-sm" type="submit" form="permissions-form">Save changes</button>
-              <button th:if="${perms.contains('users:delete') and !selectedRole.systemRole}"
+              <button th:if="${perms.contains('roles:delete') and !selectedRole.systemRole}"
                       type="button" class="btn btn-ghost btn-sm btn-danger" id="btn-delete-role"
                       th:data-id="${selectedRole.id}" th:data-name="${selectedRole.name}">Delete role</button>
             </span>
@@ -66,28 +66,25 @@
              th:text="${selectedRole.description}">Description</p>
 
           <form id="permissions-form" method="post" th:action="@{'/admin/roles/' + ${selectedRole.id} + '/permissions'}">
-            <table class="dt" style="min-width:0">
-              <thead>
-                <tr class="filters" style="background:var(--surf)">
-                  <th style="padding:10px 20px"><span class="kicker">Resource</span></th>
-                  <th style="width:110px;text-align:center"><span class="kicker">View</span></th>
-                  <th style="width:110px;text-align:center"><span class="kicker">Create</span></th>
-                  <th style="width:110px;text-align:center"><span class="kicker">Edit</span></th>
-                  <th style="width:110px;text-align:center"><span class="kicker">Delete</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="row : ${permissionMatrix}">
-                  <td style="padding:12px 20px;font-size:14px;font-weight:600" th:text="${row.label}">Posts</td>
-                  <td th:each="cell : ${row.cells}" style="text-align:center">
-                    <input class="checkbox" type="checkbox" name="permissionIds"
+            <div class="perm-matrix">
+              <div class="perm-row" th:each="row : ${permissionMatrix}"
+                   style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:16px;align-items:start;padding:14px 20px;border-bottom:1px solid var(--line)">
+                <div style="font-size:14px;font-weight:600;padding-top:6px" th:text="${row.label}">Posts</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <label th:each="cell : ${row.cells}" th:title="${cell.code}"
+                         style="display:flex;align-items:flex-start;gap:8px;min-width:210px;flex:1 1 210px;max-width:320px;padding:8px 10px;border:1px solid var(--line);cursor:pointer">
+                    <input class="checkbox" type="checkbox" name="permissionIds" style="margin-top:2px"
                            th:value="${cell.id}"
                            th:checked="${cell.granted}"
-                           th:disabled="${selectedRole.systemRole or !perms.contains('users:edit')}">
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                           th:disabled="${selectedRole.systemRole or !perms.contains('roles:edit')}">
+                    <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                      <span class="kicker" th:text="${cell.action}">view</span>
+                      <span class="dim" style="font-size:12px;line-height:1.35" th:text="${cell.label}">View posts</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>

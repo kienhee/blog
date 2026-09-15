@@ -1,5 +1,6 @@
 package com.kienhee.blog.entity;
 
+import org.hibernate.annotations.SQLRestriction;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "posts")
+@SQLRestriction("deleted_at IS NULL")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -64,6 +66,14 @@ public class Post {
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
+
+    /** When a SCHEDULED post goes live (ScheduledPostPublisher). Null for every other status. */
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
+
+    /** Set while the row is in the Trash (V22). @SQLRestriction hides such rows from every JPA query. */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

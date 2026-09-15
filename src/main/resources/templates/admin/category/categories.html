@@ -29,13 +29,12 @@
 
         <div class="bulk">
           <span class="n">0 selected</span>
-          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
-          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
-          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <button th:if="${perms.contains('categories:delete')}" class="btn btn-ghost btn-xs btn-danger" data-bulk="Delete">Delete</button>
+                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
         </div>
 
         <div class="table-wrap">
-          <table class="dt">
+          <table class="dt" th:data-bulk-delete-url="@{/admin/categories/bulk-delete}" data-bulk-noun="categories" data-bulk-delete-note="They move to the trash, where you can restore them. Categories that still have subcategories or posts are skipped.">
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>

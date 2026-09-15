@@ -59,6 +59,11 @@ public class PostServiceImpl implements PostService {
 
         Set<Hashtag> hashtags = resolveHashtags(request.getHashtagIds());
 
+        boolean scheduled = request.getStatus() == PostStatus.SCHEDULED;
+        if (scheduled && request.getScheduledAt() == null) {
+            throw new IllegalArgumentException("Choose when the post should go live.");
+        }
+
         Post post = Post.builder()
                 .title(request.getTitle().trim())
                 .slug(slug)
@@ -72,6 +77,7 @@ public class PostServiceImpl implements PostService {
                 .seoTitle(request.getSeoTitle() != null && !request.getSeoTitle().isBlank() ? request.getSeoTitle().trim() : null)
                 .seoDescription(request.getSeoDescription() != null && !request.getSeoDescription().isBlank() ? request.getSeoDescription().trim() : null)
                 .publishedAt(request.getStatus() == PostStatus.PUBLISHED ? LocalDateTime.now() : null)
+                .scheduledAt(scheduled ? request.getScheduledAt() : null)
                 .build();
 
         return postRepository.save(post);
@@ -93,6 +99,10 @@ public class PostServiceImpl implements PostService {
 
         Set<Hashtag> hashtags = resolveHashtags(request.getHashtagIds());
 
+        boolean scheduled = request.getStatus() == PostStatus.SCHEDULED;
+        if (scheduled && request.getScheduledAt() == null) {
+            throw new IllegalArgumentException("Choose when the post should go live.");
+        }
         boolean becomingPublished = request.getStatus() == PostStatus.PUBLISHED && post.getPublishedAt() == null;
 
         post.setTitle(request.getTitle().trim());
@@ -109,6 +119,13 @@ public class PostServiceImpl implements PostService {
         if (becomingPublished) {
             post.setPublishedAt(LocalDateTime.now());
         }
+        if (scheduled) {
+            // Off the public site until the publisher job puts it back at the scheduled time.
+            post.setScheduledAt(request.getScheduledAt());
+            post.setPublishedAt(null);
+        } else {
+            post.setScheduledAt(null);
+        }
 
         return postRepository.save(post);
     }
@@ -118,7 +135,8 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
-        postRepository.delete(post);
+        // To the Trash (restore or purge there). Comments stay attached and come back with the post.
+        postRepository.moveToTrash(post.getId(), LocalDateTime.now());
     }
 
     @Override
@@ -144,5 +162,11 @@ public class PostServiceImpl implements PostService {
             throw new IllegalArgumentException("One or more selected hashtags were not found.");
         }
         return new LinkedHashSet<>(found);
+    }
+
+    @Override
+    @Transactional
+    public int publishDuePosts(LocalDateTime now) {
+        return postRepository.publishDue(now);
     }
 }

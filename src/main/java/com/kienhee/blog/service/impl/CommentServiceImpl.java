@@ -95,7 +95,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public int delete(Collection<Long> ids) {
-        return commentRepository.deleteByIds(requireIds(ids));
+        Collection<Long> selected = requireIds(ids);
+        int live = (int) commentRepository.countLiveByIds(selected);
+        // To the Trash, replies included; the count is the comments that were selected.
+        commentRepository.moveToTrash(selected, LocalDateTime.now());
+        return live;
     }
 
     private static Collection<Long> requireIds(Collection<Long> ids) {
@@ -108,5 +112,40 @@ public class CommentServiceImpl implements CommentService {
     private static String truncate(String value, int max) {
         if (value == null) return null;
         return value.length() > max ? value.substring(0, max) : value;
+    }
+
+    @Override
+    @Transactional
+    public Comment replyAsStaff(Long commentId, String content, String staffEmail) {
+        String text = content == null ? "" : content.replace("\r\n", "\n").trim();
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("Write a reply first.");
+        }
+        if (text.length() > 2000) {
+            throw new IllegalArgumentException("Replies can be at most 2000 characters.");
+        }
+        Comment target = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("That comment is no longer available."));
+        User staff = userRepository.findByEmail(staffEmail == null ? "" : staffEmail.trim().toLowerCase(Locale.ROOT))
+                .orElseThrow(() -> new IllegalArgumentException("Your account was not found."));
+
+        Long rootId = target.getParentId() != null ? target.getParentId() : target.getId();
+        // A reply is public, so the conversation it belongs to must be too.
+        for (Long id : new LinkedHashSet<>(List.of(target.getId(), rootId))) {
+            commentRepository.findById(id).filter(c -> c.getStatus() != CommentStatus.APPROVED).ifPresent(c -> {
+                c.setStatus(CommentStatus.APPROVED);
+                commentRepository.save(c);
+            });
+        }
+
+        return commentRepository.save(Comment.builder()
+                .post(postRepository.getReferenceById(target.getPostId()))
+                .parent(commentRepository.getReferenceById(rootId))
+                .user(staff)
+                .authorName(staff.getFullName())
+                .authorEmail(staff.getEmail())
+                .content(text)
+                .status(CommentStatus.APPROVED)
+                .build());
     }
 }

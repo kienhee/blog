@@ -23,7 +23,7 @@ $(function () {
     $('#comment-delete-form').attr('action', '/admin/comments/' + $btn.attr('data-id') + '/delete');
     if (window.khDialog) {
       window.khDialog('the comment by "' + ($btn.attr('data-name') || 'unknown') + '"', '#comment-delete-form',
-        'This cannot be undone. Replies to this comment are deleted with it.');
+        'It moves to the trash with its replies. You can restore it from the Trash page.');
     }
   });
 
@@ -45,7 +45,7 @@ $(function () {
       $form.attr('action', '/admin/comments/bulk-delete');
       if (window.khDialog) {
         window.khDialog(ids.length === 1 ? '1 selected comment' : ids.length + ' selected comments', '#comment-bulk-form',
-          'This cannot be undone. Replies to these comments are deleted with them.');
+          'They move to the trash with their replies. You can restore them from the Trash page.');
       }
       return;
     }
@@ -53,5 +53,42 @@ $(function () {
     $form.attr('action', '/admin/comments/bulk-status');
     $('<input type="hidden" name="status">').val(action).appendTo($form);
     $form[0].submit();
+  });
+});
+
+/* Reply from the moderation page: one modal, its action points at the chosen comment. */
+$(function () {
+  'use strict';
+
+  var $modal = $('#comment-reply-modal');
+  if (!$modal.length) return;
+  var $form = $('#comment-reply-form');
+  var $text = $('#reply-content');
+
+  function close() {
+    $modal.removeClass('open');
+  }
+
+  $(document).on('click', '.btn-reply-comment', function () {
+    var $btn = $(this);
+    $form.attr('action', '/admin/comments/' + $btn.attr('data-id') + '/reply');
+    $('#reply-context').text('Replying to ' + ($btn.attr('data-name') || 'this comment') + ' on "' + ($btn.attr('data-post') || '') + '"');
+    $text.val('');
+    $modal.addClass('open');
+    setTimeout(function () { $text.trigger('focus'); }, 50);
+  });
+
+  $('#reply-cancel').on('click', close);
+  $modal.on('mousedown', function (e) { if (e.target === this) close(); });
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape' && $modal.hasClass('open')) close();
+  });
+
+  $form.on('submit', function (e) {
+    if (!$.trim($text.val())) {
+      e.preventDefault();
+      if (window.khToast) window.khToast('Write a reply first');
+      $text.trigger('focus');
+    }
   });
 });

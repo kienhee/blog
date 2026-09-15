@@ -1,5 +1,7 @@
 package com.kienhee.blog.dto;
 
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import com.kienhee.blog.entity.PostStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -47,6 +49,10 @@ public class PostUpdateRequest {
 
     @Builder.Default
     private Set<Long> hashtagIds = new LinkedHashSet<>();
+
+    /** Required when status is SCHEDULED; the editor posts "yyyy-MM-dd HH:mm" (server time). */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", fallbackPatterns = {"yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd'T'HH:mm:ss"})
+    private LocalDateTime scheduledAt;
 
     @Size(max = 60, message = "SEO title must not exceed 60 characters.")
     private String seoTitle;

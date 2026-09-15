@@ -46,11 +46,15 @@
                 <h2 style="font-size:38px;line-height:1.05;margin-bottom:16px">One email a week. AI that actually works.</h2>
                 <p class="dim" style="line-height:1.55;max-width:48ch">Hands-on guides, tool releases and the news worth your time — written for people who use AI at work.</p>
             </div>
-            <div style="display:flex;flex-direction:column;gap:14px;justify-content:center">
-                <input class="input" type="email" placeholder="Enter your email">
-                <a class="btn" th:href="@{/subscribe}">Subscribe free</a>
+            <form id="newsletter" method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:14px;justify-content:center">
+                <input type="hidden" name="from" value="home">
+                <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+                <input class="input" type="email" name="email" th:value="${newsletterEmail}" placeholder="Enter your email" maxlength="150" aria-label="Email address">
+                <button class="btn" type="submit">Subscribe free</button>
+                <span th:if="${newsletterSuccess}" class="cmt-flash ok" role="status" style="margin-top:0" th:text="${newsletterSuccess}">Check your inbox</span>
+                <span th:if="${newsletterError}" class="cmt-flash err" role="alert" style="margin-top:0" th:text="${newsletterError}">Enter a valid email</span>
                 <span class="dim" style="font-size:12px">No spam. Unsubscribe anytime.</span>
-            </div>
+            </form>
         </div>
     </section>
 

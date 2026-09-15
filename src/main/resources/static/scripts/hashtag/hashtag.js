@@ -70,7 +70,7 @@ $(function () {
     $('#delete-hashtag-form').attr('action', '/admin/hashtags/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'hashtag "' + name + '"' : 'this hashtag', '#delete-hashtag-form',
-        'This cannot be undone. The hashtag is removed from every post that uses it; the posts themselves stay.');
+        'It moves to the trash, where you can restore it.');
     }
   });
 

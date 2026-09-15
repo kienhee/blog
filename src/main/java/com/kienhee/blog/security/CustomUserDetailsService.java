@@ -29,6 +29,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .authorities(buildAuthorities(user))
+                // Checked only after the password matches (SecurityConfig), so status never leaks to strangers.
+                .disabled(user.getStatus() == com.kienhee.blog.entity.UserStatus.PENDING)
+                .accountLocked(user.getStatus() == com.kienhee.blog.entity.UserStatus.DISABLED)
                 .build();
     }
 

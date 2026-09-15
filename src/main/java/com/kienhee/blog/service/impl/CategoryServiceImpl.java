@@ -1,5 +1,7 @@
 package com.kienhee.blog.service.impl;
 
+import java.time.LocalDateTime;
+import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.dto.CategoryCreateRequest;
 import com.kienhee.blog.dto.CategoryUpdateRequest;
 import com.kienhee.blog.entity.Category;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final PostRepository postRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -81,10 +84,13 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
 
         if (categoryRepository.existsByParentId(id)) {
-            throw new IllegalArgumentException("Cannot delete a category that has subcategories.");
+            throw new IllegalArgumentException("Cannot delete a category that has subcategories (including ones in the trash).");
+        }
+        if (postRepository.existsByCategory_Id(id)) {
+            throw new IllegalArgumentException("Cannot delete a category that still has posts (including posts in the trash). Move or permanently delete them first.");
         }
 
-        categoryRepository.delete(category);
+        categoryRepository.moveToTrash(category.getId(), LocalDateTime.now());
     }
 
     @Override

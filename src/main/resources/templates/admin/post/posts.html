@@ -29,13 +29,12 @@
 
         <div class="bulk">
           <span class="n">0 selected</span>
-          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
-          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
-          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <button th:if="${perms.contains('posts:delete')}" class="btn btn-ghost btn-xs btn-danger" data-bulk="Delete">Delete</button>
+                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
         </div>
 
         <div class="table-wrap">
-          <table class="dt">
+          <table class="dt" th:data-bulk-delete-url="@{/admin/posts/bulk-delete}" data-bulk-noun="posts" data-bulk-delete-note="They move to the trash; their public URLs return 404 until you restore them.">
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
@@ -88,12 +87,14 @@
                   <span class="badge"
                         th:style="${p.status.name() == 'PUBLISHED' ? 'color:#5ee38a' : (p.status.name() == 'DRAFT' ? 'color:#a0a0a0' : (p.status.name() == 'SCHEDULED' ? 'color:#ffc94d' : 'color:#7d7979'))}"
                         th:text="${#strings.capitalize(#strings.toLowerCase(p.status.name()))}">Published</span>
+                  <span th:if="${p.status.name() == 'SCHEDULED'}" class="dim" style="display:block;margin-top:4px;font-size:11px"
+                        th:text="${p.scheduledAt != null} ? ${#temporals.format(p.scheduledAt, 'yyyy-MM-dd HH:mm')} : 'No time set'">2026-09-20 09:00</span>
                 </td>
                 <td class="dim" th:text="${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
                 <td class="right">
                   <span style="display:inline-flex;gap:6px">
                     <a class="btn btn-ghost btn-xs" th:href="@{'/admin/post/' + ${p.id} + '/edit'}">Edit</a>
-                    <button type="button" class="btn btn-ghost btn-xs btn-danger btn-del-post"
+                    <button th:if="${perms.contains('posts:delete')}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-post"
                             th:data-id="${p.id}"
                             th:data-name="${p.title}">Del</button>
                   </span>

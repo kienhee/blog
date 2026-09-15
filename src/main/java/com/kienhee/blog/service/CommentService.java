@@ -33,6 +33,14 @@ public interface CommentService {
      */
     Comment submit(Post post, CommentForm form, User user, String ipAddress, String userAgent);
 
+    /**
+     * Staff reply from the Comments page: posted under the staff account and approved right away, one level
+     * deep (a reply to a reply goes under the top-level comment). Replying approves the comment it answers.
+     *
+     * @throws IllegalArgumentException for an empty/too long reply or a comment that no longer exists
+     */
+    Comment replyAsStaff(Long commentId, String content, String staffEmail);
+
     List<Comment> allForAdmin();
 
     long countByStatus(CommentStatus status);
@@ -40,7 +48,7 @@ public interface CommentService {
     /** @throws IllegalArgumentException when no ids are given */
     int updateStatus(Collection<Long> ids, CommentStatus status);
 
-    /** Deletes the comments and their replies. @throws IllegalArgumentException when no ids are given */
+    /** Moves the comments and their replies to the Trash. @throws IllegalArgumentException when no ids are given */
     int delete(Collection<Long> ids);
 
     /** "approved" / "pending" / "spam" (any case) → status. @throws IllegalArgumentException otherwise */

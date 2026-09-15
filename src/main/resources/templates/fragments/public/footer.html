@@ -20,13 +20,19 @@
             <a th:href="${mainAuthorId != null} ? @{/author/{id}(id=${mainAuthorId})} : @{/author}">Author</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/subscribe}">Subscribe</a>
+            <a th:href="@{/rss.xml}">RSS</a>
         </div>
-        <div class="col">
+        <th:block th:with="xUrl=${site != null ? site['social.x'] : null},
+                      ytUrl=${site != null ? site['social.youtube'] : null},
+                      xOk=${xUrl != null and (#strings.startsWith(xUrl, 'https://') or #strings.startsWith(xUrl, 'http://'))},
+                      ytOk=${ytUrl != null and (#strings.startsWith(ytUrl, 'https://') or #strings.startsWith(ytUrl, 'http://'))}">
+        <!-- Links come from Settings (social.x, social.youtube); only http(s) URLs are rendered. -->
+        <div class="col" th:if="${xOk or ytOk}">
             <span class="kicker">Elsewhere</span>
-            <a href="#">X / Twitter</a>
-            <a href="#">YouTube</a>
-            <a href="#">RSS</a>
+            <a th:if="${xOk}" th:href="${xUrl}" target="_blank" rel="me noopener noreferrer">X / Twitter</a>
+            <a th:if="${ytOk}" th:href="${ytUrl}" target="_blank" rel="me noopener noreferrer">YouTube</a>
         </div>
+        </th:block>
     </div>
 </footer>
 

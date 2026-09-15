@@ -21,6 +21,16 @@ public interface MediaService {
     Media updateMedia(Long id, MediaUpdateRequest request);
 
     /**
+     * Replaces an image's pixels with an edited version from the image editor. The id, public URL,
+     * file name and format stay the same, so every page using the image picks up the change.
+     * Dimensions, size, hash and thumbnail are recomputed; the owner's quota follows the new size.
+     *
+     * @throws IllegalArgumentException for a missing/trashed file, a non-raster image, a different
+     *                                  format than the original, or content that fails validation
+     */
+    Media replaceImage(Long id, MultipartFile file, String editorEmail);
+
+    /**
      * <b>Soft</b> delete: moves the file to the trash ({@code status = TRASHED},
      * {@code deleted_at = now}). The bytes stay on disk, the blob's ref_count is untouched
      * and the uploader's quota is NOT given back — trashed files still occupy quota, or

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/public-master}">
+<head>
+    <title>Newsletter</title>
+    <meta name="referrer" content="no-referrer">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+<main layout:fragment="content">
+  <section class="wrap" style="padding-top:80px;padding-bottom:40px">
+    <div style="max-width:620px;display:flex;flex-direction:column;gap:18px">
+
+      <th:block th:if="${state == 'confirmed'}">
+        <span class="kicker" style="color:var(--accent)">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05">You are subscribed</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55">Thanks for confirming. The next issue lands in your inbox. Every email has a one-click way to leave.</p>
+        <div><a class="btn" th:href="@{/}">Back to the site</a></div>
+      </th:block>
+
+      <th:block th:if="${state == 'unsubscribe'}">
+        <span class="kicker" style="color:var(--accent)">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05">Unsubscribe?</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55">You will stop receiving the newsletter. You can sign up again at any time.</p>
+        <form method="post" th:action="@{/subscribe/unsubscribe}">
+          <input type="hidden" name="token" th:value="${token}">
+          <button class="btn" type="submit">Unsubscribe</button>
+          <a class="btn btn-ghost" th:href="@{/}" style="margin-left:8px">Keep me subscribed</a>
+        </form>
+      </th:block>
+
+      <th:block th:if="${state == 'unsubscribed'}">
+        <span class="kicker" style="color:var(--accent)">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05">You are unsubscribed</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55">You won't receive any more issues. Changed your mind? Sign up again whenever you like.</p>
+        <div><a class="btn btn-ghost" th:href="@{/subscribe}">Subscribe again</a></div>
+      </th:block>
+
+      <th:block th:if="${state == 'invalid'}">
+        <span class="kicker" style="color:var(--accent)">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05">Link expired</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55">This link is invalid or has expired. Confirmation links work for 7 days.</p>
+        <div><a class="btn" th:href="@{/subscribe}">Sign up again</a></div>
+      </th:block>
+
+    </div>
+  </section>
+</main>
+</body>
+</html>

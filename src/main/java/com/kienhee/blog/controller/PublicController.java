@@ -1,5 +1,7 @@
 package com.kienhee.blog.controller;
 
+import com.kienhee.blog.service.NewsletterService;
+import com.kienhee.blog.service.PageViewService;
 import com.kienhee.blog.dto.CommentForm;
 import com.kienhee.blog.entity.Category;
 import com.kienhee.blog.service.CommentService;
@@ -30,6 +32,8 @@ public class PublicController {
 
     private final PublicBlogService blog;
     private final CommentService commentService;
+    private final PageViewService pageViewService;
+    private final NewsletterService newsletterService;
 
     private static ResponseStatusException notFound() {
         return new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -99,8 +103,15 @@ public class PublicController {
     }
 
     @GetMapping("/article/{slug}")
-    public String article(@PathVariable String slug, Model model) {
+    public String article(@PathVariable String slug, Model model, jakarta.servlet.http.HttpServletRequest request) {
         Post post = blog.article(slug).orElseThrow(PublicController::notFound);
+        if (ViewCountingPolicy.isCountable(request)) {
+            try {
+                pageViewService.recordView(post.getId(), java.time.LocalDate.now());
+            } catch (org.springframework.dao.DataAccessException e) {
+                // A lost view is never worth a broken article page.
+            }
+        }
         model.addAttribute("post", post);
         model.addAttribute("previous", blog.previous(post).orElse(null));
         model.addAttribute("next", blog.next(post).orElse(null));
@@ -125,7 +136,8 @@ public class PublicController {
     }
 
     @GetMapping("/subscribe")
-    public String subscribe() {
+    public String subscribe(Model model) {
+        model.addAttribute("subscriberCount", newsletterService.confirmedCount());
         return "public/subscribe";
     }
 }

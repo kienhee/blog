@@ -1,0 +1,31 @@
+# Production profile: run with SPRING_PROFILES_ACTIVE=prod.
+# Secrets never live here: DB credentials, MAIL_*, TINIFY_API_KEY and APP_BASE_URL come from environment variables.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8}
+    username: ${DB_USERNAME:blog}
+    password: ${DB_PASSWORD:}
+  flyway:
+    # No db/demo: a fresh production database gets the schema and the permission catalog, never fake content
+    # or the demo admin account. The first person to sign up becomes the Admin.
+    locations: classpath:db/migration
+  thymeleaf:
+    cache: true
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+server:
+  # Behind a reverse proxy: honour X-Forwarded-* so absolute links (RSS, sitemap, reset emails) use the public host.
+  forward-headers-strategy: framework
+
+app:
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+  media:
+    trash:
+      auto-purge-enabled: true
+  trash:
+    auto-purge-enabled: true

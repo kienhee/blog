@@ -12,7 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -25,13 +30,26 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/admin/roles")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('users:view')")
+@PreAuthorize("hasAuthority('roles:view')")
 public class RoleController {
 
-    /** Display order of the grid, matching the resource list the UI was designed around. */
-    private static final List<String> RESOURCE_ORDER =
-            List.of("posts", "categories", "hashtags", "media", "comments", "users", "settings");
-    private static final List<String> ACTION_ORDER = List.of("view", "create", "edit", "delete");
+    /** Module order on the Roles page (catalog: V20__Permission_catalog_v2.sql). Unknown modules are appended. */
+    private static final Map<String, String> RESOURCE_LABELS = new LinkedHashMap<>();
+    static {
+        RESOURCE_LABELS.put("dashboard", "Dashboard");
+        RESOURCE_LABELS.put("posts", "Posts");
+        RESOURCE_LABELS.put("categories", "Categories");
+        RESOURCE_LABELS.put("hashtags", "Hashtags");
+        RESOURCE_LABELS.put("media", "Media library");
+        RESOURCE_LABELS.put("comments", "Comments");
+        RESOURCE_LABELS.put("users", "Users");
+        RESOURCE_LABELS.put("roles", "Roles");
+        RESOURCE_LABELS.put("settings", "Settings");
+        RESOURCE_LABELS.put("subscribers", "Newsletter");
+    }
+
+    /** Action order inside a module; unknown actions are appended. */
+    private static final List<String> ACTION_ORDER = List.of("view", "create", "edit", "publish", "send", "delete", "purge");
 
     private final RoleService roleService;
 
@@ -55,7 +73,7 @@ public class RoleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('users:create')")
+    @PreAuthorize("hasAuthority('roles:create')")
     public String createRole(@Valid @ModelAttribute("roleCreateRequest") RoleCreateRequest request,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes) {
@@ -75,7 +93,7 @@ public class RoleController {
     }
 
     @PostMapping("/{id}/edit")
-    @PreAuthorize("hasAuthority('users:edit')")
+    @PreAuthorize("hasAuthority('roles:edit')")
     public String renameRole(@PathVariable Long id,
                               @RequestParam String name,
                               @RequestParam(required = false) String description,
@@ -90,7 +108,7 @@ public class RoleController {
     }
 
     @PostMapping("/{id}/permissions")
-    @PreAuthorize("hasAuthority('users:edit')")
+    @PreAuthorize("hasAuthority('roles:edit')")
     public String savePermissions(@PathVariable Long id,
                                    @RequestParam(value = "permissionIds", required = false) List<Long> permissionIds,
                                    RedirectAttributes redirectAttributes) {
@@ -104,7 +122,7 @@ public class RoleController {
     }
 
     @PostMapping("/{id}/delete")
-    @PreAuthorize("hasAuthority('users:delete')")
+    @PreAuthorize("hasAuthority('roles:delete')")
     public String deleteRole(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             roleService.deleteRole(id);
@@ -116,34 +134,35 @@ public class RoleController {
     }
 
     private List<PermissionMatrixRow> buildMatrix(Role selected) {
-        List<Permission> all = roleService.getAllPermissions();
         Set<Long> granted = selected == null ? Set.of()
                 : selected.getPermissions().stream().map(Permission::getId).collect(Collectors.toSet());
 
-        Map<String, Map<String, Permission>> byResource = new LinkedHashMap<>();
-        for (Permission p : all) {
-            byResource.computeIfAbsent(p.getResource(), k -> new LinkedHashMap<>()).put(p.getAction(), p);
+        Map<String, List<Permission>> byResource = new LinkedHashMap<>();
+        RESOURCE_LABELS.keySet().forEach(resource -> byResource.put(resource, new ArrayList<>()));
+        for (Permission p : roleService.getAllPermissions()) {
+            byResource.computeIfAbsent(p.getResource(), k -> new ArrayList<>()).add(p);
         }
 
         List<PermissionMatrixRow> rows = new ArrayList<>();
-        for (String resource : RESOURCE_ORDER) {
-            Map<String, Permission> actions = byResource.get(resource);
-            if (actions == null) continue;
-
-            List<PermissionMatrixRow.Cell> cells = new ArrayList<>();
-            for (String action : ACTION_ORDER) {
-                Permission p = actions.get(action);
-                if (p == null) continue;
-                // A system role (Owner) always shows everything ticked and locked.
-                boolean isGranted = (selected != null && selected.isSystemRole()) || granted.contains(p.getId());
-                cells.add(new PermissionMatrixRow.Cell(p.getId(), action, isGranted));
+        byResource.forEach((resource, permissions) -> {
+            if (permissions.isEmpty()) {
+                return;
             }
-            rows.add(new PermissionMatrixRow(resource, capitalize(resource), cells));
-        }
+            permissions.sort((a, b) -> Integer.compare(actionRank(a.getAction()), actionRank(b.getAction())));
+            List<PermissionMatrixRow.Cell> cells = permissions.stream()
+                    // A system role (Admin) always shows everything ticked and locked.
+                    .map(p -> new PermissionMatrixRow.Cell(p.getId(), p.getAction(), p.getCode(), p.getLabel(),
+                            (selected != null && selected.isSystemRole()) || granted.contains(p.getId())))
+                    .toList();
+            String label = RESOURCE_LABELS.getOrDefault(resource,
+                    resource.substring(0, 1).toUpperCase() + resource.substring(1));
+            rows.add(new PermissionMatrixRow(resource, label, cells));
+        });
         return rows;
     }
 
-    private String capitalize(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    private static int actionRank(String action) {
+        int index = ACTION_ORDER.indexOf(action);
+        return index < 0 ? ACTION_ORDER.size() : index;
     }
 }

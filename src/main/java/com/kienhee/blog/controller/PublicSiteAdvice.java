@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Site-wide values for the public layout (header, footer, search overlay). */
-@ControllerAdvice(assignableTypes = PublicController.class)
+@ControllerAdvice(assignableTypes = {PublicController.class, NewsletterController.class})
 @RequiredArgsConstructor
 public class PublicSiteAdvice {
 

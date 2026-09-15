@@ -110,7 +110,7 @@ public class CategoryController {
     public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             categoryService.deleteCategory(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Category deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", "Category moved to trash.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -126,5 +126,14 @@ public class CategoryController {
         } else {
             bindingResult.reject("categoryError", message);
         }
+    }
+
+    @PostMapping("/bulk-delete")
+    @PreAuthorize("hasAuthority('categories:delete')")
+    public String bulkDelete(@org.springframework.web.bind.annotation.RequestParam(name = "ids", required = false) java.util.List<Long> ids,
+                             RedirectAttributes redirectAttributes) {
+        java.util.Map<Long, String> names = categoryService.getAllCategories().stream().collect(java.util.stream.Collectors.toMap(c -> c.getId(), c -> c.getName(), (a, b) -> a));
+        BulkDelete.run(ids, "category", "categories", names, categoryService::deleteCategory, redirectAttributes);
+        return "redirect:/admin/categories";
     }
 }

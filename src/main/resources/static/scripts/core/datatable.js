@@ -2,6 +2,12 @@
 $(function () {
   'use strict';
 
+  // Lightbox2 (admin layout) inserts captions as HTML by default. Captions come from user data
+  // (post titles, file names), so they are always inserted as text.
+  if (window.lightbox) {
+    window.lightbox.option({ sanitizeTitle: true });
+  }
+
   if (!$.fn.DataTable) {
     return;
   }
@@ -99,13 +105,28 @@ $(function () {
     });
 
     if ($bulk.length) {
-      $bulk.find('[data-bulk]').on('click', function () {
-        var act = $(this).attr('data-bulk');
-        if (act === 'Delete') {
-          if (window.khDialog) window.khDialog('the selected records');
+      // Bulk delete posts the checked ids (from every page, not only the visible one) to the table's
+      // data-bulk-delete-url through the shared confirm dialog. Tables without that attribute have no bulk delete.
+      $bulk.find('[data-bulk="Delete"]').on('click', function () {
+        var url = $table.attr('data-bulk-delete-url');
+        if (!url) return;
+        var ids = $(dt.rows().nodes()).find('.rowcheck:checked').map(function () { return this.value; }).get();
+        if (!ids.length) {
+          if (window.khToast) window.khToast('Select at least one row');
           return;
         }
-        if (window.khToast) window.khToast(act + ' · applied to selection');
+        var $form = $('#dt-bulk-delete-form');
+        if (!$form.length) {
+          $form = $('<form id="dt-bulk-delete-form" method="post" style="display:none"></form>').appendTo(document.body);
+        }
+        $form.empty().attr('action', url);
+        $('<input type="hidden" name="_csrf">').val($('meta[name="_csrf"]').attr('content') || '').appendTo($form);
+        $.each(ids, function (_, id) { $('<input type="hidden" name="ids">').val(id).appendTo($form); });
+        var noun = $table.attr('data-bulk-noun') || 'records';
+        if (window.khDialog) {
+          window.khDialog(ids.length + ' selected ' + noun, '#dt-bulk-delete-form',
+            $table.attr('data-bulk-delete-note') || 'This cannot be undone.');
+        }
       });
 
       $bulk.find('[data-bulk-clear]').on('click', function () {

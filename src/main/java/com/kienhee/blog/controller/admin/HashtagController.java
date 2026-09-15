@@ -110,7 +110,7 @@ public class HashtagController {
     public String deleteHashtag(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             hashtagService.deleteHashtag(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Hashtag deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", "Hashtag moved to trash.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -124,5 +124,14 @@ public class HashtagController {
         } else {
             bindingResult.reject("hashtagError", message);
         }
+    }
+
+    @PostMapping("/bulk-delete")
+    @PreAuthorize("hasAuthority('hashtags:delete')")
+    public String bulkDelete(@org.springframework.web.bind.annotation.RequestParam(name = "ids", required = false) java.util.List<Long> ids,
+                             RedirectAttributes redirectAttributes) {
+        java.util.Map<Long, String> names = hashtagService.getAllHashtags().stream().collect(java.util.stream.Collectors.toMap(h -> h.getId(), h -> h.getName(), (a, b) -> a));
+        BulkDelete.run(ids, "hashtag", "hashtags", names, hashtagService::deleteHashtag, redirectAttributes);
+        return "redirect:/admin/hashtags";
     }
 }

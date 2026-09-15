@@ -12,15 +12,18 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
  */
 public final class TestAuth {
 
-    /** Every permission in the seeded catalog — equivalent to the Owner role. */
+    /** Every permission in the seeded catalog (V20) — equivalent to the Admin role. */
     public static final String[] ALL_PERMISSIONS = {
-            "posts:view", "posts:create", "posts:edit", "posts:delete",
+            "dashboard:view",
+            "posts:view", "posts:create", "posts:edit", "posts:publish", "posts:delete",
             "categories:view", "categories:create", "categories:edit", "categories:delete",
             "hashtags:view", "hashtags:create", "hashtags:edit", "hashtags:delete",
-            "media:view", "media:create", "media:edit", "media:delete",
-            "comments:view", "comments:create", "comments:edit", "comments:delete",
+            "media:view", "media:create", "media:edit", "media:delete", "media:purge",
+            "comments:view", "comments:edit", "comments:delete",
             "users:view", "users:create", "users:edit", "users:delete",
-            "settings:view", "settings:create", "settings:edit", "settings:delete"
+            "roles:view", "roles:create", "roles:edit", "roles:delete",
+            "settings:view", "settings:edit",
+            "subscribers:view", "subscribers:send", "subscribers:delete"
     };
 
     private TestAuth() {
@@ -28,7 +31,7 @@ public final class TestAuth {
 
     /** Signed in as the seeded admin, holding every permission. */
     public static RequestPostProcessor owner() {
-        return owner("admin@kienhee.com");
+        return owner("test-owner@kienhee.test");
     }
 
     public static RequestPostProcessor owner(String email) {

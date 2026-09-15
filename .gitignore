@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets (SMTP credentials etc.) ###
+/config/secrets.yaml
+
+### Runtime data (media uploaded while running the app) ###
+/uploads/

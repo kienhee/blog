@@ -1,5 +1,6 @@
 package com.kienhee.blog.repository;
 
+import com.kienhee.blog.entity.UserStatus;
 import com.kienhee.blog.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,5 +34,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select distinct u.avatarUrl from User u where u.avatarUrl is not null")
     List<String> findDistinctAvatarUrls();
-}
 
+    /** How many accounts hold a system (Admin) role — the last one can never lose it. */
+    long countByRole_SystemRoleTrue();
+
+    /** Admin accounts that can still sign in — the last one can never be demoted, disabled or deleted. */
+    long countByRole_SystemRoleTrueAndStatus(UserStatus status);
+
+    long countByStatus(UserStatus status);
+
+    /** Where "new account waiting for approval" emails go. */
+    @Query("select u.email from User u join u.role r where r.systemRole = true and u.status = com.kienhee.blog.entity.UserStatus.ACTIVE")
+    List<String> findActiveAdminEmails();
+}

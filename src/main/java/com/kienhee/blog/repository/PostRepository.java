@@ -1,5 +1,6 @@
 package com.kienhee.blog.repository;
 
+import org.springframework.data.jpa.repository.Modifying;
 import com.kienhee.blog.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +16,20 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    boolean existsBySlug(String slug);
+    /** Counts trashed rows too: a slug held by something in the trash is still taken (the column is unique). */
+    @Query(value = "select count(*) from posts where slug = :slug", nativeQuery = true)
+    long countAllBySlug(@Param("slug") String slug);
 
-    boolean existsBySlugAndIdNot(String slug, Long id);
+    @Query(value = "select count(*) from posts where slug = :slug and id <> :id", nativeQuery = true)
+    long countAllBySlugExcluding(@Param("slug") String slug, @Param("id") Long id);
+
+    default boolean existsBySlug(String slug) {
+        return countAllBySlug(slug) > 0;
+    }
+
+    default boolean existsBySlugAndIdNot(String slug, Long id) {
+        return countAllBySlugExcluding(slug, id) > 0;
+    }
 
     boolean existsByCoverImage(String coverImage);
 
@@ -98,4 +110,35 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p.author.id from Post p where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED " +
             "group by p.author.id order by count(p) desc")
     List<Long> findPublishingAuthorIds(Pageable pageable);
+
+    /** Includes trashed posts: they still reference the author (posts.author_id is NOT NULL). */
+    @Query(value = "select count(*) from posts where author_id = :authorId", nativeQuery = true)
+    long countAllByAuthor(@Param("authorId") Long authorId);
+
+    /** Includes trashed posts: they still reference the category (posts.category_id is NOT NULL). */
+    @Query(value = "select count(*) from posts where category_id = :categoryId", nativeQuery = true)
+    long countAllByCategory(@Param("categoryId") Long categoryId);
+
+    default boolean existsByAuthor_Id(Long authorId) {
+        return countAllByAuthor(authorId) > 0;
+    }
+
+    default boolean existsByCategory_Id(Long categoryId) {
+        return countAllByCategory(categoryId) > 0;
+    }
+
+    /**
+     * Publishes every SCHEDULED post whose time has come, in one conditional UPDATE: safe to run repeatedly
+     * or on several instances. published_at becomes the scheduled time, so ordering reflects the plan.
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update Post p set p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED, p.publishedAt = p.scheduledAt, " +
+            "p.updatedAt = :now where p.status = com.kienhee.blog.entity.PostStatus.SCHEDULED " +
+            "and p.scheduledAt is not null and p.scheduledAt <= :now")
+    int publishDue(@Param("now") LocalDateTime now);
+
+    /** Moves the row to the Trash (the entity is filtered, so this is native). */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "update posts set deleted_at = :now where id = :id and deleted_at is null", nativeQuery = true)
+    int moveToTrash(@Param("id") Long id, @Param("now") LocalDateTime now);
 }

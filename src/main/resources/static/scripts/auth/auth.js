@@ -9,6 +9,7 @@ $(function () {
   var hasFullName = $authForm.find('[name="fullName"]').length > 0;
   var isRegister = action.indexOf('register') !== -1 || hasFullName;
   var isForgot = action.indexOf('forgot') !== -1;
+  var isReset = action.indexOf('/auth/reset') !== -1;
 
   var validationRules = {
     email: {
@@ -24,7 +25,19 @@ $(function () {
     }
   };
 
-  if (isRegister) {
+  if (isReset) {
+    validationRules.password = { required: true, minlength: 8, maxlength: 72 };
+    validationMessages.password = {
+      required: 'Password is required.',
+      minlength: 'Password must be at least 8 characters.',
+      maxlength: 'Password must be at most 72 characters.'
+    };
+    validationRules.confirmPassword = { required: true, equalTo: '#password' };
+    validationMessages.confirmPassword = {
+      required: 'Please confirm the new password.',
+      equalTo: "The two passwords don't match."
+    };
+  } else if (isRegister) {
     validationRules.fullName = {
       required: true,
       minlength: 2

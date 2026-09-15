@@ -15,8 +15,8 @@
     <div class="h"><span style="font-size:22px;font-weight:800;letter-spacing:-.02em">Kienhee</span> </div>
     <div class="b">
       <div>
-        <h1 style="font-size:32px;line-height:1.05">Create account</h1>
-        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5">Sign up to manage posts, categories and hashtags.</p>
+        <h1 style="font-size:32px;line-height:1.05" th:text="${firstAccount} ? 'Create the owner account' : 'Create account'">Create account</h1>
+        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5"><th:block th:if="${firstAccount}">This is the first account on the site, so it gets full admin access.</th:block><th:block th:unless="${firstAccount}">An administrator reviews new accounts. You can sign in once yours is approved.</th:block></p>
       </div>
 
       <div th:if="${errorMessage}" style="padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">

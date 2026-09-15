@@ -69,7 +69,20 @@ public class CommentController {
     private String remove(List<Long> ids, RedirectAttributes redirect) {
         try {
             int n = commentService.delete(ids);
-            redirect.addFlashAttribute("successMessage", (n == 1 ? "1 comment" : n + " comments") + " deleted.");
+            redirect.addFlashAttribute("successMessage", (n == 1 ? "1 comment" : n + " comments") + " moved to trash.");
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return REDIRECT;
+    }
+
+    @PostMapping("/{id}/reply")
+    @PreAuthorize("hasAuthority('comments:edit')")
+    public String reply(@PathVariable Long id, @RequestParam(value = "content", required = false) String content,
+                        java.security.Principal principal, RedirectAttributes redirect) {
+        try {
+            commentService.replyAsStaff(id, content, principal != null ? principal.getName() : null);
+            redirect.addFlashAttribute("successMessage", "Reply posted.");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("errorMessage", e.getMessage());
         }

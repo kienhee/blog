@@ -43,6 +43,12 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    /** Only ACTIVE accounts can sign in (V25). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

@@ -104,12 +104,33 @@
             <div class="meta-block">
               <span class="kicker">Status<span class="req"> *</span></span>
               <select class="select" id="post-status" name="status" style="margin-top:8px">
+                <th:block th:if="${perms.contains('posts:publish')}">
                 <option value="DRAFT" th:selected="${postForm.status != null and postForm.status.name() == 'DRAFT'}">Draft</option>
                 <option value="SCHEDULED" th:selected="${postForm.status != null and postForm.status.name() == 'SCHEDULED'}">Scheduled</option>
                 <option value="PUBLISHED" th:selected="${postForm.status != null and postForm.status.name() == 'PUBLISHED'}">Published</option>
                 <option value="ARCHIVED" th:selected="${postForm.status != null and postForm.status.name() == 'ARCHIVED'}">Archived</option>
+                </th:block>
+                <!-- Without posts:publish: new posts are drafts and an existing post keeps its status (enforced in PostController). -->
+                <th:block th:unless="${perms.contains('posts:publish')}">
+                <option th:if="${postForm.status == null or postId == null}" value="DRAFT" selected>Draft</option>
+                <option th:if="${postForm.status != null and postId != null}" th:value="${postForm.status.name()}" selected
+                        th:text="${#strings.capitalize(#strings.toLowerCase(postForm.status.name()))}">Draft</option>
+                </th:block>
               </select>
+              <span th:unless="${perms.contains('posts:publish')}" class="dim" style="display:block;margin-top:6px;font-size:12px">Publishing needs the "Publish" permission. Ask an admin.</span>
               <span class="err show" id="err-status" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
+              <!-- Shown while the status is Scheduled (post-editor.js); ScheduledPostPublisher publishes it at this time. -->
+              <div id="post-schedule" style="margin-top:12px"
+                   th:hidden="${postForm.status == null or postForm.status.name() != 'SCHEDULED'}">
+                <label class="kicker" for="post-scheduledAt">Publish on<span class="req"> *</span></label>
+                <input class="input" type="text" id="post-scheduledAt" name="scheduledAt" style="margin-top:8px" autocomplete="off"
+                       placeholder="Pick a date and time"
+                       th:value="${postForm.scheduledAt != null ? #temporals.format(postForm.scheduledAt, 'yyyy-MM-dd HH:mm') : ''}"
+                       th:disabled="${!perms.contains('posts:publish')}">
+                <span class="dim" style="display:block;margin-top:6px;font-size:12px"
+                      th:text="|Goes live automatically at this time (server time, ${serverZone}).|">Goes live automatically at this time.</span>
+                <span class="err show" id="err-scheduledAt" th:if="${#fields.hasErrors('scheduledAt')}" th:errors="*{scheduledAt}"></span>
+              </div>
             </div>
 
             <div class="meta-block">

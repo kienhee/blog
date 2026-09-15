@@ -25,6 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class BlogApplicationTests {
 
+	/** The dev database already has accounts (sign-up closed); these tests cover the sign-up form itself. */
+	@org.springframework.test.context.bean.override.mockito.MockitoBean
+	private com.kienhee.blog.service.RegistrationPolicy registrationPolicy;
+
 	@Autowired
 	private WebApplicationContext wac;
 
@@ -41,6 +45,7 @@ class BlogApplicationTests {
 
 	@BeforeEach
 	void setUp() {
+		org.mockito.Mockito.when(registrationPolicy.isFirstAccount()).thenReturn(true);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
 				.apply(springSecurity())
 				.build();

@@ -53,7 +53,9 @@
     delete: I('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>', MENU),
     info: I('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', MENU),
     folder: I('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>', MENU),
-    select: I('<path d="M20 6 9 17l-5-5"/>', MENU)
+    select: I('<path d="M20 6 9 17l-5-5"/>', MENU),
+    edit: I('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>', MENU),
+    preview: I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6"/><path d="M8 11h6"/>', MENU)
   };
   var FOLDER_TILE = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
   var FILE_TILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
@@ -82,6 +84,12 @@
 
   function errorOf(xhr, fallback) {
     return (xhr && xhr.responseJSON && xhr.responseJSON.message) || fallback;
+  }
+
+  /** Preview URL that changes when the image is edited in place (same URL, new bytes). */
+  function versioned(url, file) {
+    if (!url || !file || !file.version) return url;
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=' + encodeURIComponent(file.version);
   }
 
   function norm(value) {
@@ -241,6 +249,8 @@
     '          <img class="ph mx-detail-preview" data-mx="detail-preview" alt="">' +
     '          <div class="ph mx-detail-preview-file" data-mx="detail-preview-file"><span class="badge mx-detail-ext" data-mx="detail-ext">FILE</span></div>' +
     '          <div class="dim mx-detail-meta" data-mx="detail-meta"></div>' +
+    '          <button type="button" class="btn btn-ghost btn-sm mx-detail-edit" data-mx="detail-edit">' +
+    I('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>') + '<span>Edit image</span></button>' +
     '          <label class="field"><span>Display name<span class="req"> *</span></span>' +
     '            <input class="input" name="displayName" data-mx="detail-name" placeholder="File name"></label>' +
     '          <label class="field"><span>Alt text</span>' +
@@ -586,7 +596,11 @@
       .attr('aria-label', 'Select ' + file.name).appendTo($tile);
     var $wrap = $('<div class="icon-wrap">').appendTo($tile);
     if (file.kind === 'image') {
-      $('<img loading="lazy" alt="">').attr('src', file.thumbUrl || file.url).appendTo($wrap);
+      $('<img loading="lazy" alt="">').attr('src', versioned(file.thumbUrl || file.url, file)).appendTo($wrap);
+      if (window.lightbox) {
+        $('<button type="button" class="tile-preview">').attr({ title: 'Preview', 'aria-label': 'Preview ' + file.name })
+          .html(I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6"/><path d="M8 11h6"/>', ' width="13" height="13"')).appendTo($tile);
+      }
     } else {
       $wrap.html(FILE_TILE);
     }
@@ -851,12 +865,21 @@
     var self = this;
     var perms = this.state.permissions;
     if (this.pick) {
+      if (this.canPreview(file)) {
+        this.menuItem($menu, 'preview', 'Preview', false, function () { self.previewImage(file); });
+      }
       this.menuItem($menu, 'select', this.opts.multiple ? 'Select' : 'Use this file', false, function () {
         if (self.opts.multiple) self.setSelected(file.id, true); else self.choose([file]);
       });
       return;
     }
     this.menuItem($menu, 'open', 'Open', false, function () { self.openDetail(file); });
+    if (this.canPreview(file)) {
+      this.menuItem($menu, 'preview', 'Preview', false, function () { self.previewImage(file); });
+    }
+    if (this.canEditImage(file)) {
+      this.menuItem($menu, 'edit', 'Edit image', false, function () { self.editImage(file); });
+    }
     if (perms.edit) {
       this.menuItem($menu, 'rename', 'Rename', false, function () { self.openDetail(file, true); });
       $('<hr>').appendTo($menu);
@@ -915,7 +938,7 @@
     this.$('detail-folder').val(norm(file.folderId));
     this.$('detail-url').val(file.url);
     if (file.kind === 'image') {
-      this.$('detail-preview').attr('src', file.thumbUrl || file.url).show();
+      this.$('detail-preview').attr('src', versioned(file.thumbUrl || file.url, file)).show();
       this.$('detail-preview-file').hide();
     } else {
       this.$('detail-preview').hide();
@@ -929,10 +952,96 @@
     if (file.createdAt) {
       meta.push('Uploaded ' + String(file.createdAt).replace('T', ' ').slice(0, 16) + (file.uploaderName ? ' by ' + file.uploaderName : ''));
     }
+    this.$('detail-edit').toggle(this.canEditImage(file));
     var $meta = this.$('detail-meta').empty();
     meta.forEach(function (line) { $('<span>').text(line).appendTo($meta); });
     this.$detail.addClass('open');
     if (focusName) setTimeout(function () { self.$('detail-name').trigger('focus').trigger('select'); }, 50);
+  };
+
+  /* ---------------- image editor (scripts/media/image-editor.js, optional) ---------------- */
+
+  P.canEditImage = function (file) {
+    var perms = this.state.permissions;
+    return !this.pick && !!window.MediaImageEditor && window.MediaImageEditor.canEdit(file) && !!(perms.edit || perms.create);
+  };
+
+  P.editImage = function (file) {
+    var self = this;
+    if (!this.canEditImage(file)) return;
+    this.closeMenus();
+    window.MediaImageEditor.open(file, {
+      canReplace: !!this.state.permissions.edit,
+      canCopy: !!this.state.permissions.create,
+      onReplaced: function (updated) {
+        self.replaceFiles([updated]);
+        self.render();
+        if (self.$detail.hasClass('open') && String(self.state.detailFileId) === String(updated.id)) self.openDetail(updated);
+      },
+      onCopied: function (created) {
+        self.state.files.unshift(created);
+        self.resetAndRender();
+      }
+    });
+  };
+
+  /* ---------------- image preview (Lightbox2, loaded by the admin layout) ---------------- */
+
+  P.canPreview = function (file) {
+    return !!(window.lightbox && file && file.kind === 'image');
+  };
+
+  /**
+   * Opens Lightbox2 on `file`. The album is every image in the current folder view (same filters and
+   * sort as the grid, across all pages), so the arrows walk through what the user is looking at.
+   * Lightbox2 builds albums from a[data-lightbox] links, so hidden links are rendered per instance.
+   */
+  P.previewImage = function (file) {
+    if (!this.canPreview(file)) return;
+    var self = this;
+    this.closeMenus();
+    if (!this.previewGroup) this.previewGroup = 'mx-preview-' + Math.random().toString(36).slice(2, 10);
+
+    var images = this.visibleFiles(this.filters()).filter(function (f) { return f.kind === 'image'; });
+    if (!images.some(function (f) { return String(f.id) === String(file.id); })) images = [file];
+
+    var $links = this.$root.children('[data-mx="preview-links"]');
+    if (!$links.length) $links = $('<div data-mx="preview-links" hidden>').appendTo(this.$root);
+    $links.empty();
+
+    var $start = null;
+    images.forEach(function (f) {
+      var caption = f.name + (f.width && f.height ? ' · ' + f.width + ' × ' + f.height + ' px' : '') + ' · ' + kb(f.sizeBytes);
+      var $a = $('<a>').attr({
+        // Lightbox2 detects SVG by the URL's extension, so SVGs keep the bare URL.
+        href: /svg/i.test(f.contentType || '') ? f.url : versioned(f.url, f),
+        'data-lightbox': self.previewGroup,
+        'data-title': caption,
+        'data-alt': f.altText || f.name
+      }).appendTo($links);
+      if (String(f.id) === String(file.id)) $start = $a;
+    });
+
+    window.lightbox.option({
+      sanitizeTitle: true, // captions are file names: never insert them as HTML
+      wrapAround: images.length > 1,
+      albumLabel: 'Image %1 of %2',
+      fadeDuration: 200,
+      imageFadeDuration: 200,
+      resizeDuration: 250
+    });
+    window.lightbox.start($start);
+  };
+
+  /** Space previews the first selected image, unless the user is typing or another overlay is open. */
+  P.previewFromKeyboard = function (e) {
+    if (!window.lightbox || $(e.target).closest('input, textarea, select, button, [contenteditable="true"]').length) return false;
+    if (!this.$root.is(':visible') || $('#lightbox').is(':visible') || $('.ie-modal.open').length || this.$folderModal.hasClass('open')) return false;
+    var image = this.selectedFiles().filter(function (f) { return f.kind === 'image'; })[0];
+    if (!image) return false;
+    e.preventDefault();
+    this.previewImage(image);
+    return true;
   };
 
   /* ---------------- API actions ---------------- */
@@ -1065,13 +1174,19 @@
 
     // grid
     this.$grid.on('click', '.folder-tile', function () { self.goToFolder($(this).attr('data-folder-id')); });
+    this.$grid.on('click', '.tile-preview', function (e) {
+      e.stopPropagation(); // don't toggle the tile's selection
+      var file = self.fileById($(this).closest('.file-tile').attr('data-id'));
+      if (file) self.previewImage(file);
+    });
     this.$grid.on('click', '.file-tile', function (e) {
       if ($(e.target).is('.tile-check')) return;
       var id = $(this).attr('data-id');
       self.setSelected(id, !self.state.selected[id]);
     });
     this.$grid.on('change', '.tile-check', function () { self.setSelected(this.value, this.checked); });
-    this.$grid.on('dblclick', '.file-tile', function () {
+    this.$grid.on('dblclick', '.file-tile', function (e) {
+      if ($(e.target).closest('.tile-preview').length) return;
       var file = self.fileById($(this).attr('data-id'));
       if (!file) return;
       if (self.pick) self.choose([file]); else self.openDetail(file);
@@ -1147,6 +1262,15 @@
     this.$('rename-cancel').on('click', function () { self.closeMenus(); });
 
     // detail panel
+    this.$('detail-preview').on('click', function () {
+      var file = self.fileById(self.state.detailFileId);
+      if (file) self.previewImage(file);
+    });
+    this.$('detail-edit').on('click', function () {
+      var id = String(self.state.detailFileId);
+      var file = self.state.files.filter(function (f) { return String(f.id) === id; })[0];
+      if (file) self.editImage(file);
+    });
     this.$('detail-copy').on('click', function () {
       var url = self.$('detail-url').val();
       var done = function () { notify('URL copied'); };
@@ -1161,6 +1285,7 @@
       if (!$(e.target).closest(self.$menu.add(self.$renameForm)).length) self.closeMenus();
     });
     $(document).on('keydown' + ns, function (e) {
+      if ((e.key === ' ' || e.code === 'Space') && self.previewFromKeyboard(e)) return;
       if (e.key !== 'Escape') return;
       self.closeMenus();
       if (self.$folderModal.hasClass('open')) self.closeFolderModal();

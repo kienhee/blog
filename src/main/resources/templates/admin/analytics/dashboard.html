@@ -7,34 +7,126 @@
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Dashboard</strong>
+    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Overview</strong>
 </div>
 
-<div layout:fragment="content">
+<!-- Every number here comes from DashboardService (the database), refreshed on each visit.
+     Cards and lists are shown only to users with the matching *:view permission. -->
+<div layout:fragment="content"
+     th:with="canPosts=${perms.contains('posts:view')}, canComments=${perms.contains('comments:view')},
+              canMedia=${perms.contains('media:view')}, canCategories=${perms.contains('categories:view')}">
     <h1 style="font-size:34px">Overview</h1>
-    <p class="dim" style="margin:4px 0 28px">Last 30 days on kienhee.com</p>
+    <p class="dim" style="margin:4px 0 28px">Live numbers from the database. Post counts cover the last 30 days where noted.</p>
+
     <div class="stats">
-        <div class="stat"><div class="kicker">Views</div><div class="v">48.2k</div><div class="d">+12.4% vs last 30d</div></div>
-        <div class="stat"><div class="kicker">Posts published</div><div class="v">11</div><div class="d">+3 vs last 30d</div></div>
-        <div class="stat"><div class="kicker">Subscribers</div><div class="v">9,412</div><div class="d">+284 new</div></div>
-        <div class="stat"><div class="kicker">Comments</div><div class="v">146</div><div class="d">7 awaiting review</div></div>
-    </div>
-    <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;margin-top:32px">
-        <div>
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Views by category</p>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">AI news</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:92%"></span></span><span class="dim" style="font-size:13px;text-align:right">16.4k</span></div>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Prompting</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:63%"></span></span><span class="dim" style="font-size:13px;text-align:right">11.2k</span></div>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Getting started</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:50%"></span></span><span class="dim" style="font-size:13px;text-align:right">8.9k</span></div>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Tools</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:34%"></span></span><span class="dim" style="font-size:13px;text-align:right">6.1k</span></div>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">Automation</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:19%"></span></span><span class="dim" style="font-size:13px;text-align:right">3.4k</span></div>
-            <div class="bar-row" style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">For developers</span><span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent);width:12%"></span></span><span class="dim" style="font-size:13px;text-align:right">2.2k</span></div>
+        <div class="stat" th:if="${canPosts}">
+            <div class="kicker">Views · last 30 days</div>
+            <div class="v" th:text="${#numbers.formatInteger(stats.viewsLast30Days, 1, 'COMMA')}">0</div>
+            <div class="d" th:text="${stats.viewsDelta() > 0} ? |+${stats.viewsDelta()} vs previous 30 days| : (${stats.viewsDelta() < 0} ? |${stats.viewsDelta()} vs previous 30 days| : 'Same as previous 30 days')">Same as previous 30 days</div>
         </div>
+        <div class="stat" th:if="${canPosts}">
+            <div class="kicker">Published · last 30 days</div>
+            <div class="v" th:text="${stats.publishedLast30Days}">0</div>
+            <div class="d" th:text="${stats.publishedDelta() > 0} ? |+${stats.publishedDelta()} vs previous 30 days| : (${stats.publishedDelta() < 0} ? |${stats.publishedDelta()} vs previous 30 days| : 'Same as previous 30 days')">Same as previous 30 days</div>
+        </div>
+        <div class="stat" th:if="${canPosts}">
+            <div class="kicker">Posts</div>
+            <div class="v" th:text="${stats.publishedTotal}">0</div>
+            <div class="d" th:text="|published · ${stats.drafts} drafts · ${stats.scheduled} scheduled|">published</div>
+        </div>
+        <div class="stat" th:if="${canComments}">
+            <div class="kicker">Comments</div>
+            <div class="v" th:text="${stats.commentsApproved}">0</div>
+            <div class="d"><a th:href="@{/admin/comments}" th:text="|${stats.commentsPending} awaiting moderation|">0 awaiting moderation</a></div>
+        </div>
+        <div class="stat" th:if="${canMedia}">
+            <div class="kicker">Media library</div>
+            <div class="v" th:text="${stats.mediaFiles}">0</div>
+            <div class="d" th:text="|files · ${stats.mediaSize()}|">files</div>
+        </div>
+    </div>
+
+    <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;margin-top:32px">
+        <div th:if="${canPosts}">
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Published posts by category</p>
+            <p th:if="${stats.topCategories.isEmpty()}" class="dim" style="padding:16px 0">No published posts yet.</p>
+            <div class="bar-row" th:each="c : ${stats.topCategories}"
+                 style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)">
+                <span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:title="${c.name}" th:text="${c.name}">Category</span>
+                <span style="display:block;height:10px;background:var(--surf2)"><span style="display:block;height:10px;background:var(--accent)"
+                      th:style="|display:block;height:10px;background:var(--accent);width:${c.posts * 100 / stats.maxCategoryPosts()}%|"></span></span>
+                <span class="dim" style="font-size:13px;text-align:right;font-variant-numeric:tabular-nums" th:text="${c.posts}">0</span>
+            </div>
+        </div>
+
         <div>
             <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Needs attention</p>
-            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Comments pending review</span><span style="font-size:13px;font-weight:700;color:var(--accent)">7</span></div>
-            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Drafts older than 30 days</span><span style="font-size:13px;font-weight:700;color:var(--accent)">4</span></div>
-            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Posts missing SEO title</span><span style="font-size:13px;font-weight:700;color:var(--accent)">3</span></div>
-            <div style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"><span style="font-size:14px">Redirect loops</span><span style="font-size:13px;font-weight:700;color:var(--accent)">2</span></div>
+            <a th:if="${perms.contains('users:view')}" th:href="@{/admin/users}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
+                <span style="font-size:14px">Accounts waiting for approval</span>
+                <span th:style="${stats.usersPending > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.usersPending}">0</span>
+            </a>
+            <a th:if="${canComments}" th:href="@{/admin/comments}" class="attention-row" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
+                <span style="font-size:14px">Comments awaiting moderation</span>
+                <span style="font-size:13px;font-weight:700" th:style="${stats.commentsPending > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.commentsPending}">0</span>
+            </a>
+            <th:block th:if="${canPosts}">
+                <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
+                    <span style="font-size:14px">Drafts not edited for 30+ days</span>
+                    <span th:style="${stats.staleDrafts > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.staleDrafts}">0</span>
+                </a>
+                <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
+                    <span style="font-size:14px">Published posts missing an SEO title</span>
+                    <span th:style="${stats.missingSeoTitle > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.missingSeoTitle}">0</span>
+                </a>
+                <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
+                    <span style="font-size:14px">Published posts missing a meta description</span>
+                    <span th:style="${stats.missingSeoDescription > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.missingSeoDescription}">0</span>
+                </a>
+                <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"
+                   title="These posts are Scheduled but have no publish time, so they will not go live on their own">
+                    <span style="font-size:14px">Scheduled posts with no publish time</span>
+                    <span th:style="${stats.scheduledWithoutTime > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.scheduledWithoutTime}">0</span>
+                </a>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;margin-top:36px">
+        <div th:if="${canComments}">
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Latest comments awaiting moderation</p>
+            <p th:if="${stats.pendingComments.isEmpty()}" class="dim" style="padding:16px 0">Nothing to moderate.</p>
+            <a th:each="c : ${stats.pendingComments}" th:href="@{/admin/comments}"
+               style="display:flex;flex-direction:column;gap:4px;padding:14px 0;border-bottom:1px solid var(--line)">
+                <span style="display:flex;justify-content:space-between;gap:12px">
+                    <strong style="font-size:13px" th:text="${c.authorName}">Name</strong>
+                    <span class="dim" style="font-size:12px;white-space:nowrap" th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}">2026-09-15 10:00</span>
+                </span>
+                <span class="dim" style="font-size:13px;overflow-wrap:anywhere" th:text="${#strings.abbreviate(c.content, 110)}">Comment</span>
+                <span style="font-size:12px" th:text="|on ${c.post.title}|">on Post</span>
+            </a>
+        </div>
+
+        <div th:if="${canPosts}">
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Most read · last 30 days</p>
+            <p th:if="${stats.topPosts.isEmpty()}" class="dim" style="padding:16px 0">No views recorded yet. Views are counted for real readers only (no bots, no staff).</p>
+            <a th:each="t : ${stats.topPosts}" th:href="@{/article/{slug}(slug=${t.slug})}" target="_blank" rel="noopener"
+               style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)">
+                <strong style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${t.title}">Title</strong>
+                <span class="dim" style="font-size:13px;font-variant-numeric:tabular-nums" th:text="|${#numbers.formatInteger(t.views, 1, 'COMMA')} views|">0 views</span>
+            </a>
+        </div>
+
+        <div th:if="${canPosts}">
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Recently edited posts</p>
+            <p th:if="${stats.recentPosts.isEmpty()}" class="dim" style="padding:16px 0">No posts yet.</p>
+            <a th:each="p : ${stats.recentPosts}" th:href="@{'/admin/post/' + ${p.id} + '/edit'}"
+               style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)">
+                <strong style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${p.title}">Title</strong>
+                <span class="badge"
+                      th:style="${p.status.name() == 'PUBLISHED' ? 'color:#5ee38a' : (p.status.name() == 'DRAFT' ? 'color:#a0a0a0' : (p.status.name() == 'SCHEDULED' ? 'color:#ffc94d' : 'color:#7d7979'))}"
+                      th:text="${#strings.capitalize(#strings.toLowerCase(p.status.name()))}">Draft</span>
+                <span class="dim" style="font-size:12px" th:text="|${p.category.name} · edited ${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'}|">Category · edited</span>
+            </a>
         </div>
     </div>
 </div>

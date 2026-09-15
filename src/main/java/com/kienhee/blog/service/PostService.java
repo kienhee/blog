@@ -1,5 +1,6 @@
 package com.kienhee.blog.service;
 
+import java.time.LocalDateTime;
 import com.kienhee.blog.dto.PostCreateRequest;
 import com.kienhee.blog.dto.PostUpdateRequest;
 import com.kienhee.blog.entity.Post;
@@ -22,4 +23,7 @@ public interface PostService {
     boolean existsBySlug(String slug);
 
     boolean existsBySlugExcluding(String slug, Long id);
+
+    /** Publishes SCHEDULED posts due at {@code now}; returns how many went live. */
+    int publishDuePosts(LocalDateTime now);
 }

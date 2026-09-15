@@ -30,19 +30,24 @@
 
         <div class="bulk">
           <span class="n">0 selected</span>
-          <button class="btn btn-ghost btn-xs" data-bulk="Delete">Delete</button>
-          <button class="btn btn-ghost btn-xs" data-bulk="Export CSV">Export CSV</button>
-          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <button th:if="${perms.contains('users:delete')}" class="btn btn-ghost btn-xs btn-danger" data-bulk="Delete">Delete</button>
+                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
         </div>
 
+        <th:block th:with="waiting=${#lists.size(users.?[status.name() == 'PENDING'])}"><div th:if="${waiting > 0}"
+             style="margin-bottom:18px;padding:12px 14px;background:rgba(255,201,77,0.12);border:1px solid #ffc94d;color:#ffc94d;border-radius:6px;font-size:13px;font-weight:600">
+          <span th:text="|${waiting} account${waiting == 1 ? '' : 's'} waiting for approval. Filter the Status column by Pending to review them.|">1 account waiting for approval.</span>
+        </div></th:block>
+
         <div class="table-wrap">
-          <table class="dt">
+          <table class="dt" th:data-bulk-delete-url="@{/admin/users/bulk-delete}" data-bulk-noun="users" data-bulk-delete-note="This cannot be undone. Your own account, admins (unless you are an admin) and users who still have posts are skipped.">
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
                 <th style="width:22%">Name</th>
                 <th style="width:22%">Email</th>
                 <th style="width:120px">Role</th>
+                <th style="width:110px">Status</th>
                 <th style="width:130px">Phone</th>
                 <th style="width:18%">Address</th>
                 <th style="width:140px">Created</th>
@@ -58,9 +63,17 @@
                     <option th:each="r : ${roles}" th:value="${r.name}" th:text="${r.name}"></option>
                   </select>
                 </th>
-                <th><input class="input" data-col="4" placeholder="Filter…"></th>
+                <th>
+                  <select class="select" data-col="4">
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Active">Active</option>
+                    <option value="Disabled">Disabled</option>
+                  </select>
+                </th>
                 <th><input class="input" data-col="5" placeholder="Filter…"></th>
                 <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th><input class="input" data-col="7" placeholder="Filter…"></th>
                 <th></th>
               </tr>
             </thead>
@@ -74,11 +87,24 @@
                         th:style="${u.role.systemRole} ? 'color:#5ee38a' : 'color:#a0a0a0'">Owner</span>
                   <span class="dim" th:if="${u.role == null}">— none —</span>
                 </td>
+                <td>
+                  <span class="badge"
+                        th:style="${u.status.name() == 'ACTIVE'} ? 'color:#5ee38a' : (${u.status.name() == 'PENDING'} ? 'color:#ffc94d' : 'color:#a0a0a0')"
+                        th:text="${#strings.capitalize(#strings.toLowerCase(u.status.name()))}">Active</span>
+                </td>
                 <td th:text="${u.phone != null and !u.phone.isEmpty() ? u.phone : '—'}">—</td>
                 <td class="dim" th:text="${u.address != null and !u.address.isEmpty() ? u.address : '—'}">—</td>
                 <td class="dim" th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
                 <td class="right">
-                  <span style="display:inline-flex;gap:6px">
+                  <span style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+                    <th:block th:if="${perms.contains('users:edit') and (currentUser == null or currentUser.id != u.id)}">
+                      <button th:if="${u.status.name() == 'PENDING'}" type="button" class="btn btn-xs btn-user-status"
+                              th:data-id="${u.id}" th:data-name="${u.fullName}" data-status="ACTIVE">Approve</button>
+                      <button th:if="${u.status.name() == 'ACTIVE'}" type="button" class="btn btn-ghost btn-xs btn-user-status"
+                              th:data-id="${u.id}" th:data-name="${u.fullName}" data-status="DISABLED">Disable</button>
+                      <button th:if="${u.status.name() == 'DISABLED'}" type="button" class="btn btn-ghost btn-xs btn-user-status"
+                              th:data-id="${u.id}" th:data-name="${u.fullName}" data-status="ACTIVE">Enable</button>
+                    </th:block>
                     <button th:if="${perms.contains('users:edit')}" type="button" class="btn btn-ghost btn-xs btn-edit-user"
                             th:data-id="${u.id}"
                             th:data-name="${u.fullName}"
@@ -182,11 +208,13 @@
       </div>
 
       <!-- Hidden form for deleting user -->
+      <form id="user-status-form" method="post" th:action="@{/admin/users/0/status}" style="display:none"><input type="hidden" name="status"></form>
       <form id="delete-user-form" method="post" th:action="@{/admin/users/0/delete}" style="display:none"></form>
 </div>
 
 <th:block layout:fragment="scripts">
     <script th:src="@{/scripts/user/user.js}"></script>
+    <script th:src="@{/scripts/user/user-status.js}"></script>
 </th:block>
 
 </body>

@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
+    <link rel="alternate" type="application/rss+xml" th:title="${siteTitle} ?: 'Kienhee'" th:href="@{/rss.xml}">
     <link rel="stylesheet" th:href="@{/styles/main.css}">
     <th:block layout:fragment="styles"></th:block>
 </head>

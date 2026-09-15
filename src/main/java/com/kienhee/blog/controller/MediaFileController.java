@@ -20,12 +20,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Locale;
 
 /**
@@ -56,21 +56,21 @@ public class MediaFileController {
     private final MediaStorageLayout layout;
 
     @GetMapping("/{id}/thumb")
-    public ResponseEntity<Resource> thumbnail(@PathVariable Long id) {
+    public ResponseEntity<Resource> thumbnail(@PathVariable Long id, WebRequest request) {
         Media media = findVisible(id);
         StoragePath thumb = layout.existingThumbnail(id);
         if (thumb == null) {
             // No separate thumbnail (small image, SVG, legacy row): the original is the thumbnail.
-            return serve(media, layout.effectivePath(media), media.getContentType());
+            return serve(media, layout.effectivePath(media), media.getContentType(), "o", request);
         }
         String type = thumb.filename().endsWith(".jpg") ? MediaType.IMAGE_JPEG_VALUE : MediaType.IMAGE_PNG_VALUE;
-        return serve(media, thumb, type);
+        return serve(media, thumb, type, "t", request);
     }
 
     @GetMapping("/{id}/{filename}")
-    public ResponseEntity<Resource> file(@PathVariable Long id, @PathVariable String filename) {
+    public ResponseEntity<Resource> file(@PathVariable Long id, @PathVariable String filename, WebRequest request) {
         Media media = findVisible(id);
-        return serve(media, layout.effectivePath(media), media.getContentType());
+        return serve(media, layout.effectivePath(media), media.getContentType(), "o", request);
     }
 
     private Media findVisible(Long id) {
@@ -89,7 +89,8 @@ public class MediaFileController {
                 && auth.getAuthorities().stream().anyMatch(a -> "media:view".equals(a.getAuthority()));
     }
 
-    private ResponseEntity<Resource> serve(Media media, StoragePath path, String contentType) {
+    private ResponseEntity<Resource> serve(Media media, StoragePath path, String contentType, String variant,
+                                           WebRequest request) {
         java.nio.file.Path absolute;
         try {
             if (!storage.fileExists(path)) {
@@ -121,11 +122,19 @@ public class MediaFileController {
         if (svg) {
             headers.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; sandbox");
         }
+        // The URL stays the same when an image is edited in place, so browsers revalidate every time
+        // (cheap 304 via the ETag, which follows the file's hash) instead of caching blindly for an hour.
         CacheControl cache = media.getStatus() == Media.Status.TRASHED
                 ? CacheControl.noStore()
-                : CacheControl.maxAge(Duration.ofHours(1));
+                : CacheControl.noCache();
+        String version = media.getSha256() != null ? media.getSha256() : media.getSizeBytes() + "-" + media.getWidth() + "x" + media.getHeight();
+        String etag = "\"" + media.getId() + "-" + variant + "-" + version + "\"";
+        if (media.getStatus() != Media.Status.TRASHED && request.checkNotModified(etag)) {
+            return ResponseEntity.status(304).eTag(etag).cacheControl(cache).build();
+        }
 
         return ResponseEntity.ok()
+                .eTag(etag)
                 .headers(headers)
                 .cacheControl(cache)
                 .contentType(type)

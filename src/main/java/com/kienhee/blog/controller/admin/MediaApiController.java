@@ -167,6 +167,49 @@ public class MediaApiController {
         return ResponseEntity.ok(Map.of("message", "File updated.", "file", updated.get(0)));
     }
 
+    /** Image editor, "Replace original": same id, URL and format; see {@link MediaService#replaceImage}. */
+    @PostMapping("/files/{id}/image")
+    @PreAuthorize("hasAuthority('media:edit')")
+    public ResponseEntity<Map<String, Object>> replaceImage(@PathVariable Long id,
+                                                            @RequestParam(value = "file", required = false) MultipartFile file,
+                                                            Principal principal) {
+        try {
+            mediaService.replaceImage(id, file, principal != null ? principal.getName() : null);
+        } catch (IllegalArgumentException e) {
+            return unprocessable(e.getMessage());
+        }
+        List<Map<String, Object>> updated = filesByIds(List.of(id));
+        if (updated.isEmpty()) {
+            return unprocessable("Media not found with id: " + id);
+        }
+        return ResponseEntity.ok(Map.of("message", "Image updated.", "file", updated.get(0)));
+    }
+
+    /** Image editor, "Save as copy": a normal upload into the source image's folder (format may change). */
+    @PostMapping("/files/{id}/image-copy")
+    @PreAuthorize("hasAuthority('media:create')")
+    public ResponseEntity<Map<String, Object>> copyImage(@PathVariable Long id,
+                                                         @RequestParam(value = "file", required = false) MultipartFile file,
+                                                         Principal principal) {
+        List<Map<String, Object>> source = filesByIds(List.of(id));
+        if (source.isEmpty()) {
+            return unprocessable("Media not found with id: " + id);
+        }
+        if (!"image".equals(source.get(0).get("kind"))) {
+            return unprocessable("Only images can be edited.");
+        }
+        if (file == null || file.isEmpty()) {
+            return unprocessable("Please choose an image.");
+        }
+        try {
+            Long folderId = (Long) source.get(0).get("folderId");
+            Media copy = mediaService.uploadMedia(file, principal != null ? principal.getName() : null, folderId);
+            return ResponseEntity.ok(Map.of("message", "Saved as a new image.", "file", filesByIds(List.of(copy.getId())).get(0)));
+        } catch (IllegalArgumentException e) {
+            return unprocessable(e.getMessage());
+        }
+    }
+
     /** Moves files into a folder ({@code folderId} omitted = Home). */
     @PostMapping("/files/move")
     @PreAuthorize("hasAuthority('media:edit')")
@@ -326,6 +369,10 @@ public class MediaApiController {
         row.put("sizeBytes", media.getSizeBytes());
         row.put("originalSizeBytes", media.getOriginalSizeBytes());
         row.put("optimized", media.isOptimized());
+        // Changes whenever the bytes change (image editor): the explorer appends it to preview URLs.
+        row.put("version", media.getSha256() != null && media.getSha256().length() >= 12
+                ? media.getSha256().substring(0, 12)
+                : String.valueOf(media.getSizeBytes()));
         row.put("width", media.getWidth());
         row.put("height", media.getHeight());
         row.put("altText", media.getAltText());

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-master}">
+<head>
+    <title>Trash</title>
+</head>
+<body>
+
+<div layout:fragment="breadcrumb" class="crumb">
+    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Trash</strong>
+</div>
+
+<th:block layout:fragment="styles">
+    <!-- Same look as the media trash; not class="dt" (DataTables would page/sort away the selection state). -->
+    <style>
+        .trash-tabs{display:flex;flex-wrap:wrap;gap:4px;margin:20px 0 18px;border-bottom:1px solid var(--line)}
+        .trash-tabs a{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;font-weight:600;
+            border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--dim)}
+        .trash-tabs a:hover{color:var(--ink)}
+        .trash-tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+        .trash-tabs .count{font-size:11px;font-variant-numeric:tabular-nums;padding:1px 7px;border:1px solid var(--line);color:var(--dim)}
+        .trash-bulk{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+        table.trash-table{width:100%;min-width:640px;border-collapse:collapse}
+        table.trash-table thead tr{border-bottom:2px solid var(--rule)}
+        table.trash-table th{padding:12px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+        table.trash-table td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+        table.trash-table tbody tr:hover{background:var(--surf)}
+        table.trash-table td.dim{color:var(--dim);overflow-wrap:anywhere}
+        table.trash-table input[type=checkbox]{cursor:pointer}
+        .btn.danger,.btn-ghost.danger:hover{border-color:var(--err);color:var(--err)}
+    </style>
+</th:block>
+
+<div layout:fragment="content">
+    <div class="page-head" style="border-bottom:2px solid var(--rule)">
+        <div>
+            <h1>Trash</h1>
+            <p class="dim" style="margin-top:6px">Deleted items wait here until you restore them or delete them permanently.</p>
+        </div>
+        <form id="trash-empty-form" method="post" th:action="@{/admin/trash/{t}/empty(t=${selected.slug})}">
+            <button type="button" class="btn danger" id="btn-empty-trash" th:disabled="${items.isEmpty()}"
+                    th:text="|Empty ${#strings.toLowerCase(selected.label)} trash|">Empty trash</button>
+        </form>
+    </div>
+
+    <div th:if="${successMessage}" style="margin:18px 0 0;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
+        <span th:text="${successMessage}">Success message</span>
+    </div>
+    <div th:if="${errorMessage}" style="margin:18px 0 0;padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
+        <span th:text="${errorMessage}">Error message</span>
+    </div>
+
+    <nav class="trash-tabs" aria-label="Trash sections">
+        <a th:each="t : ${tabs}" th:href="@{/admin/trash(type=${t.slug})}"
+           th:attr="aria-current=${t.slug == selected.slug} ? 'page' : null">
+            <span th:text="${t.label}">Posts</span><span class="count" th:text="${t.count}">0</span>
+        </a>
+        <a th:if="${perms.contains('media:view')}" th:href="@{/admin/media/trash}">Media <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <p th:if="${items.isEmpty()}" class="dim" style="padding:48px 0;text-align:center"
+       th:text="|No ${#strings.toLowerCase(selected.label)} in the trash.|">Nothing in the trash.</p>
+
+    <th:block th:unless="${items.isEmpty()}">
+        <div class="trash-bulk">
+            <span class="dim" id="trash-selected" style="font-size:13px">0 selected</span>
+            <button type="button" class="btn btn-ghost btn-xs" data-trash-bulk="restore" disabled
+                    th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}">Restore</button>
+            <button type="button" class="btn btn-ghost btn-xs danger" data-trash-bulk="purge" disabled
+                    th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}">Delete permanently</button>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="trash-table">
+                <thead>
+                <tr>
+                    <th style="width:40px"><input type="checkbox" id="trash-check-all" aria-label="Select all"></th>
+                    <th th:text="${selected.slug == 'comments'} ? 'Author' : 'Name'">Name</th>
+                    <th>Details</th>
+                    <th style="width:140px">Deleted</th>
+                    <th style="width:240px;text-align:right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${items}">
+                    <td><input type="checkbox" class="trash-check" th:value="${i.id}" th:attr="aria-label=|Select ${i.name}|"></td>
+                    <td class="strong" th:text="${i.name}">Name</td>
+                    <td class="dim" th:text="${i.detail}">Details</td>
+                    <td class="dim" th:text="${#temporals.format(i.deletedAt, 'yyyy-MM-dd HH:mm')}">2026-09-15 10:00</td>
+                    <td style="text-align:right;white-space:nowrap">
+                        <button type="button" class="btn btn-ghost btn-xs" data-trash-row="restore"
+                                th:data-id="${i.id}" th:data-name="${i.name}"
+                                th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}">Restore</button>
+                        <button type="button" class="btn btn-ghost btn-xs danger" data-trash-row="purge"
+                                th:data-id="${i.id}" th:data-name="${i.name}"
+                                th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}">Delete permanently</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+    <!-- trash.js sets the action and ids; th:action adds the CSRF token. -->
+    <form id="trash-action-form" method="post" th:action="@{/admin/trash}" style="display:none"></form>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/scripts/trash/trash.js}"></script>
+</th:block>
+
+</body>
+</html>

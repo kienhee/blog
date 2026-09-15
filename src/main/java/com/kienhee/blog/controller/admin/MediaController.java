@@ -42,8 +42,7 @@ public class MediaController {
      * one would break the seeded roles), so the higher tier is expressed as the
      * combination media:delete + settings:delete — Owner has both, Editor only the first.
      */
-    private static final String PURGE_AUTHORITY =
-            "hasAuthority('media:delete') and hasAuthority('settings:delete')";
+    private static final String PURGE_AUTHORITY = "hasAuthority('media:purge')";
 
     private final MediaService mediaService;
     private final MediaFolderService mediaFolderService;

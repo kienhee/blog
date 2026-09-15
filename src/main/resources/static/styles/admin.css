@@ -183,6 +183,11 @@ table.dt td .thumb{width:64px;height:40px;background:var(--surf);border:1px soli
 .icon-tile .tile-check{position:absolute;top:4px;left:4px;z-index:2;opacity:0;transition:opacity .1s}
 .icon-tile:hover .tile-check,.icon-tile.selected .tile-check{opacity:1}
 .icon-tile .badge-mini{position:absolute;top:4px;right:4px;font-size:8px;letter-spacing:.04em;padding:1px 5px;background:var(--surf);border:1px solid var(--line);color:var(--dim)}
+/* Lightbox2 preview button: bottom-right corner of the 60px thumbnail (12px tile padding + 60 - 22) */
+.icon-tile .tile-preview{position:absolute;top:50px;left:calc(50% + 12px);z-index:2;width:22px;height:22px;padding:0;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--line);color:var(--ink);cursor:zoom-in;opacity:0;transition:opacity .1s}
+.icon-tile:hover .tile-preview,.icon-tile .tile-preview:focus-visible{opacity:1}
+.icon-tile .tile-preview:hover{color:var(--accent);border-color:var(--accent)}
+@media (hover:none){.icon-tile .tile-preview{opacity:1}}
 
 .context-menu{position:fixed;z-index:200;background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35);min-width:170px;padding:6px 0;display:none}
 .context-menu.open{display:block}
@@ -529,7 +534,7 @@ span.err[style*="display:block"] {
 .mx .mx-folder-location{font-size:13px}
 .mx .mx-folder-body{padding:20px 24px 0}
 .mx .mx-folder-input{width:100%}
-.mx .mx-detail-preview{height:220px;object-fit:cover}
+.mx .mx-detail-preview{height:220px;object-fit:cover;cursor:zoom-in}
 .mx .mx-detail-preview-file{height:220px;display:none;align-items:center;justify-content:center;background:var(--surf)}
 .mx .mx-detail-ext{font-size:22px;padding:10px 20px;color:var(--accent);border:1px solid var(--accent)}
 .mx .mx-detail-meta{font-size:12px;display:flex;flex-direction:column;gap:4px}

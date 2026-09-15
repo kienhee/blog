@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import java.time.LocalDateTime;
 import com.kienhee.blog.dto.HashtagCreateRequest;
 import com.kienhee.blog.dto.HashtagUpdateRequest;
 import com.kienhee.blog.entity.Hashtag;
@@ -74,7 +75,8 @@ public class HashtagServiceImpl implements HashtagService {
         Hashtag hashtag = hashtagRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Hashtag not found with id: " + id));
 
-        hashtagRepository.delete(hashtag);
+        // To the Trash: it disappears from posts until restored.
+        hashtagRepository.moveToTrash(hashtag.getId(), LocalDateTime.now());
     }
 
     @Override

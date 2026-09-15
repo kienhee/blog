@@ -58,7 +58,7 @@ public class UserCrudTests {
                 .apply(springSecurity())
                 .build();
 
-        userRepository.findByEmail("admin@kienhee.com").ifPresentOrElse(
+        userRepository.findByEmail("test-owner@kienhee.test").ifPresentOrElse(
                 u -> {
                     u.setFullName("Admin User");
                     u.setPassword(passwordEncoder.encode("admin123"));
@@ -67,7 +67,7 @@ public class UserCrudTests {
                 () -> {
                     userRepository.save(User.builder()
                             .fullName("Admin User")
-                            .email("admin@kienhee.com")
+                            .email("test-owner@kienhee.test")
                             .password(passwordEncoder.encode("admin123"))
                             .build());
                 }
@@ -165,7 +165,7 @@ public class UserCrudTests {
         void testCreateUserDuplicateEmail() {
             UserCreateRequest req = UserCreateRequest.builder()
                     .fullName("Duplicate Email User")
-                    .email("admin@kienhee.com")
+                    .email("test-owner@kienhee.test")
                     .password("secret123")
                     .build();
 
@@ -205,9 +205,9 @@ public class UserCrudTests {
         @Test
         @DisplayName("UserService - không cho phép quản trị viên tự xóa chính mình")
         void testDeleteSelfPrevented() {
-            User admin = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User admin = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
             assertThrows(IllegalArgumentException.class, () ->
-                    userService.deleteUser(admin.getId(), "admin@kienhee.com")
+                    userService.deleteUser(admin.getId(), "test-owner@kienhee.test")
             );
         }
 
@@ -221,7 +221,7 @@ public class UserCrudTests {
                     .build());
 
             Long id = temp.getId();
-            userService.deleteUser(id, "admin@kienhee.com");
+            userService.deleteUser(id, "test-owner@kienhee.test");
             assertFalse(userRepository.existsById(id));
         }
     }
@@ -239,7 +239,7 @@ public class UserCrudTests {
                     .andExpect(view().name("admin/user/users"))
                     .andExpect(model().attributeExists("users"))
                     .andExpect(content().string(containsString("table class=\"dt\"")))
-                    .andExpect(content().string(containsString("admin@kienhee.com")))
+                    .andExpect(content().string(containsString("test-owner@kienhee.test")))
                     .andExpect(content().string(containsString("name=\"kh-posts-per-page\"")))
                     .andExpect(content().string(not(containsString("✕"))));
         }
@@ -292,7 +292,7 @@ public class UserCrudTests {
                             .with(owner())
                             .with(csrf())
                             .param("fullName", "Admin Copy")
-                            .param("email", "admin@kienhee.com")
+                            .param("email", "test-owner@kienhee.test")
                             .param("password", "admin123"))
                     .andExpect(status().isOk())
                     .andExpect(view().name("admin/user/users"))
@@ -334,7 +334,7 @@ public class UserCrudTests {
         @Test
         @DisplayName("POST /admin/users/{id}/delete - Ngăn chặn tự xóa chính mình")
         void testDeleteSelfMvcPrevented() throws Exception {
-            User admin = userRepository.findByEmail("admin@kienhee.com").orElseThrow();
+            User admin = userRepository.findByEmail("test-owner@kienhee.test").orElseThrow();
 
             mockMvc.perform(post("/admin/users/" + admin.getId() + "/delete")
                             .with(owner())

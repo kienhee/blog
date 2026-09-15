@@ -1,0 +1,55 @@
+/* Kienhee admin — MediaImageEditor (scripts/media/image-editor.js). Needs styles/lib/cropper.min.css. */
+
+.ie-modal{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.78);display:flex;padding:16px;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility 0s linear .2s}
+/* visibility flips instantly on open (see the fade block in admin.css) so the editor is clickable at once */
+.ie-modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s ease,visibility 0s linear 0s}
+.ie-box{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--bg);border:2px solid var(--rule)}
+
+.ie-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line)}
+.ie-head-text{min-width:0}
+.ie-title{font-size:18px;font-weight:800;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.ie-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.ie-stage{position:relative;min-width:0;min-height:0;background:#050505;padding:16px;overflow:hidden}
+.ie-stage img{display:block;max-width:100%;max-height:100%}
+.ie-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+.ie-side{min-height:0;overflow-y:auto;border-left:1px solid var(--line);padding:0 18px 18px}
+.ie-side section{display:flex;flex-direction:column;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}
+.ie-side section:last-child{border-bottom:none}
+.ie-side .field{margin:0}
+.ie-chips,.ie-tools{display:flex;flex-wrap:wrap;gap:6px}
+.ie-chip.active,.ie-lock.on{border-color:var(--accent);color:var(--accent)}
+.ie-tool{width:34px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.ie-hint{margin:0;font-size:12px;line-height:1.45}
+
+.ie-range{display:grid;grid-template-columns:80px minmax(0,1fr) 44px;align-items:center;gap:10px;font-size:13px}
+.ie-range input{width:100%;accent-color:var(--accent)}
+.ie-range output{font-size:12px;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+
+.ie-size{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+.ie-size label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--dim);min-width:0}
+.ie-size .input{width:100%}
+.ie-lock{height:38px;width:38px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+
+.ie-foot{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 20px;border-top:1px solid var(--line)}
+.ie-spacer{flex:1}
+.ie-status{font-size:13px}
+.ie-status.err{color:#ff6b6b}
+
+/* the cropper sits on a black stage in both themes */
+.ie-stage .cropper-bg{background-image:none}
+.ie-stage .cropper-view-box{outline-color:var(--accent)}
+.ie-stage .cropper-line,.ie-stage .cropper-point{background-color:var(--accent)}
+
+/* explorer detail panel button */
+.mx-detail-edit{align-self:flex-start;display:inline-flex;align-items:center;gap:8px}
+.mx-detail-edit svg{width:14px;height:14px}
+
+@media (max-width:860px){
+  .ie-modal{padding:0}
+  .ie-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(240px,1fr) auto}
+  .ie-side{border-left:none;border-top:1px solid var(--line);max-height:42vh}
+}
+@media (prefers-reduced-motion:reduce){.ie-modal{transition:none}}

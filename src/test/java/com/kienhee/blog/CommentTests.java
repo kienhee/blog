@@ -315,7 +315,7 @@ class CommentTests {
                 .andExpect(flash().attribute("errorMessage", "Unknown comment status."));
 
         mockMvc.perform(post("/admin/comments/bulk-delete").param("ids", ids).with(TestAuth.owner()).with(csrf()))
-                .andExpect(flash().attribute("successMessage", "2 comments deleted."));
+                .andExpect(flash().attribute("successMessage", "2 comments moved to trash."));
         assertTrue(commentsOf(post).isEmpty());
     }
 
@@ -329,7 +329,7 @@ class CommentTests {
         assertEquals(2, commentsOf(post).size());
 
         mockMvc.perform(post("/admin/comments/" + rootId + "/delete").with(TestAuth.owner()).with(csrf()))
-                .andExpect(flash().attribute("successMessage", "1 comment deleted."));
+                .andExpect(flash().attribute("successMessage", "1 comment moved to trash."));
         assertTrue(commentsOf(post).isEmpty());
     }
 }

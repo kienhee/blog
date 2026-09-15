@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${subject}">Newsletter</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f3f1;font-family:Arial,Helvetica,sans-serif;color:#17171a">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f3f1;padding:32px 12px">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border:1px solid #e2e0dc">
+        <tr><td style="padding:22px 28px;border-bottom:3px solid #17171a;font-size:20px;font-weight:bold" th:text="${siteName}">Kienhee</td></tr>
+        <tr>
+          <td style="padding:28px">
+            <p style="margin:0 0 20px;font-size:24px;font-weight:bold;line-height:1.2" th:text="${subject}">Subject</p>
+            <!-- Plain-text body, escaped; blank lines became paragraphs. -->
+            <p th:each="paragraph : ${paragraphs}" style="margin:0 0 16px;font-size:15px;line-height:1.65;white-space:pre-line" th:text="${paragraph}">Paragraph</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:18px 28px;border-top:1px solid #e2e0dc;font-size:12px;line-height:1.5;color:#65625d">
+            You get this because you confirmed a subscription to the <span th:text="${siteName}">Kienhee</span> newsletter.
+            <a th:href="${unsubscribeUrl}" href="#" style="color:#65625d">Unsubscribe</a>.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

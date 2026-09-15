@@ -165,3 +165,38 @@ $(function () {
     });
   }
 });
+
+/* Scheduling: the "Publish on" picker follows the status select (rules also enforced in PostController). */
+$(function () {
+  'use strict';
+
+  var $status = $('#post-status');
+  var $box = $('#post-schedule');
+  var $input = $('#post-scheduledAt');
+  if (!$status.length || !$box.length || !$input.length) return;
+
+  if (window.flatpickr && !$input.prop('disabled')) {
+    window.flatpickr($input[0], {
+      enableTime: true,
+      time_24hr: true,
+      dateFormat: 'Y-m-d H:i',
+      minDate: 'today',
+      minuteIncrement: 5,
+      allowInput: true
+    });
+  }
+
+  function sync() {
+    $box.prop('hidden', $status.val() !== 'SCHEDULED');
+  }
+  $status.on('change', sync);
+  sync();
+
+  var validator = $('#post-form').data('validator');
+  if (validator && !$input.prop('disabled')) {
+    $input.rules('add', {
+      required: function () { return $status.val() === 'SCHEDULED'; },
+      messages: { required: 'Choose when the post should go live.' }
+    });
+  }
+});
