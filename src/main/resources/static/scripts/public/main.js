@@ -112,6 +112,48 @@ $(function () {
     $toc.prop('hidden', $toc.find('a').length === 0);
   }
 
+  /* newsletter: check the address before the post, so a typo costs no round trip.
+     The server validates again (and answers the same way whether or not the address is known),
+     this only saves the reader a reload. The honeypot is left alone on purpose: a filled one
+     submits as usual and is dropped server-side, so a bot learns nothing. */
+  $('[data-newsletter]').each(function () {
+    var $form = $(this);
+    var $email = $form.find('input[name="email"]');
+    var $button = $form.find('button[type="submit"]');
+    var $error = $form.find('[data-newsletter-error]');
+
+    function fail(message) {
+      $error.text(message).prop('hidden', false);
+      $email.attr('aria-invalid', 'true').trigger('focus');
+    }
+
+    function clear() {
+      $error.prop('hidden', true);
+      $email.removeAttr('aria-invalid');
+    }
+
+    $email.on('input', clear);
+
+    $form.on('submit', function (e) {
+      var value = $.trim($email.val());
+      $email.val(value);
+      if (!value) {
+        e.preventDefault();
+        fail('Enter your email address.');
+        return;
+      }
+      // Deliberately loose: the address is confirmed by the email we send, not by this regex.
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+        e.preventDefault();
+        fail('That does not look like an email address.');
+        return;
+      }
+      clear();
+      // The POST reloads the page, so this only guards against a double click.
+      $button.prop('disabled', true).text('Subscribing…');
+    });
+  });
+
   /* comments: reply sets the parent id on the single comment form */
   var $cForm = $('[data-comment-form]');
   if ($cForm.length) {

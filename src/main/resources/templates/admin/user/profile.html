@@ -86,7 +86,7 @@
             <span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error changing password.</span>
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+          <div class="field-row-3">
             <label class="field" th:classappend="${#fields.hasErrors('currentPassword')} ? 'has-error' : ''">
               <span>Current password<span class="req"> *</span></span>
               <input class="input" type="password" th:field="*{currentPassword}" placeholder="Current password">

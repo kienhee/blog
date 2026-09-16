@@ -61,8 +61,8 @@
             <label class="field" id="field-coverImage" th:classappend="${#fields.hasErrors('coverImage')} ? 'has-error' : ''">
               <span>Cover image URL<span class="help" tabindex="0" role="note"
                     data-tip="Recommended: 2560 x 1440 (16:9), WebP or JPG, under 400 KB. Minimum 1600 x 900.&#10;The image is cropped to fit three frames: the article hero (up to 4:1 on wide screens), the home page feature (about 1.13:1) and the list thumbnail (5:3, square on mobile).&#10;Keep the subject in the middle — roughly the centre 64% of the width and 44% of the height — and avoid text inside the image.&#10;Upload limit: 10 MB per file (JPG, PNG, WebP, GIF, SVG).">?</span></span>
-              <span style="display:flex;gap:8px">
-                <input class="input" id="post-coverImage" name="coverImage" th:value="*{coverImage}" placeholder="https://example.com/cover.jpg" style="flex:1">
+              <span class="input-with-btn">
+                <input class="input" id="post-coverImage" name="coverImage" th:value="*{coverImage}" placeholder="https://example.com/cover.jpg">
                 <button type="button" class="btn btn-ghost" id="btn-open-media-picker">Choose from library</button>
               </span>
               <img id="post-coverImage-preview" class="ph" alt="" style="height:160px;object-fit:cover;margin-top:10px"

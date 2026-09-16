@@ -207,6 +207,9 @@ body.side-open .scrim{display:block}
   .main{width:100%}
   .topbar{padding:0 16px;gap:12px}
   .topbar .input{display:none}
+  /* The breadcrumb is the only part that may shrink; the actions keep their size. */
+  .crumb{flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .head-actions{flex:0 0 auto}
   .content{padding:20px 16px}
   .page-head{flex-direction:column;align-items:flex-start;gap:14px}
   .page-head h1{font-size:clamp(24px,4.4vw,34px)}
@@ -237,12 +240,23 @@ body.side-open .scrim{display:block}
   .pagination{flex-direction:column;align-items:flex-start;gap:12px}
   .bulk{gap:6px}
   .profile-grid{grid-template-columns:minmax(0,1fr)!important}
-  #pw-form > div{grid-template-columns:minmax(0,1fr)!important}
+  .field-row-3{grid-template-columns:minmax(0,1fr)}
+  .perm-row{grid-template-columns:minmax(0,1fr);gap:8px;padding:14px 16px}
+  .perm-label{padding-top:0}
   .stats{grid-template-columns:minmax(0,1fr)}
   .dashboard-split{grid-template-columns:minmax(0,1fr)!important;gap:32px!important}
   .dashboard-split .bar-row{grid-template-columns:110px minmax(0,1fr) 60px!important}
   .auth-shell{padding:16px}
   .auth-card .b{padding:22px}
+}
+@media (max-width:520px){
+  /* Only the current page is worth the width here; "Dashboard /" goes. */
+  .topbar .crumb .dim,
+  .topbar .crumb .crumb-sep,
+  .topbar .crumb > span:not(:last-child){display:none}
+  .topbar{padding:0 12px;gap:8px}
+  .head-actions{gap:6px}
+  .head-actions .btn-sm{padding:0 10px;font-size:11px}
 }
 
 /* jQuery Validation & form error styles */
@@ -652,3 +666,48 @@ table.trash-table .trash-actions{text-align:right;white-space:nowrap}
 .trash-thumb{width:48px;height:48px;object-fit:cover;border:1px solid var(--line);background:var(--surf)}
 .trash-thumb-none{display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.1em;color:var(--dim)}
 .btn.danger,.btn-ghost.danger:hover{border-color:var(--err);color:var(--err)}
+
+/* Rows of equal fields (e.g. the three password inputs on Profile) and the role permission matrix.
+   Both used to carry the grid in a style attribute, where the breakpoints above could not reach it. */
+/* A field with a button beside it (cover image URL): the button drops below on a narrow screen
+   instead of squeezing the input down to a few characters. */
+.input-with-btn{display:flex;flex-wrap:wrap;gap:8px}
+.input-with-btn .input{flex:1 1 220px}
+.field-row-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.perm-row{display:grid;grid-template-columns:160px minmax(0,1fr);gap:16px;align-items:start;
+  padding:14px 20px;border-bottom:1px solid var(--line)}
+.perm-label{font-size:14px;font-weight:600;padding-top:6px}
+.perm-cells{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Trash table: same stacked-card treatment as the DataTables list tables, so it is readable on a
+   phone instead of scrolling sideways. */
+@media (max-width:760px){
+  .trash-scroll{overflow:visible}
+  table.trash-table{min-width:0}
+  table.trash-table thead{display:none}
+  table.trash-table tbody tr{display:grid;grid-template-columns:24px minmax(0,1fr);gap:4px 12px;
+    padding:14px 0;border-bottom:2px solid var(--line)}
+  table.trash-table td{border-bottom:none;padding:2px 0}
+  table.trash-table td:first-child{grid-row:1 / span 2}
+  table.trash-table .trash-actions{grid-column:2;text-align:left;white-space:normal;padding-top:8px}
+  table.trash-table .trash-thumb{width:40px;height:40px}
+  /* The picker modal keeps a third of a phone screen for its own margin otherwise. */
+  .media-picker{padding:12px}
+}
+
+/* ---- DataTables on small screens ----------------------------------------------------------
+   The default theme keeps a 220px search box, a one-line "Showing x to y" and a full pager on
+   one row; on a phone that row is wider than the screen. Here each part gets its own line and
+   is allowed to shrink. */
+@media (max-width:760px){
+  .dt-container .dt-layout-row{flex-direction:column;align-items:stretch;gap:10px}
+  .dt-container .dt-search{width:100%}
+  .dt-container .dt-search input{min-width:0;flex:1 1 auto;width:100%}
+  .dt-container .dt-length,
+  .dt-container .dt-layout-end{width:100%;justify-content:space-between}
+  .dt-container .dt-info{font-size:12px}
+  .dt-container .dt-paging{flex-wrap:wrap;justify-content:flex-end}
+  .dt-container .dt-paging .dt-paging-button{min-width:30px;height:30px;padding:0 8px}
+  /* The stacked cards already fill the width, so the horizontal scroller is pointless here. */
+  .dt-container .dt-layout-table{overflow-x:visible;border:none}
+}

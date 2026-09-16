@@ -7,11 +7,11 @@
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:56px">
-    <div class="author-grid" style="display:grid;grid-template-columns:340px minmax(0,1fr);gap:56px;padding-bottom:48px;border-bottom:2px solid var(--rule)">
-      <img class="ph" th:src="${author.avatarUrl != null and !author.avatarUrl.isBlank()} ? ${author.avatarUrl} : @{/images/placeholder.svg}" th:alt="${author.fullName}" style="height:400px;object-fit:cover">
+    <div class="author-grid">
+      <img class="ph author-photo" th:src="${author.avatarUrl != null and !author.avatarUrl.isBlank()} ? ${author.avatarUrl} : @{/images/placeholder.svg}" th:alt="${author.fullName}">
       <div style="display:flex;flex-direction:column;gap:20px;justify-content:center">
         <span class="kicker" style="color:var(--accent)">Author</span>
-        <h1 style="font-size:64px;line-height:1" th:text="${author.fullName}">Author</h1>
+        <h1 class="page-title" th:text="${author.fullName}">Author</h1>
         <p th:if="${author.bio != null and !author.bio.isBlank()}" style="font-size:19px;line-height:1.6;color:var(--body);max-width:58ch" th:text="${author.bio}">Bio</p>
         <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));border-left:none;border-top:1px solid var(--line)">
           <div class="stat" style="border-bottom:none"><div class="kicker">Articles</div><div class="v" th:text="${stats.articles}">12</div></div>

@@ -67,10 +67,9 @@
 
           <form id="permissions-form" method="post" th:action="@{'/admin/roles/' + ${selectedRole.id} + '/permissions'}">
             <div class="perm-matrix">
-              <div class="perm-row" th:each="row : ${permissionMatrix}"
-                   style="display:grid;grid-template-columns:160px minmax(0,1fr);gap:16px;align-items:start;padding:14px 20px;border-bottom:1px solid var(--line)">
-                <div style="font-size:14px;font-weight:600;padding-top:6px" th:text="${row.label}">Posts</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <div class="perm-row" th:each="row : ${permissionMatrix}">
+                <div class="perm-label" th:text="${row.label}">Posts</div>
+                <div class="perm-cells">
                   <label th:each="cell : ${row.cells}" th:title="${cell.code}"
                          style="display:flex;align-items:flex-start;gap:8px;min-width:210px;flex:1 1 210px;max-width:320px;padding:8px 10px;border:1px solid var(--line);cursor:pointer">
                     <input class="checkbox" type="checkbox" name="permissionIds" style="margin-top:2px"

@@ -7,7 +7,7 @@
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:56px">
-    <h1 style="font-size:64px;line-height:1">News &amp; Guides</h1>
+    <h1 class="page-title">News &amp; Guides</h1>
     <p class="dim" style="margin-top:16px;font-size:17px;max-width:60ch" th:text="|Everything published on ${site['site.domain'] ?: 'this site'}, newest first.|">Everything published, newest first.</p>
     <div class="chips" th:if="${!categories.isEmpty()}">
       <a class="chip" th:href="@{/news}" aria-pressed="true">All<span class="bar"></span></a>

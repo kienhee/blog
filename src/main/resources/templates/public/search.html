@@ -7,8 +7,8 @@
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:56px">
-    <h1 style="font-size:64px;line-height:1">Search</h1>
-    <form method="get" th:action="@{/search}" role="search" style="display:flex;gap:12px;margin:28px 0 0;max-width:680px">
+    <h1 class="page-title">Search</h1>
+    <form method="get" th:action="@{/search}" role="search" class="search-form">
       <input class="input" type="text" name="q" autocomplete="off" th:value="${q}" placeholder="Search guides and news" maxlength="100" autofocus>
       <button class="btn" type="submit">Search</button>
     </form>
