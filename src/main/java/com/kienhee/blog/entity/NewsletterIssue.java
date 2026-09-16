@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/** A newsletter issue that was sent. See {@code V24__Newsletter.sql}. */
+/** A newsletter issue that was sent. See {@code V6__Newsletter.sql}. */
 @Entity
 @Table(name = "newsletter_issues")
 @Getter

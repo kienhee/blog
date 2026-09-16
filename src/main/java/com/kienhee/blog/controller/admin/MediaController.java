@@ -249,14 +249,13 @@ public class MediaController {
 
     // ---- Trash (soft delete / restore / purge) ------------------------------
 
+    /**
+     * The media trash is now two tabs of the shared Trash page. Kept as a redirect so old links,
+     * bookmarks and the button in the media explorer still land in the right place.
+     */
     @GetMapping("/trash")
-    public String trash(Model model) {
-        model.addAttribute("trashedMedia", mediaService.getTrashedMedia());
-        model.addAttribute("trashedFolders", mediaFolderService.getTrashedFolders());
-        model.addAttribute("trashSummary", mediaService.getTrashSummary());
-        model.addAttribute("retentionDays", trashProperties.getRetentionDays());
-        model.addAttribute("autoPurgeEnabled", trashProperties.isAutoPurgeEnabled());
-        return "admin/media/trash";
+    public String trash() {
+        return "redirect:/admin/trash?type=media-files";
     }
 
     @PostMapping("/{id}/restore")
@@ -270,7 +269,7 @@ public class MediaController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/media/trash";
+        return "redirect:/admin/trash?type=media-files";
     }
 
     /**
@@ -286,7 +285,7 @@ public class MediaController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/media/trash";
+        return "redirect:/admin/trash?type=media-files";
     }
 
     @PostMapping("/folders/{id}/restore")
@@ -300,7 +299,7 @@ public class MediaController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/media/trash";
+        return "redirect:/admin/trash?type=media-files";
     }
 
     @PostMapping("/folders/{id}/delete-permanent")
@@ -313,7 +312,7 @@ public class MediaController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/media/trash";
+        return "redirect:/admin/trash?type=media-files";
     }
 
     // ---- JSON bulk actions for the trash page ------------------------------
@@ -457,6 +456,6 @@ public class MediaController {
         if (!result.errors().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", String.join(" · ", result.errors()));
         }
-        return "redirect:/admin/media/trash";
+        return "redirect:/admin/trash?type=media-files";
     }
 }

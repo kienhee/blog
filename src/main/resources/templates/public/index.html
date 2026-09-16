@@ -46,7 +46,7 @@
                 <h2 style="font-size:38px;line-height:1.05;margin-bottom:16px">One email a week. AI that actually works.</h2>
                 <p class="dim" style="line-height:1.55;max-width:48ch">Hands-on guides, tool releases and the news worth your time — written for people who use AI at work.</p>
             </div>
-            <form id="newsletter" method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:14px;justify-content:center">
+            <form id="newsletter" method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:14px;justify-content:center;padding:1rem">
                 <input type="hidden" name="from" value="home">
                 <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
                 <input class="input" type="email" name="email" th:value="${newsletterEmail}" placeholder="Enter your email" maxlength="150" aria-label="Email address">

@@ -16,9 +16,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Public site. Everything here reads published content only (see {@link PublicBlogService});
@@ -73,14 +75,20 @@ public class PublicController {
         return "public/category";
     }
 
+    /** The default author (the one who publishes most), rendered directly without an id in the URL. */
     @GetMapping("/author")
-    public String authorIndex() {
-        return blog.mainAuthorId().map(id -> "redirect:/author/" + id).orElse("redirect:/about");
+    public String authorIndex(@RequestParam(defaultValue = "1") int page, Model model) {
+        User author = blog.mainAuthorId().flatMap(blog::author).orElseThrow(PublicController::notFound);
+        return renderAuthor(author, page, "/author", model);
     }
 
     @GetMapping("/author/{id}")
     public String author(@PathVariable Long id, @RequestParam(defaultValue = "1") int page, Model model) {
         User author = blog.author(id).orElseThrow(PublicController::notFound);
+        return renderAuthor(author, page, "/author/" + id, model);
+    }
+
+    private String renderAuthor(User author, int page, String basePath, Model model) {
         Page<Post> posts = blog.postsByAuthor(author, page);
         if (posts.getTotalElements() == 0) {
             // Only people who have published something get a public profile.
@@ -89,6 +97,7 @@ public class PublicController {
         model.addAttribute("author", author);
         model.addAttribute("posts", posts);
         model.addAttribute("stats", blog.authorStats(author));
+        model.addAttribute("authorPath", basePath);
         return "public/author";
     }
 
@@ -127,12 +136,39 @@ public class PublicController {
         return "public/article";
     }
 
+    /**
+     * Free-text search, or — with {@code ?tag=<slug>} — every published post carrying that hashtag
+     * (the "#tag" links on an article). The two modes share this page; {@code tag} wins.
+     */
     @GetMapping("/search")
-    public String search(@RequestParam(required = false) String q, @RequestParam(defaultValue = "1") int page, Model model) {
+    public String search(@RequestParam(required = false) String q,
+                         @RequestParam(required = false) String tag,
+                         @RequestParam(defaultValue = "1") int page,
+                         Model model) {
         String query = q == null ? "" : q.trim();
+        String slug = tag == null ? "" : tag.trim();
         model.addAttribute("q", query);
-        model.addAttribute("posts", blog.search(query, page));
+        model.addAttribute("tag", slug);
+        if (!slug.isEmpty()) {
+            model.addAttribute("hashtag", blog.hashtag(slug).orElse(null));
+            model.addAttribute("posts", blog.postsWithHashtag(slug, page));
+        } else {
+            model.addAttribute("posts", blog.search(query, page));
+        }
         return "public/search";
+    }
+
+    /** Search-as-you-type for the header overlay: the first matches as JSON (title, category, link). */
+    @GetMapping("/search/live")
+    @ResponseBody
+    public List<Map<String, String>> liveSearch(@RequestParam(required = false) String q) {
+        return blog.search(q == null ? "" : q, 1).getContent().stream()
+                .limit(8)
+                .map(p -> Map.of(
+                        "title", p.getTitle(),
+                        "category", p.getCategory() != null ? p.getCategory().getName() : "",
+                        "url", "/article/" + p.getSlug()))
+                .toList();
     }
 
     @GetMapping("/subscribe")

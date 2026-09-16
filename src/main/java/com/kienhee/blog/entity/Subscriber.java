@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/** A newsletter subscriber (double opt-in). See {@code V24__Newsletter.sql}. */
+/** A newsletter subscriber (double opt-in). See {@code V6__Newsletter.sql}. */
 @Entity
 @Table(name = "subscribers")
 @Getter

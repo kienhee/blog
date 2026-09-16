@@ -39,7 +39,9 @@
         <div th:if="${!post.hashtags.isEmpty()}">
           <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Tags</p>
           <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:14px">
-            <span class="badge" th:each="h : ${post.hashtags}" th:if="${h.active}" th:text="|#${h.name}|">#tag</span>
+            <!-- Clicking a tag opens the search page filtered on that hashtag (/search?tag=slug). -->
+            <a class="badge tag-link" th:each="h : ${post.hashtags}" th:if="${h.active}"
+               th:href="@{/search(tag=${h.slug})}" th:text="|#${h.name}|">#tag</a>
           </div>
         </div>
         <div>

@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/** A single-use password reset link. See {@code V19__Password_reset_tokens.sql}. */
+/** A single-use password reset link. See {@code V1__Auth.sql}. */
 @Entity
 @Table(name = "password_reset_tokens")
 @Getter

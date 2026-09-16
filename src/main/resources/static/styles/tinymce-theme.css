@@ -1,0 +1,197 @@
+/* Kienhee admin — TinyMCE chrome restyled with the design system tokens (main.css).
+   The oxide skin ships rounded corners, its own greys, its own font and a blue focus ring; these
+   rules pull it back to the Modernist look used everywhere else in the admin: sharp edges,
+   var(--line) borders, Archivo, and the accent for hover/active. Everything reads CSS variables,
+   so both themes follow automatically.
+
+   NOTE ON SELECTORS: TinyMCE injects its skin stylesheet into <head> at init, i.e. AFTER this file.
+   With equal specificity the skin wins, so every rule here is doubled up (.tox.tox-tinymce for the
+   editor, .tox.tox-tinymce-aux for menus and dialogs, which render in their own root). Do not
+   "simplify" these selectors back to a bare .tox — the styling silently stops applying. */
+
+/* ---------------- editor frame ---------------- */
+.tox.tox-tinymce {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  font-family: "Archivo", system-ui, sans-serif;
+}
+.tox.tox-tinymce:focus-within { border-color: var(--accent); }
+.tox.tox-tinymce.tox-fullscreen { border: none; z-index: 80; }
+
+/* No blue focus ring around the content area — the frame border already shows focus. */
+.tox.tox-tinymce .tox-edit-area::before { display: none; }
+.tox.tox-tinymce .tox-edit-area { border-radius: 0; }
+
+.tox.tox-tinymce .tox-editor-header {
+  background: var(--surf);
+  border-bottom: 1px solid var(--line);
+  box-shadow: none;
+  padding: 0;
+}
+.tox.tox-tinymce .tox-menubar,
+.tox.tox-tinymce .tox-toolbar,
+.tox.tox-tinymce .tox-toolbar__primary,
+.tox.tox-tinymce .tox-toolbar-overlord { background: none; }
+.tox.tox-tinymce .tox-toolbar__primary { border-top: 1px solid var(--line); padding: 4px 6px; }
+.tox.tox-tinymce .tox-toolbar__group { padding: 0 6px; border-color: var(--line); }
+.tox.tox-tinymce .tox-toolbar__group:not(:last-of-type) { border-right: 1px solid var(--line); }
+
+/* ---------------- menubar ---------------- */
+.tox.tox-tinymce .tox-mbtn {
+  border-radius: 0; height: 32px; margin: 4px 2px;
+  color: var(--dim);
+}
+.tox.tox-tinymce .tox-mbtn__select-label {
+  color: inherit; cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+}
+.tox.tox-tinymce .tox-mbtn:hover:not(:disabled),
+.tox.tox-tinymce .tox-mbtn:focus:not(:disabled),
+.tox.tox-tinymce .tox-mbtn--active {
+  background: none; color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+/* ---------------- toolbar buttons ---------------- */
+.tox.tox-tinymce .tox-tbtn {
+  width: 34px; height: 34px; margin: 2px;
+  border: 1px solid transparent; border-radius: 0;
+  color: var(--ink);
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.tox.tox-tinymce .tox-tbtn svg { fill: currentColor; }
+.tox.tox-tinymce .tox-tbtn:hover:not(.tox-tbtn--disabled),
+.tox.tox-tinymce .tox-tbtn:focus:not(.tox-tbtn--disabled) {
+  background: var(--surf2); border-color: var(--accent); color: var(--accent); box-shadow: none;
+}
+.tox.tox-tinymce .tox-tbtn--enabled,
+.tox.tox-tinymce .tox-tbtn--enabled:hover,
+.tox.tox-tinymce .tox-tbtn--enabled:focus {
+  background: var(--accent); border-color: var(--accent); color: #0a0a0a; box-shadow: none;
+}
+.tox.tox-tinymce .tox-tbtn--disabled,
+.tox.tox-tinymce .tox-tbtn:disabled { color: var(--dim); opacity: .45; }
+
+/* Split buttons (lists, table) read as one control */
+.tox.tox-tinymce .tox-split-button { border: 1px solid transparent; border-radius: 0; margin: 2px; }
+.tox.tox-tinymce .tox-split-button:hover,
+.tox.tox-tinymce .tox-split-button:focus { border-color: var(--accent); box-shadow: none; }
+.tox.tox-tinymce .tox-split-button:hover .tox-tbtn,
+.tox.tox-tinymce .tox-split-button:focus .tox-tbtn { color: var(--accent); }
+.tox.tox-tinymce .tox-split-button > .tox-tbtn { margin: 0; border: none; }
+.tox.tox-tinymce .tox-split-button__chevron { width: 18px; }
+
+/* The "Paragraph / Heading" dropdown reads as an .input from main.css */
+.tox.tox-tinymce .tox-tbtn--bespoke {
+  width: auto; min-width: 118px; padding: 0 8px; margin: 2px 4px;
+  background: var(--bg); border: 1px solid var(--line);
+}
+.tox.tox-tinymce .tox-tbtn--bespoke:hover,
+.tox.tox-tinymce .tox-tbtn--bespoke:focus { background: var(--bg); border-color: var(--accent); }
+.tox.tox-tinymce .tox-tbtn__select-label {
+  color: inherit; cursor: pointer; font-size: 13px; font-weight: 600; margin: 0 4px;
+}
+
+/* ---------------- status bar ---------------- */
+.tox.tox-tinymce .tox-statusbar {
+  background: var(--surf); border-top: 1px solid var(--line); color: var(--dim);
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+}
+.tox.tox-tinymce .tox-statusbar a,
+.tox.tox-tinymce .tox-statusbar__path-item,
+.tox.tox-tinymce .tox-statusbar__wordcount { color: var(--dim); font-size: 11px; }
+.tox.tox-tinymce .tox-statusbar a:hover,
+.tox.tox-tinymce .tox-statusbar__path-item:hover { color: var(--accent); }
+.tox.tox-tinymce .tox-statusbar__resize-handle svg { fill: var(--dim); }
+
+/* ---------------- menus and dropdowns (rendered in .tox-tinymce-aux) ---------------- */
+.tox.tox-tinymce-aux .tox-menu,
+.tox.tox-tinymce-aux .tox-collection--list,
+.tox.tox-tinymce-aux .tox-collection--toolbar {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,.35);
+}
+.tox.tox-tinymce-aux .tox-collection__item { border-radius: 0; color: var(--ink); }
+.tox.tox-tinymce-aux .tox-collection__item-label { color: inherit; }
+.tox.tox-tinymce-aux .tox-collection__item-icon svg,
+.tox.tox-tinymce-aux .tox-collection__item-checkmark svg { fill: currentColor; }
+.tox.tox-tinymce-aux .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+  background: var(--surf2); color: var(--accent);
+}
+.tox.tox-tinymce-aux .tox-collection__item--enabled { background: var(--surf); color: var(--accent); }
+.tox.tox-tinymce-aux .tox-collection__item-accessory { color: var(--dim); }
+.tox.tox-tinymce-aux .tox-collection__group { border-color: var(--line); }
+.tox.tox-tinymce-aux .tox-menu__divider { background: var(--line); }
+
+/* ---------------- dialogs ---------------- */
+.tox.tox-tinymce-aux .tox-dialog {
+  background: var(--bg); border: 2px solid var(--rule); border-radius: 0;
+  box-shadow: 0 16px 48px rgba(0,0,0,.45);
+}
+.tox.tox-tinymce-aux .tox-dialog__header,
+.tox.tox-tinymce-aux .tox-dialog__footer {
+  background: none; border-color: var(--line); color: var(--ink);
+}
+.tox.tox-tinymce-aux .tox-dialog__title {
+  color: var(--ink); font-family: "Archivo", system-ui, sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: -.02em;
+}
+.tox.tox-tinymce-aux .tox-dialog__body,
+.tox.tox-tinymce-aux .tox-dialog__body-nav-item,
+.tox.tox-tinymce-aux .tox-toolbar-label {
+  color: var(--ink); font-family: "Archivo", system-ui, sans-serif;
+}
+.tox.tox-tinymce-aux .tox-label {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dim);
+}
+.tox.tox-tinymce-aux .tox-dialog__body-nav-item { border-radius: 0; color: var(--dim); }
+.tox.tox-tinymce-aux .tox-dialog__body-nav-item--active {
+  color: var(--accent); border-bottom-color: var(--accent);
+}
+.tox.tox-tinymce-aux .tox-dialog-wrap__backdrop { background: rgba(0,0,0,.6); }
+
+/* Dialog form controls follow .input from main.css */
+.tox.tox-tinymce-aux .tox-textfield,
+.tox.tox-tinymce-aux .tox-textarea,
+.tox.tox-tinymce-aux .tox-listboxfield .tox-listbox--select,
+.tox.tox-tinymce-aux .tox-selectfield select {
+  background: var(--surf); border: 1px solid var(--line); border-radius: 0;
+  color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px;
+}
+.tox.tox-tinymce-aux .tox-textfield:focus,
+.tox.tox-tinymce-aux .tox-textarea:focus,
+.tox.tox-tinymce-aux .tox-listboxfield .tox-listbox--select:focus,
+.tox.tox-tinymce-aux .tox-selectfield select:focus { border-color: var(--accent); box-shadow: none; }
+
+/* Dialog buttons follow .btn / .btn-ghost from main.css */
+.tox.tox-tinymce-aux .tox-button {
+  height: 40px; padding: 0 18px; border-radius: 0;
+  background: var(--accent); border-color: var(--accent); color: #0a0a0a;
+  font-family: "Archivo", system-ui, sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.tox.tox-tinymce-aux .tox-button:hover:not(:disabled),
+.tox.tox-tinymce-aux .tox-button:focus:not(:disabled) {
+  background: var(--accent); border-color: var(--accent); filter: brightness(1.1); box-shadow: none;
+}
+.tox.tox-tinymce-aux .tox-button--secondary {
+  background: none; border: 1px solid var(--line); color: var(--ink);
+}
+.tox.tox-tinymce-aux .tox-button--secondary:hover:not(:disabled),
+.tox.tox-tinymce-aux .tox-button--secondary:focus:not(:disabled) {
+  background: none; border-color: var(--accent); color: var(--accent); filter: none;
+}
+.tox.tox-tinymce-aux .tox-button--icon,
+.tox.tox-tinymce-aux .tox-button--naked {
+  background: none; border-color: transparent; color: var(--ink);
+}
+.tox.tox-tinymce-aux .tox-button--icon:hover:not(:disabled),
+.tox.tox-tinymce-aux .tox-button--naked:hover:not(:disabled) {
+  background: none; color: var(--accent); filter: none;
+}
+.tox.tox-tinymce-aux .tox-button--icon svg,
+.tox.tox-tinymce-aux .tox-button--naked svg { fill: currentColor; }
+
+/* The MediaExplorer picker is opened from inside TinyMCE's image dialog (file_picker_callback),
+   so it has to sit above that dialog (oxide uses z-index 1300). */
+.media-picker { z-index: 1400; }

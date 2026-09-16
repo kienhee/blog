@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-/** A reader comment on a post. See {@code V18__Comments.sql}. */
+/** A reader comment on a post. See {@code V4__Comments.sql}. */
 @Entity
 @Table(name = "comments")
 @SQLRestriction("deleted_at IS NULL")

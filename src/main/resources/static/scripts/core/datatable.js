@@ -27,9 +27,19 @@ $(function () {
 
     var lastColumnIndex = $table.find('thead tr:first-child th').length - 1;
 
+    // Page-size choices; the table's own default size is always one of them.
+    var lengthMenu = [10, 25, 50, 100];
+    if (lengthMenu.indexOf(perPage) < 0) lengthMenu.push(perPage);
+    lengthMenu.sort(function (a, b) { return a - b; });
+
     var dt = $table.DataTable({
       pageLength: perPage,
-      lengthChange: false,
+      lengthMenu: lengthMenu,
+      // "Show N entries" sits next to the pagination instead of above the table.
+      layout: {
+        topStart: null,
+        bottomEnd: ['pageLength', 'paging']
+      },
       orderCellsTop: true,
       autoWidth: false,
       // Default sort: column 1 ascending; a table can override with data-order-col / data-order-dir.

@@ -17,7 +17,7 @@
         </div>
         <div class="col">
             <span class="kicker">More</span>
-            <a th:href="${mainAuthorId != null} ? @{/author/{id}(id=${mainAuthorId})} : @{/author}">Author</a>
+            <a th:href="@{/author}">Author</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/subscribe}">Subscribe</a>
             <a th:href="@{/rss.xml}">RSS</a>

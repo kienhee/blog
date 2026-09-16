@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
         // Lock the Admin role row first: two sign-ups racing on an empty database are serialised here,
         // so only one of them can become the first (Admin) account.
         Role admin = roleRepository.findBySlugForUpdate("admin")
-                .orElseThrow(() -> new IllegalStateException("The Admin role is missing (see V20__Permission_catalog_v2.sql)."));
+                .orElseThrow(() -> new IllegalStateException("The Admin role is missing (see V1__Auth.sql)."));
         boolean first = registrationPolicy.isFirstAccount();
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already in use: " + request.getEmail());

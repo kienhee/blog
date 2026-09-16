@@ -30,6 +30,19 @@ public class GlobalControllerAdvice {
         return value >= 1 && value <= 100 ? value : 10;
     }
 
+    /**
+     * Site domain from Settings ({@code site.domain}), for admin templates that show a public URL —
+     * e.g. the prefix in front of the post slug field. Displayed as typed, without a scheme.
+     */
+    @ModelAttribute("siteDomain")
+    public String siteDomain() {
+        String domain = settingService.get("site.domain", "");
+        if (domain.isBlank()) {
+            return "";
+        }
+        return domain.trim().replaceFirst("^https?://", "").replaceAll("/+$", "");
+    }
+
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {
         String uri = request.getRequestURI();

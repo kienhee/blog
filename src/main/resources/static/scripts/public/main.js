@@ -26,10 +26,7 @@ $(function () {
   });
 
   /* theme */
-  var saved = null;
-  try { saved = localStorage.getItem('kienhee-theme'); } catch (e) {}
-  if (saved) $('html').attr('data-theme', saved);
-
+  /* the saved theme is applied by an inline script in <head>, before first paint */
   $('[data-theme-toggle]').on('click', function () {
     var next = $('html').attr('data-theme') === 'light' ? 'dark' : 'light';
     $('html').attr('data-theme', next);
@@ -48,6 +45,46 @@ $(function () {
     if (e.key === 'Escape' && $ov.hasClass('open')) $ov.removeClass('open');
   });
 
+  /* search as you type */
+  var $live = $ov.find('[data-live-search]');
+  if ($live.length) {
+    var $input = $live.find('input[name="q"]');
+    var $latest = $ov.find('[data-search-latest]');
+    var $results = $ov.find('[data-search-results]');
+    var timer = null;
+    var seq = 0;
+    var showLatest = function () {
+      $results.prop('hidden', true).empty();
+      $latest.prop('hidden', false);
+    };
+    $input.on('input', function () {
+      clearTimeout(timer);
+      var q = $.trim($input.val());
+      if (!q.length) { seq++; showLatest(); return; }
+      timer = setTimeout(function () {
+        var mine = ++seq;
+        $.getJSON($live.attr('data-live-url'), { q: q }).done(function (items) {
+          if (mine !== seq) return;
+          $latest.prop('hidden', true);
+          $results.empty().prop('hidden', false);
+          $('<p class="kicker" style="padding:20px 0">')
+            .text(items.length ? 'Results' : 'No articles match \u201c' + q + '\u201d').appendTo($results);
+          $.each(items, function (_, it) {
+            $('<a class="res">').attr('href', it.url)
+              .append($('<span class="kicker">').text(it.category))
+              .append($('<span style="font-size:18px;font-weight:600">').text(it.title))
+              .appendTo($results);
+          });
+          if (items.length) {
+            $('<a class="kicker" style="display:block;padding:16px 0;color:var(--accent)">')
+              .attr('href', $live.attr('action') + '?q=' + encodeURIComponent(q))
+              .text('See all results \u2192').appendTo($results);
+          }
+        });
+      }, 250);
+    });
+  }
+
   /* article: table of contents from the h2 headings */
   var $article = $('[data-article]');
   var $toc = $('[data-toc]');
@@ -59,7 +96,12 @@ $(function () {
       if (!text) return;
       var id = $h.attr('id');
       if (!id) {
-        var base = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'section';
+        // Headings are usually Vietnamese: strip the accents first, or every accented letter
+        // becomes a separator and the anchor turns into "b-i-vi-t".
+        var base = text.normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[\u0110\u0111]/g, 'd')
+          .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'section';
         id = base;
         for (var n = 2; used[id] || document.getElementById(id); n++) id = base + '-' + n;
         $h.attr('id', id);

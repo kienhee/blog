@@ -174,36 +174,35 @@ $(function () {
   });
 
   /* ---- slug auto-fill ---- */
+  // Titles are usually Vietnamese, so accents are transliterated before the slug is built
+  // ("Bai viet so 1" from "Bài viết số 1"); a naive [^a-z0-9] strip turns those letters into
+  // separators and leaves "b-i-vi-t-s". Slugs stay ASCII on purpose: they go straight into URLs.
+  function slugify(value) {
+    return String(value == null ? '' : value)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')   // combining accents NFD splits off (a-grave, e-acute, o-dot, ...)
+      .replace(/[\u0110\u0111]/g, 'd')   // D-bar and d-bar, which NFD leaves alone
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+  window.khSlugify = slugify;
+
   $('[data-slug-source]').each(function () {
     var $src = $(this);
     var $target = $($src.attr('data-slug-source'));
     $src.on('input', function () {
       if (!$target.length || $target.data('touched')) return;
-      var slug = $.trim($src.val()).toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-      $target.val(slug);
+      $target.val(slugify($.trim($src.val())));
     });
     if ($target.length) {
       $target.on('input', function () { $(this).data('touched', true); });
-    }
-  });
-
-  /* ---- rich text toolbar ---- */
-  $('[data-cmd]').on('click', function () {
-    var cmd = $(this).attr('data-cmd');
-    try {
-      if (cmd === 'h2' || cmd === 'h3' || cmd === 'blockquote' || cmd === 'pre') {
-        document.execCommand('formatBlock', false, cmd);
-      } else if (cmd === 'link') {
-        document.execCommand('createLink', false, 'https://kienhee.com');
-      } else if (cmd === 'image') {
-        toast('Opens the media library');
-      } else {
-        document.execCommand(cmd);
-      }
-    } catch (e) {
-      toast('Formatting: ' + cmd);
+      // Typing a Vietnamese title straight into the slug field should still produce a valid slug.
+      $target.on('blur', function () {
+        var $t = $(this);
+        var cleaned = slugify($t.val());
+        if (cleaned !== $.trim($t.val())) $t.val(cleaned);
+      });
     }
   });
 

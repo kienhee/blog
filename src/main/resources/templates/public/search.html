@@ -9,12 +9,25 @@
   <section class="wrap" style="padding-top:56px">
     <h1 style="font-size:64px;line-height:1">Search</h1>
     <form method="get" th:action="@{/search}" role="search" style="display:flex;gap:12px;margin:28px 0 0;max-width:680px">
-      <input class="input" type="search" name="q" th:value="${q}" placeholder="Search guides and news" maxlength="100" autofocus>
+      <input class="input" type="text" name="q" autocomplete="off" th:value="${q}" placeholder="Search guides and news" maxlength="100" autofocus>
       <button class="btn" type="submit">Search</button>
     </form>
-    <th:block th:if="${!q.isEmpty()}">
-      <p class="kicker" style="padding:28px 0 12px" th:if="${q.length() < 2}">Type at least 2 characters.</p>
-      <p class="kicker" style="padding:28px 0 12px" th:if="${q.length() >= 2}"
+    <!-- Hashtag mode: /search?tag=<slug>, reached from the #tag links on an article. -->
+    <th:block th:if="${!tag.isEmpty()}">
+      <p class="kicker" style="padding:28px 0 12px"
+         th:text="|${posts.totalElements} ${posts.totalElements == 1 ? 'article' : 'articles'} tagged #${hashtag != null ? hashtag.name : tag}|">4 articles tagged #ai</p>
+      <p class="dim" th:if="${hashtag != null and !#strings.isEmpty(hashtag.description)}" style="padding-bottom:12px"
+         th:text="${hashtag.description}">What this tag covers.</p>
+      <th:block th:each="p : ${posts}"><a th:replace="~{fragments/public/pagination :: thumbRow(${p})}"></a></th:block>
+      <!-- th:replace runs before th:if, so the condition lives on a wrapper block. -->
+      <th:block th:if="${posts.totalElements == 0}">
+        <p th:replace="~{fragments/public/pagination :: empty('No articles carry this tag yet.')}"></p>
+      </th:block>
+      <nav th:replace="~{fragments/public/pagination :: pagerTag(${posts}, '/search', ${tag})}"></nav>
+    </th:block>
+
+    <th:block th:if="${tag.isEmpty() and !q.isEmpty()}">
+      <p class="kicker" style="padding:28px 0 12px"
          th:text="|${posts.totalElements} ${posts.totalElements == 1 ? 'result' : 'results'} for “${q}”|">3 results for “prompt”</p>
       <th:block th:each="p : ${posts}"><a th:replace="~{fragments/public/pagination :: thumbRow(${p})}"></a></th:block>
       <nav th:replace="~{fragments/public/pagination :: pager(${posts}, '/search', ${q})}"></nav>

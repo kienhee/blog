@@ -1,6 +1,7 @@
 package com.kienhee.blog.service;
 
 import com.kienhee.blog.entity.Category;
+import com.kienhee.blog.entity.Hashtag;
 import com.kienhee.blog.entity.Post;
 import com.kienhee.blog.entity.User;
 import org.springframework.data.domain.Page;
@@ -50,4 +51,10 @@ public interface PublicBlogService {
 
     /** Blank or very short queries return an empty page. */
     Page<Post> search(String query, int page);
+
+    /** Published posts tagged with this hashtag slug (case-insensitive); empty page when the slug is blank. */
+    Page<Post> postsWithHashtag(String slug, int page);
+
+    /** The hashtag itself, so the search page can show its real name; empty when unknown or inactive. */
+    Optional<Hashtag> hashtag(String slug);
 }

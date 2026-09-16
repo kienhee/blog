@@ -10,27 +10,69 @@ $(function () {
     }, 'Invalid format.');
   }
 
-  var $area = $('#post-content-area');
-  var $contentField = $('#post-content');
+  /* ---- Content: TinyMCE (self-hosted GPL build in scripts/lib/tinymce) ---- */
+  // Replaces the old contenteditable toolbar. The editor writes back into #post-content
+  // (name="content"), so the form post and jQuery Validate keep working unchanged.
+  var TINY_BASE = window.KH_TINYMCE_BASE || '/scripts/lib/tinymce';
 
-  function updateWordCount() {
-    var text = $.trim($area.text());
-    var words = text.length ? text.split(/\s+/).length : 0;
-    $('#post-word-count').text(words + (words === 1 ? ' word' : ' words'));
+  function isLightTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'light';
   }
 
   function syncContent() {
-    if (!$area.length || !$contentField.length) return;
-    $contentField.val($area.html());
+    var ed = window.tinymce && window.tinymce.get('post-content');
+    if (ed) ed.save();
   }
 
-  if ($area.length) {
-    $area.on('input blur', function () {
-      syncContent();
-      updateWordCount();
+  function initTinymce() {
+    if (!window.tinymce || !document.getElementById('post-content')) return;
+    var light = isLightTheme();
+    window.tinymce.init({
+      selector: '#post-content',
+      base_url: TINY_BASE,
+      license_key: 'gpl',
+      promotion: false,
+      branding: false,
+      menubar: 'edit insert format table',
+      height: 620,
+      plugins: 'advlist anchor autolink charmap code codesample fullscreen image link lists preview searchreplace table visualblocks wordcount',
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist | blockquote link image table codesample | removeformat fullscreen code',
+      // Chrome is restyled by styles/tinymce-theme.css; the content area follows the public
+      // article styles (styles/tinymce-content.css), with .kh-light for the light admin theme.
+      skin: light ? 'oxide' : 'oxide-dark',
+      content_css: '/styles/tinymce-content.css',
+      body_class: light ? 'kh-light' : '',
+      relative_urls: false,
+      remove_script_host: true,
+      convert_urls: true,
+      image_caption: true,
+      // "Choose from library" inside the image/media dialogs: the same MediaExplorer picker as the cover image.
+      // No media/embed plugin: PublicViewHelper.safeHtml strips iframes, so embeds would silently vanish.
+      file_picker_types: 'image',
+      file_picker_callback: function (callback, value, meta) {
+        openMediaPicker('image', function (file) {
+          callback(file.url, { title: file.name, alt: file.name });
+        });
+      },
+      setup: function (editor) {
+        // Keep the textarea (and therefore jQuery Validate) in step with the editor.
+        editor.on('change keyup undo redo SetContent', function () { editor.save(); });
+      }
     });
-    updateWordCount();
   }
+
+  initTinymce();
+
+  // The admin theme toggle swaps the skin: re-create the editor with the content it holds.
+  var themeObserver = new MutationObserver(function () {
+    var ed = window.tinymce && window.tinymce.get('post-content');
+    if (!ed) return;
+    var html = ed.getContent();
+    ed.remove();
+    $('#post-content').val(html);
+    initTinymce();
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ---- Cover image: the shared MediaExplorer in pick mode ---- */
   // Same component as the Media library page (scripts/media/media-explorer.js), so the picker always
@@ -38,21 +80,29 @@ $(function () {
   // reflects uploads and changes made elsewhere.
   var $picker = $('#media-picker');
   var pickerExplorer = null;
+  var pickerAccept = 'image';
+  var pickerHandler = null;
 
   function closeMediaPicker() {
     $picker.removeClass('open');
+    pickerHandler = null;
   }
 
-  $('#btn-open-media-picker').on('click', function () {
+  // accept: 'image' (or null for any file), onPick: receives the chosen file.
+  function openMediaPicker(accept, onPick) {
     if (!window.MediaExplorer) return;
-    if (!pickerExplorer) {
+    pickerHandler = onPick;
+    if (!pickerExplorer || pickerAccept !== accept) {
+      if (pickerExplorer && pickerExplorer.destroy) pickerExplorer.destroy();
+      pickerAccept = accept;
       pickerExplorer = window.MediaExplorer.mount(document.getElementById('media-picker-explorer'), {
         mode: 'pick',
-        accept: 'image',
+        accept: accept || undefined,
         multiple: false,
         onSelect: function (files) {
-          if (files.length) $('#post-coverImage').val(files[0].url).trigger('input');
+          var handler = pickerHandler;
           closeMediaPicker();
+          if (files.length && handler) handler(files[0]);
         },
         onCancel: closeMediaPicker
       });
@@ -60,6 +110,12 @@ $(function () {
       pickerExplorer.reload();
     }
     $picker.addClass('open');
+  }
+
+  $('#btn-open-media-picker').on('click', function () {
+    openMediaPicker('image', function (file) {
+      $('#post-coverImage').val(file.url).trigger('input');
+    });
   });
 
   $('#btn-close-media-picker').on('click', closeMediaPicker);
@@ -88,6 +144,8 @@ $(function () {
 
   /* ---- jQuery validation for Post form ---- */
   if ($.fn.validate && $('#post-form').length) {
+    // Runs before jQuery Validate's own submit handler, so the "content" rule sees the editor's HTML.
+    $('#post-form').on('submit', syncContent);
     $('#post-form').validate({
       ignore: [],
       rules: {

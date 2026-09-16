@@ -222,6 +222,27 @@ class TrashTests {
     }
 
     @Test
+    @DisplayName("media is two tabs of this page, and deleting permanently there needs media:purge")
+    void mediaTabs() throws Exception {
+        // media:delete alone sees the tabs and may restore, but not purge (the second permission).
+        var mediaOnly = TestAuth.withPermissions("mediaonly@test.com", "media:delete");
+        mockMvc.perform(get("/admin/trash").param("type", "media-files").with(mediaOnly))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("type=media-files")))
+                .andExpect(content().string(containsString("type=media-folders")))
+                .andExpect(content().string(not(containsString("data-trash-row=\"purge\""))));
+        mockMvc.perform(post("/admin/trash/media-files/purge").param("ids", "1").with(csrf()).with(mediaOnly))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/admin/trash/media-files/empty").with(csrf()).with(mediaOnly))
+                .andExpect(status().isForbidden());
+
+        // Someone with neither media permission sees no media tab at all.
+        mockMvc.perform(get("/admin/trash").with(TestAuth.withPermissions("tagger@test.com", "hashtags:delete")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("type=media-files"))));
+    }
+
+    @Test
     @DisplayName("the sidebar links to the trash")
     void sidebarLink() throws Exception {
         mockMvc.perform(get("/admin/dashboard").with(TestAuth.owner()))

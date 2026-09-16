@@ -16,7 +16,7 @@
             <a th:href="@{/categories}"
                th:classappend="${#strings.startsWith(uri, '/categor')} ? 'active'"
                th:attr="aria-current=${#strings.startsWith(uri, '/categor')} ? 'page' : null">Categories</a>
-            <a th:href="${mainAuthorId != null} ? @{/author/{id}(id=${mainAuthorId})} : @{/author}"
+            <a th:href="@{/author}"
                th:classappend="${#strings.startsWith(uri, '/author')} ? 'active'"
                th:attr="aria-current=${#strings.startsWith(uri, '/author')} ? 'page' : null">Author</a>
             <a th:href="@{/about}"
@@ -41,15 +41,18 @@
 
     <div class="overlay">
         <div class="box">
-            <form class="top" method="get" th:action="@{/search}" role="search">
+            <form class="top" method="get" th:action="@{/search}" role="search" data-live-search th:attr="data-live-url=@{/search/live}">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-                <input type="search" name="q" placeholder="Search guides and news" maxlength="100">
+                <input type="text" name="q" placeholder="Search guides and news" maxlength="100" autocomplete="off" aria-label="Search">
                 <button type="button" class="btn btn-ghost btn-xs" data-search-close>ESC</button>
             </form>
             <th:block th:if="${suggestedPosts != null and !suggestedPosts.isEmpty()}">
+                <div data-search-latest>
                 <p class="kicker" style="padding:20px 0">Latest reading</p>
                 <a class="res" th:each="p : ${suggestedPosts}" th:href="@{/article/{slug}(slug=${p.slug})}"><span class="kicker" th:text="${p.category.name}">Category</span><span style="font-size:18px;font-weight:600" th:text="${p.title}">Title</span></a>
+                </div>
             </th:block>
+            <div data-search-results hidden></div>
         </div>
     </div>
 </header>

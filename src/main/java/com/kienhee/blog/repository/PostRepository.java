@@ -71,15 +71,34 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED and p.author.id = :authorId")
     Page<Post> findPublishedByAuthor(@Param("authorId") Long authorId, Pageable pageable);
 
-    /** Case-insensitive match on title / excerpt / SEO description. {@code q} is matched literally (no wildcards). */
+    /**
+     * Case-insensitive substring match (LIKE %q%) on title / excerpt / SEO description / content.
+     * {@code q} is matched literally: the caller escapes % and _ (PublicBlogServiceImpl.escapeLike).
+     */
     @Query(value = "select p from Post p join fetch p.category join fetch p.author " +
             "where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED and (" +
             "lower(p.title) like lower(concat('%', :q, '%')) or lower(p.excerpt) like lower(concat('%', :q, '%')) " +
-            "or lower(p.seoDescription) like lower(concat('%', :q, '%'))) order by p.publishedAt desc, p.id desc",
+            "or lower(p.seoDescription) like lower(concat('%', :q, '%')) " +
+            "or lower(p.content) like lower(concat('%', :q, '%')) " +
+            "or exists (select h from p.hashtags h where h.active = true and (" +
+            "lower(h.name) like lower(concat('%', :q, '%')) or lower(h.slug) like lower(concat('%', :q, '%'))))) " +
+            "order by p.publishedAt desc, p.id desc",
             countQuery = "select count(p) from Post p where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED and (" +
                     "lower(p.title) like lower(concat('%', :q, '%')) or lower(p.excerpt) like lower(concat('%', :q, '%')) " +
-                    "or lower(p.seoDescription) like lower(concat('%', :q, '%')))")
+                    "or lower(p.seoDescription) like lower(concat('%', :q, '%')) " +
+                    "or lower(p.content) like lower(concat('%', :q, '%')) " +
+                    "or exists (select h from p.hashtags h where h.active = true and (" +
+                    "lower(h.name) like lower(concat('%', :q, '%')) or lower(h.slug) like lower(concat('%', :q, '%')))))")
     Page<Post> searchPublished(@Param("q") String q, Pageable pageable);
+
+    /** Published posts carrying one active hashtag, newest first — the "#tag" link on an article. */
+    @Query(value = "select distinct p from Post p join fetch p.category join fetch p.author join p.hashtags h " +
+            "where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED and h.active = true " +
+            "and lower(h.slug) = lower(:slug) order by p.publishedAt desc, p.id desc",
+            countQuery = "select count(distinct p) from Post p join p.hashtags h " +
+                    "where p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED and h.active = true " +
+                    "and lower(h.slug) = lower(:slug)")
+    Page<Post> findPublishedByHashtag(@Param("slug") String slug, Pageable pageable);
 
     @Query("select distinct p from Post p join fetch p.category join fetch p.author left join fetch p.hashtags " +
             "where p.slug = :slug and p.status = com.kienhee.blog.entity.PostStatus.PUBLISHED")

@@ -12,7 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/** One key/value site setting (e.g. {@code site.title}). See {@code V17__Site_settings.sql}. */
+/** One key/value site setting (e.g. {@code site.title}). See {@code V5__Settings.sql}. */
 @Entity
 @Table(name = "site_settings")
 @Getter

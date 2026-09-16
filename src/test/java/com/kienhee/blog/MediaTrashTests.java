@@ -463,12 +463,17 @@ class MediaTrashTests {
     class ControllerTests {
 
         @Test
-        @DisplayName("GET /admin/media/trash renders for a media viewer")
+        @DisplayName("GET /admin/media/trash redirects to the shared Trash page, which lists the files")
         void trashPageRenders() throws Exception {
+            // The media trash was merged into /admin/trash; the old URL only redirects now.
             mockMvc.perform(get("/admin/media/trash").with(TestAuth.owner()))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/admin/trash?type=media-files"));
+
+            mockMvc.perform(get("/admin/trash").param("type", "media-files").with(TestAuth.owner()))
                     .andExpect(status().isOk())
-                    .andExpect(view().name("admin/media/trash"))
-                    .andExpect(model().attributeExists("trashedMedia", "trashSummary", "retentionDays"));
+                    .andExpect(view().name("admin/trash/trash"))
+                    .andExpect(model().attributeExists("items", "tabs", "selected", "mediaTrashSummary"));
         }
 
         @Test
@@ -484,7 +489,7 @@ class MediaTrashTests {
             mockMvc.perform(post("/admin/media/" + media.getId() + "/restore")
                             .with(TestAuth.owner()).with(csrf()))
                     .andExpect(status().is3xxRedirection())
-                    .andExpect(redirectedUrl("/admin/media/trash"));
+                    .andExpect(redirectedUrl("/admin/trash?type=media-files"));
             assertEquals(Media.Status.ACTIVE, reload(media.getId()).getStatus());
         }
 

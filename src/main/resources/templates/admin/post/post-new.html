@@ -5,6 +5,7 @@
     <title th:text="${postId != null ? 'Edit post' : 'New post'}">New post</title>
     <link rel="stylesheet" th:href="@{/styles/lib/flatpickr.min.css}">
     <link rel="stylesheet" th:href="@{/styles/flatpickr-theme.css}">
+    <link rel="stylesheet" th:href="@{/styles/tinymce-theme.css}">
 </head>
 <body>
 
@@ -48,7 +49,9 @@
             <div class="field" id="field-slug" th:classappend="${#fields.hasErrors('slug')} ? 'has-error' : ''">
               <span>Slug<span class="req"> *</span></span>
               <span style="display:flex;align-items:center;border:1px solid var(--line);background:var(--surf)">
-                <span class="dim" style="padding:0 12px;font-size:13px;border-right:1px solid var(--line);height:44px;display:flex;align-items:center">kienhee.com/</span>
+                <!-- Prefix comes from the site.domain setting (GlobalControllerAdvice#siteDomain), not a hard-coded domain. -->
+                <span class="dim" th:if="${!#strings.isEmpty(siteDomain)}" th:text="${siteDomain} + '/'"
+                      style="padding:0 12px;font-size:13px;border-right:1px solid var(--line);height:44px;display:flex;align-items:center">kienhee.com/</span>
                 <input class="input" id="post-slug" name="slug" th:value="*{slug}" style="border:none;background:transparent;height:44px;font-size:14px" placeholder="enter-slug">
               </span>
               <span class="err show" id="err-slug" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}">Slug is required.</span>
@@ -56,7 +59,8 @@
             </div>
 
             <label class="field" id="field-coverImage" th:classappend="${#fields.hasErrors('coverImage')} ? 'has-error' : ''">
-              <span>Cover image URL</span>
+              <span>Cover image URL<span class="help" tabindex="0" role="note"
+                    data-tip="Recommended: 2560 x 1440 (16:9), WebP or JPG, under 400 KB. Minimum 1600 x 900.&#10;The image is cropped to fit three frames: the article hero (up to 4:1 on wide screens), the home page feature (about 1.13:1) and the list thumbnail (5:3, square on mobile).&#10;Keep the subject in the middle — roughly the centre 64% of the width and 44% of the height — and avoid text inside the image.&#10;Upload limit: 10 MB per file (JPG, PNG, WebP, GIF, SVG).">?</span></span>
               <span style="display:flex;gap:8px">
                 <input class="input" id="post-coverImage" name="coverImage" th:value="*{coverImage}" placeholder="https://example.com/cover.jpg" style="flex:1">
                 <button type="button" class="btn btn-ghost" id="btn-open-media-picker">Choose from library</button>
@@ -78,23 +82,8 @@
 
             <div class="field" id="field-content" th:classappend="${#fields.hasErrors('content')} ? 'has-error' : ''">
               <span>Content<span class="req"> *</span></span>
-              <div class="rte">
-                <div class="bar">
-                  <button type="button" data-cmd="bold" title="bold">B</button>
-                  <button type="button" data-cmd="italic" title="italic">I</button>
-                  <button type="button" data-cmd="underline" title="underline">U</button>
-                  <button type="button" data-cmd="h2" title="h2">H2</button>
-                  <button type="button" data-cmd="h3" title="h3">H3</button>
-                  <button type="button" data-cmd="blockquote" title="blockquote">&ldquo; &rdquo;</button>
-                  <button type="button" data-cmd="insertUnorderedList" title="insertUnorderedList">&bull; List</button>
-                  <button type="button" data-cmd="link" title="link">Link</button>
-                  <button type="button" data-cmd="image" title="image">Image</button>
-                  <button type="button" data-cmd="pre" title="pre">&lt;/&gt;</button>
-                </div>
-                <div class="area" id="post-content-area" contenteditable="true" th:utext="*{content}"></div>
-                <div class="foot"><span>Rich text</span><span id="post-word-count">0 words</span></div>
-              </div>
-              <textarea id="post-content" name="content" style="display:none" th:text="*{content}"></textarea>
+              <!-- TinyMCE (self-hosted GPL build, scripts/lib/tinymce) is initialised on this textarea by post-editor.js. -->
+              <textarea class="textarea" id="post-content" name="content" th:text="*{content}"></textarea>
               <span class="err show" id="err-content" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Content is required.</span>
               <span class="err" id="err-content" th:unless="${#fields.hasErrors('content')}">Content is required.</span>
             </div>
@@ -185,6 +174,7 @@
 <th:block layout:fragment="scripts">
     <!-- The cover image picker is the shared MediaExplorer component (same as the Media library page). -->
     <script th:src="@{/scripts/lib/flatpickr.min.js}"></script>
+    <script th:src="@{/scripts/lib/tinymce/tinymce.min.js}" referrerpolicy="origin"></script>
     <script th:src="@{/scripts/media/media-explorer.js}"></script>
     <script th:src="@{/scripts/post/post-editor.js}"></script>
 </th:block>

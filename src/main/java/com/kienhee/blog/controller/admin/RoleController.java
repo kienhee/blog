@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasAuthority('roles:view')")
 public class RoleController {
 
-    /** Module order on the Roles page (catalog: V20__Permission_catalog_v2.sql). Unknown modules are appended. */
+    /** Module order on the Roles page (catalog: V1__Auth.sql). Unknown modules are appended. */
     private static final Map<String, String> RESOURCE_LABELS = new LinkedHashMap<>();
     static {
         RESOURCE_LABELS.put("dashboard", "Dashboard");

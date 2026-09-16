@@ -5,6 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Apply the saved theme before first paint, otherwise light mode flashes dark first. -->
+    <script>try{var t=localStorage.getItem('kienhee-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <title layout:title-pattern="$CONTENT_TITLE — $LAYOUT_TITLE" th:text="${siteTitle} ?: 'Kienhee'">Kienhee</title>
     <meta name="description" th:content="${pageDescription} ?: (${siteDescription} ?: 'AI guides and news')">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

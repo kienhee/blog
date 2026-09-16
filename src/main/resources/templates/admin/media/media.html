@@ -34,7 +34,7 @@
            image) mount the very same component in "pick" mode, so both always stay in sync. -->
       <div id="media-library"
            th:attr="data-initial-folder=${currentFolderId}"
-           th:data-trash-url="@{/admin/media/trash}">
+           th:data-trash-url="@{/admin/trash(type='media-files')}">
         <noscript><p class="dim" style="padding:24px">The media library needs JavaScript.</p></noscript>
       </div>
 </div>

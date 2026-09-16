@@ -1,9 +1,11 @@
 package com.kienhee.blog.service.impl;
 
 import com.kienhee.blog.entity.Category;
+import com.kienhee.blog.entity.Hashtag;
 import com.kienhee.blog.entity.Post;
 import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.CategoryRepository;
+import com.kienhee.blog.repository.HashtagRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.PublicBlogService;
@@ -24,11 +26,13 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PublicBlogServiceImpl implements PublicBlogService {
 
-    static final int MIN_QUERY_LENGTH = 2;
+    // One character is enough: the query runs as LIKE %q%, so a single letter is a valid search.
+    static final int MIN_QUERY_LENGTH = 1;
     static final int MAX_QUERY_LENGTH = 100;
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final HashtagRepository hashtagRepository;
     private final UserRepository userRepository;
     private final SettingService settingService;
 
@@ -121,6 +125,24 @@ public class PublicBlogServiceImpl implements PublicBlogService {
             return Page.empty(pageRequest(page));
         }
         return postRepository.searchPublished(escapeLike(q), pageRequest(page));
+    }
+
+    @Override
+    public Page<Post> postsWithHashtag(String slug, int page) {
+        String tag = slug == null ? "" : slug.trim();
+        if (tag.isEmpty()) {
+            return Page.empty(pageRequest(page));
+        }
+        return postRepository.findPublishedByHashtag(tag, pageRequest(page));
+    }
+
+    @Override
+    public Optional<Hashtag> hashtag(String slug) {
+        String tag = slug == null ? "" : slug.trim();
+        if (tag.isEmpty()) {
+            return Optional.empty();
+        }
+        return hashtagRepository.findBySlugIgnoreCase(tag).filter(Hashtag::isActive);
     }
 
     static String normalizeQuery(String query) {

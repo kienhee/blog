@@ -3,7 +3,7 @@
 <body>
 
 <aside th:fragment="sidebar" class="side" th:with="uri=${currentUri}">
-    <div class="top"><span class="b">Kienhee</span><span class="badge-accent">Admin</span></div>
+    <div class="top"><span class="b">Kienhee</span></div>
     <nav>
         <a th:if="${perms.contains('dashboard:view')}" th:href="@{/admin/dashboard}"
            th:attr="aria-current=${uri == '/admin' or #strings.startsWith(uri, '/admin/dashboard') or #strings.contains(uri, 'dashboard')} ? 'page' : null">

@@ -7,7 +7,30 @@
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:80px">
-    <div class="poster">
+    <th:block th:with="xUrl=${site != null ? site['social.x'] : null},
+                  ytUrl=${site != null ? site['social.youtube'] : null},
+                  xOk=${xUrl != null and (#strings.startsWith(xUrl, 'https://') or #strings.startsWith(xUrl, 'http://'))},
+                  ytOk=${ytUrl != null and (#strings.startsWith(ytUrl, 'https://') or #strings.startsWith(ytUrl, 'http://'))}">
+    <!-- Social links come from Settings (social.x, social.youtube); only http(s) URLs are rendered. -->
+    <div class="cell-grid" style="margin-bottom:48px">
+      <a class="cell" th:if="${xOk}" th:href="${xUrl}" target="_blank" rel="me noopener noreferrer">
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">FOLLOW</span>
+        <span class="n">X / Twitter</span>
+        <span class="dim" style="font-size:15px;line-height:1.5">Short notes and links as they happen.</span>
+      </a>
+      <a class="cell" th:if="${ytOk}" th:href="${ytUrl}" target="_blank" rel="me noopener noreferrer">
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">WATCH</span>
+        <span class="n">YouTube</span>
+        <span class="dim" style="font-size:15px;line-height:1.5">Walkthroughs of the guides on video.</span>
+      </a>
+      <a class="cell" th:href="@{/rss.xml}">
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">READ</span>
+        <span class="n">RSS feed</span>
+        <span class="dim" style="font-size:15px;line-height:1.5">Every new article in your feed reader.</span>
+      </a>
+    </div>
+    </th:block>
+    <div class="poster poster-light">
       <div>
         <h1>The Kienhee Brief</h1>
         <p style="margin-top:20px;font-size:20px;line-height:1.5;max-width:44ch;font-weight:500">One email every Thursday: the week's releases, one guide, and what is safe to ignore.</p>

@@ -742,15 +742,16 @@ class MediaCrudTests {
         }
 
         @Test
-        @DisplayName("trash page renders the select-all checkbox, row checkboxes and the selection bar")
+        @DisplayName("the shared Trash page lists trashed files with select-all and row checkboxes")
         void pageRendersSelectionUi() throws Exception {
             Media media = upload("bin-render.png", null);
             postForm("/admin/media/" + media.getId() + "/delete");
-            mockMvc.perform(get("/admin/media/trash").with(owner))
+            // Media moved into /admin/trash?type=media-files; /admin/media/trash only redirects there.
+            mockMvc.perform(get("/admin/trash").param("type", "media-files").with(owner))
                     .andExpect(status().isOk())
-                    .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"trash-select-all\"")))
-                    .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"trash-selection-bar\"")))
-                    .andExpect(content().string(org.hamcrest.Matchers.containsString("data-kind=\"media\" data-id=\"" + media.getId() + "\"")));
+                    .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"trash-check-all\"")))
+                    .andExpect(content().string(org.hamcrest.Matchers.containsString("class=\"trash-check\" value=\"" + media.getId() + "\"")))
+                    .andExpect(content().string(org.hamcrest.Matchers.containsString("bin-render.png")));
         }
     }
 

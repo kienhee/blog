@@ -27,7 +27,12 @@ public class PublicViewHelper {
      */
     private static final Safelist SAFELIST = Safelist.relaxed()
             .addTags("figure", "figcaption", "hr", "mark", "s")
-            .addAttributes(":all", "id", "title")
+            // TinyMCE marks up figures, code samples and alignment with classes/inline styles.
+            .addAttributes(":all", "id", "title", "class")
+            .addAttributes("p", "style").addAttributes("h1", "style").addAttributes("h2", "style")
+            .addAttributes("h3", "style").addAttributes("h4", "style").addAttributes("h5", "style")
+            .addAttributes("h6", "style").addAttributes("figure", "style").addAttributes("img", "style")
+            .addAttributes("table", "style").addAttributes("td", "style").addAttributes("th", "style")
             .addAttributes("a", "target", "rel")
             .preserveRelativeLinks(true);
 

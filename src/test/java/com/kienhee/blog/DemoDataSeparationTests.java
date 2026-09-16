@@ -37,8 +37,8 @@ class DemoDataSeparationTests {
         }
         Set<String> demo = Arrays.stream(resolver.getResources("classpath*:db/demo/*.sql"))
                 .map(Resource::getFilename).collect(Collectors.toSet());
-        assertTrue(demo.contains("V4__seed_categories_and_hashtags.sql"));
-        assertTrue(demo.contains("V6__seed_posts.sql"));
+        assertTrue(demo.contains("V7__seed_categories_and_hashtags.sql"));
+        assertTrue(demo.contains("V8__seed_posts.sql"));
     }
 
     @Test
