@@ -36,10 +36,9 @@
             </span>
           </a>
 
-          <form th:if="${perms.contains('roles:create')}" method="post" th:action="@{/admin/roles}"
-                style="display:flex;flex-direction:column;gap:8px;padding:16px 20px">
-            <input class="input" name="name" placeholder="New role name" required minlength="2" style="height:34px;font-size:13px">
-            <input class="input" name="description" placeholder="Short description (optional)" style="height:34px;font-size:13px">
+          <form class="role-create" th:if="${perms.contains('roles:create')}" method="post" th:action="@{/admin/roles}">
+            <input class="input" name="name" placeholder="New role name" required minlength="2">
+            <input class="input" name="description" placeholder="Short description (optional)">
             <button class="btn btn-ghost btn-xs" type="submit">Add role</button>
           </form>
         </div>
@@ -70,15 +69,14 @@
               <div class="perm-row" th:each="row : ${permissionMatrix}">
                 <div class="perm-label" th:text="${row.label}">Posts</div>
                 <div class="perm-cells">
-                  <label th:each="cell : ${row.cells}" th:title="${cell.code}"
-                         style="display:flex;align-items:flex-start;gap:8px;min-width:210px;flex:1 1 210px;max-width:320px;padding:8px 10px;border:1px solid var(--line);cursor:pointer">
-                    <input class="checkbox" type="checkbox" name="permissionIds" style="margin-top:2px"
+                  <label th:each="cell : ${row.cells}" th:title="${cell.code}">
+                    <input class="checkbox" type="checkbox" name="permissionIds"
                            th:value="${cell.id}"
                            th:checked="${cell.granted}"
                            th:disabled="${selectedRole.systemRole or !perms.contains('roles:edit')}">
-                    <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                    <span class="perm-text">
                       <span class="kicker" th:text="${cell.action}">view</span>
-                      <span class="dim" style="font-size:12px;line-height:1.35" th:text="${cell.label}">View posts</span>
+                      <span class="dim perm-desc" th:text="${cell.label}">View posts</span>
                     </span>
                   </label>
                 </div>
