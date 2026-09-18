@@ -55,6 +55,18 @@ public class RoleController {
     private final RoleService roleService;
     private final BusinessMessages messages;
 
+    /**
+     * The seeded roles (V1__Auth.sql) describe themselves in English in the database, so their
+     * text comes from the catalogue by slug instead. A role someone created keeps what they typed.
+     */
+    private String describe(Role role) {
+        if (role == null || role.getDescription() == null || role.getDescription().isBlank()) {
+            return null;
+        }
+        String translated = messages.get("role.description." + role.getSlug());
+        return translated.startsWith("role.description.") ? role.getDescription() : translated;
+    }
+
     @GetMapping
     public String roles(@RequestParam(value = "roleId", required = false) Long roleId, Model model) {
         List<Role> roles = roleService.getAllRoles();
@@ -67,6 +79,7 @@ public class RoleController {
                 .orElse(null);
 
         model.addAttribute("selectedRole", selected);
+        model.addAttribute("selectedRoleDescription", describe(selected));
         model.addAttribute("permissionMatrix", buildMatrix(selected));
         if (!model.containsAttribute("roleCreateRequest")) {
             model.addAttribute("roleCreateRequest", RoleCreateRequest.builder().build());

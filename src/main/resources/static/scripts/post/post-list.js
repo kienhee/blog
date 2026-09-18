@@ -7,7 +7,7 @@ $(function () {
     var name = $(this).data('name') || '';
     $('#delete-post-form').attr('action', '/admin/post/' + id + '/delete');
     if (window.khDialog) {
-      window.khDialog(name ? 'post "' + name + '"' : 'this post', '#delete-post-form',
+      window.khDialog(name ? khT('js.dialog.named.post', name) : khT('js.dialog.this.post'), '#delete-post-form',
         khT('js.post.delete_note'));
     }
   });

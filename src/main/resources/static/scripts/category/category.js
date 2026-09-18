@@ -20,7 +20,7 @@ $(function () {
     $('#category-parentId').val('');
     $('#category-visible').prop('checked', true);
     $('#category-form').attr('action', '/admin/categories');
-    $('#oc-kicker').text('Create');
+    $('#oc-kicker').text(khT('js.form.create'));
     $('#oc-title').text(khT('js.category.new'));
     $('#category-submit-btn').text(khT('js.category.submit_create'));
 
@@ -51,7 +51,7 @@ $(function () {
     $('#category-parentId').val(parentId).find('option[value="' + id + '"]').prop('disabled', true);
     $('#category-visible').prop('checked', visible);
     $('#category-form').attr('action', '/admin/categories/' + id + '/edit');
-    $('#oc-kicker').text('Update');
+    $('#oc-kicker').text(khT('js.form.update'));
     $('#oc-title').text(khT('js.category.edit'));
     $('#category-submit-btn').text(khT('js.form.save_changes'));
 
@@ -72,7 +72,7 @@ $(function () {
     var name = $(this).data('name') || '';
     $('#delete-category-form').attr('action', '/admin/categories/' + id + '/delete');
     if (window.khDialog) {
-      window.khDialog(name ? 'category "' + name + '"' : 'this category', '#delete-category-form',
+      window.khDialog(name ? khT('js.dialog.named.category', name) : khT('js.dialog.this.category'), '#delete-category-form',
         khT('js.trash.restorable_note'));
     }
   });

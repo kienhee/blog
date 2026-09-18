@@ -12,7 +12,7 @@ $(function () {
     $form.find('[name="status"]').val(status);
 
     if (status === 'DISABLED' && window.khDialog) {
-      window.khDialog('sign-in for "' + ($btn.attr('data-name') || 'this account') + '"', function () { $form[0].submit(); },
+      window.khDialog(khT('js.user.disable_subject', $btn.attr('data-name') || khT('js.user.this_account')), function () { $form[0].submit(); },
         khT('js.user.disable_note'));
       return;
     }

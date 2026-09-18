@@ -149,7 +149,7 @@
     '    <div class="explorer-toolbar">' +
     '      <button type="button" class="btn-icon-label" data-mx="new-folder">' +
     I('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="12" y1="11" x2="12" y2="15"/><line x1="10" y1="13" x2="14" y2="13"/>') +
-    '        New Folder</button>' +
+    '        ' + khT('js.mx.new_folder') + '</button>' +
     '      <button type="button" class="btn-icon-label" data-mx="upload">' +
     I('<path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 21h16"/>') +
     '        <span data-mx="upload-label">' + khT('js.mx.upload') + '</span></button>' +
@@ -350,7 +350,7 @@
       $type.append($g);
     };
     addGroup(khT('js.mx.images'), IMAGE_TYPES);
-    if (!images) addGroup('Files', FILE_TYPES);
+    if (!images) addGroup(khT('js.mx.files'), FILE_TYPES);
 
     this.$grid = this.$('grid');
     this.$menu = this.$('menu');
@@ -606,7 +606,7 @@
     }
     $('<span class="name">').text(file.name).appendTo($tile);
     $('<span class="sub">').text(file.kind === 'image' ? kb(file.sizeBytes) : file.ext).appendTo($tile);
-    if (file.used) $('<span class="badge-mini">').text('Used').appendTo($tile);
+    if (file.used) $('<span class="badge-mini">').text(khT('js.mx.used_badge')).appendTo($tile);
     return $tile;
   };
 
@@ -667,7 +667,7 @@
     button('‹', page - 1, { disabled: page <= 1, title: khT('js.mx.prev_page') });
     pageList(page, pageCount).forEach(function (n) {
       if (n === '…') $('<span class="mx-gap dim">').text('…').appendTo($pages);
-      else button(String(n), n, { current: n === page, title: 'Page ' + n });
+      else button(String(n), n, { current: n === page, title: khT('js.mx.page_n', n) });
     });
     button('›', page + 1, { disabled: page >= pageCount, title: khT('js.mx.next_page') });
     return $pager;
@@ -828,7 +828,7 @@
   P.folderMenu = function ($menu, folder, event) {
     var self = this;
     var perms = this.state.permissions;
-    this.menuItem($menu, 'open', 'Open', false, function () { self.goToFolder(folder.id); });
+    this.menuItem($menu, 'open', khT('js.mx.open'), false, function () { self.goToFolder(folder.id); });
     if (perms.create) {
       this.menuItem($menu, 'folder', khT('js.mx.new_subfolder'), false, function () {
         self.goToFolder(folder.id);
@@ -877,7 +877,7 @@
       });
       return;
     }
-    this.menuItem($menu, 'open', 'Open', false, function () { self.openDetail(file); });
+    this.menuItem($menu, 'open', khT('js.mx.open'), false, function () { self.openDetail(file); });
     if (this.canPreview(file)) {
       this.menuItem($menu, 'preview', khT('js.mx.preview'), false, function () { self.previewImage(file); });
     }
@@ -885,7 +885,7 @@
       this.menuItem($menu, 'edit', khT('js.ie.title'), false, function () { self.editImage(file); });
     }
     if (perms.edit) {
-      this.menuItem($menu, 'rename', 'Rename', false, function () { self.openDetail(file, true); });
+      this.menuItem($menu, 'rename', khT('js.mx.rename'), false, function () { self.openDetail(file, true); });
       $('<hr>').appendTo($menu);
       $('<div class="cm-label">').text(khT('js.mx.move_to')).appendTo($menu);
       this.menuItem($menu, 'move', 'Home', false, function () { self.moveFiles([file.id], ''); });

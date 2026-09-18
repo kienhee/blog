@@ -35,7 +35,7 @@ $(function () {
     validationRules.confirmPassword = { required: true, equalTo: '#password' };
     validationMessages.confirmPassword = {
       required: khT('validation.password.confirm_new'),
-      equalTo: "The two passwords don't match."
+      equalTo: khT('js.form.passwords_differ')
     };
   } else if (isRegister) {
     validationRules.fullName = {

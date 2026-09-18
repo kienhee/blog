@@ -190,7 +190,7 @@ $(function () {
     var text = sel && $(sel).length ? $(sel).text() : window.location.href;
     if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function () {});
     var oldText = $btn.text();
-    $btn.text('Copied');
+    $btn.text(khT('js.copied'));
     setTimeout(function () { $btn.text(oldText); }, 1500);
   });
 

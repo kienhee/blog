@@ -32,7 +32,7 @@
     ['contrast', khT('js.ie.contrast'), 0, 200, 100],
     ['saturate', khT('js.ie.saturation'), 0, 200, 100],
     ['grayscale', khT('js.ie.grayscale'), 0, 100, 0],
-    ['sepia', 'Sepia', 0, 100, 0]
+    ['sepia', khT('js.ie.sepia'), 0, 100, 0]
   ];
 
   var I = function (paths) {

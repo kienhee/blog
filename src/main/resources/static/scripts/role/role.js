@@ -7,7 +7,7 @@ $(function () {
     var name = $(this).data('name') || '';
     $('#delete-role-form').attr('action', '/admin/roles/' + id + '/delete');
     if (window.khDialog) {
-      window.khDialog(name ? 'role "' + name + '"' : 'this role', '#delete-role-form',
+      window.khDialog(name ? khT('js.dialog.named.role', name) : khT('js.dialog.this.role'), '#delete-role-form',
         khT('js.role.delete_note'));
     }
   });

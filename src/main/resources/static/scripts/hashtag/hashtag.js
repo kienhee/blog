@@ -19,7 +19,7 @@ $(function () {
     $('#hashtag-description').val('');
     $('#hashtag-active').prop('checked', true);
     $('#hashtag-form').attr('action', '/admin/hashtags');
-    $('#oc-kicker').text('Create');
+    $('#oc-kicker').text(khT('js.form.create'));
     $('#oc-title').text(khT('js.hashtag.new'));
     $('#hashtag-submit-btn').text(khT('js.hashtag.submit_create'));
 
@@ -48,7 +48,7 @@ $(function () {
     $('#hashtag-description').val(description);
     $('#hashtag-active').prop('checked', active);
     $('#hashtag-form').attr('action', '/admin/hashtags/' + id + '/edit');
-    $('#oc-kicker').text('Update');
+    $('#oc-kicker').text(khT('js.form.update'));
     $('#oc-title').text(khT('js.hashtag.edit'));
     $('#hashtag-submit-btn').text(khT('js.form.save_changes'));
 
@@ -69,7 +69,7 @@ $(function () {
     var name = $(this).data('name') || '';
     $('#delete-hashtag-form').attr('action', '/admin/hashtags/' + id + '/delete');
     if (window.khDialog) {
-      window.khDialog(name ? 'hashtag "' + name + '"' : 'this hashtag', '#delete-hashtag-form',
+      window.khDialog(name ? khT('js.dialog.named.hashtag', name) : khT('js.dialog.this.hashtag'), '#delete-hashtag-form',
         khT('js.trash.restorable_note'));
     }
   });

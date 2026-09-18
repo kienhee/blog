@@ -18,7 +18,7 @@ $(function () {
       $send[0].submit();
       return;
     }
-    window.khDialog('"' + subject + '" to every confirmed subscriber', function () {
+    window.khDialog(khT('js.newsletter.dialog_subject', subject), function () {
       confirmed = true;
       $('#btn-send-newsletter').prop('disabled', true).text(khT('js.newsletter.sending'));
       $send[0].submit();

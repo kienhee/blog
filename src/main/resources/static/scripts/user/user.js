@@ -16,7 +16,7 @@ $(function () {
     $('#user-bio').val('');
     $('#user-roleId').val('');
     $('#user-form').attr('action', '/admin/users');
-    $('#oc-kicker').text('Create');
+    $('#oc-kicker').text(khT('js.form.create'));
     $('#oc-title').text(khT('js.user.new'));
     $('#user-submit-btn').text(khT('js.user.submit_create'));
 
@@ -52,7 +52,7 @@ $(function () {
     $('#user-bio').val(bio);
     $('#user-roleId').val(roleId ? String(roleId) : '');
     $('#user-form').attr('action', '/admin/users/' + id + '/edit');
-    $('#oc-kicker').text('Update');
+    $('#oc-kicker').text(khT('js.form.update'));
     $('#oc-title').text(khT('js.user.edit'));
     $('#user-submit-btn').text(khT('js.form.save_changes'));
 
@@ -73,7 +73,7 @@ $(function () {
     var name = $(this).data('name') || '';
     $('#delete-user-form').attr('action', '/admin/users/' + id + '/delete');
     if (window.khDialog) {
-      window.khDialog(name ? 'user "' + name + '"' : 'this user', '#delete-user-form',
+      window.khDialog(name ? khT('js.dialog.named.user', name) : khT('js.dialog.this.user'), '#delete-user-form',
         khT('js.user.delete_note'));
     }
   });

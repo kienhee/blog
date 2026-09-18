@@ -22,7 +22,7 @@ $(function () {
     var $btn = $(this);
     $('#comment-delete-form').attr('action', '/admin/comments/' + $btn.attr('data-id') + '/delete');
     if (window.khDialog) {
-      window.khDialog('the comment by "' + ($btn.attr('data-name') || 'unknown') + '"', '#comment-delete-form',
+      window.khDialog(khT('js.dialog.named.comment', $btn.attr('data-name') || khT('js.unknown')), '#comment-delete-form',
         khT('js.comment.delete_note'));
     }
   });
@@ -44,7 +44,7 @@ $(function () {
     if (action === 'delete') {
       $form.attr('action', '/admin/comments/bulk-delete');
       if (window.khDialog) {
-        window.khDialog(ids.length === 1 ? '1 selected comment' : ids.length + ' selected comments', '#comment-bulk-form',
+        window.khDialog(khT(ids.length === 1 ? 'js.comment.selected.one' : 'js.comment.selected.other', ids.length), '#comment-bulk-form',
           khT('js.comment.delete_note_many'));
       }
       return;

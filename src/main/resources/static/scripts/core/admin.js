@@ -163,7 +163,7 @@ $(function () {
     });
 
     if (bad === 0) {
-      var done = $btn.attr('data-success') || 'Saved';
+      var done = $btn.attr('data-success') || khT('js.toast.saved');
       $('.offcanvas').removeClass('open');
       var go = $btn.attr('data-goto');
       toast(done);
