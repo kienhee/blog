@@ -4,6 +4,7 @@ import com.kienhee.blog.entity.Role;
 import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.RoleRepository;
 import com.kienhee.blog.repository.UserRepository;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +45,8 @@ class LoginThrottleTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findBySlug("user").orElseThrow();
         user = userRepository.save(User.builder().fullName("Throttle Tester").email("throttle" + System.nanoTime() + "@test.com")
                 .password(passwordEncoder.encode("RightPassword1")).role(role).build());

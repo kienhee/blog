@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import java.time.LocalDateTime;
 import com.kienhee.blog.dto.HashtagCreateRequest;
 import com.kienhee.blog.dto.HashtagUpdateRequest;
@@ -37,7 +38,7 @@ public class HashtagServiceImpl implements HashtagService {
     public Hashtag createHashtag(HashtagCreateRequest request) {
         String slug = request.getSlug().trim().toLowerCase();
         if (hashtagRepository.existsBySlug(slug)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.hashtag.slug_taken", slug);
         }
 
         Hashtag hashtag = Hashtag.builder()
@@ -54,11 +55,11 @@ public class HashtagServiceImpl implements HashtagService {
     @Transactional
     public Hashtag updateHashtag(Long id, HashtagUpdateRequest request) {
         Hashtag hashtag = hashtagRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Hashtag not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.hashtag.not_found", id));
 
         String slug = request.getSlug().trim().toLowerCase();
         if (hashtagRepository.existsBySlugAndIdNot(slug, id)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.hashtag.slug_taken", slug);
         }
 
         hashtag.setName(request.getName().trim());
@@ -73,7 +74,7 @@ public class HashtagServiceImpl implements HashtagService {
     @Transactional
     public void deleteHashtag(Long id) {
         Hashtag hashtag = hashtagRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Hashtag not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.hashtag.not_found", id));
 
         // To the Trash: it disappears from posts until restored.
         hashtagRepository.moveToTrash(hashtag.getId(), LocalDateTime.now());

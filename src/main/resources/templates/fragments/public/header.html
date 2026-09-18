@@ -9,46 +9,47 @@
         <nav class="site-nav">
             <a th:href="@{/}"
                th:classappend="${uri == '/'} ? 'active'"
-               th:attr="aria-current=${uri == '/'} ? 'page' : null">Home</a>
+               th:attr="aria-current=${uri == '/'} ? 'page' : null" th:text="#{nav.home}">Home</a>
             <a th:href="@{/news}"
                th:classappend="${#strings.startsWith(uri, '/news') or #strings.startsWith(uri, '/article')} ? 'active'"
-               th:attr="aria-current=${#strings.startsWith(uri, '/news') or #strings.startsWith(uri, '/article')} ? 'page' : null">News</a>
+               th:attr="aria-current=${#strings.startsWith(uri, '/news') or #strings.startsWith(uri, '/article')} ? 'page' : null" th:text="#{nav.news}">News</a>
             <a th:href="@{/categories}"
                th:classappend="${#strings.startsWith(uri, '/categor')} ? 'active'"
-               th:attr="aria-current=${#strings.startsWith(uri, '/categor')} ? 'page' : null">Categories</a>
+               th:attr="aria-current=${#strings.startsWith(uri, '/categor')} ? 'page' : null" th:text="#{nav.categories}">Categories</a>
             <a th:href="@{/author}"
                th:classappend="${#strings.startsWith(uri, '/author')} ? 'active'"
-               th:attr="aria-current=${#strings.startsWith(uri, '/author')} ? 'page' : null">Author</a>
+               th:attr="aria-current=${#strings.startsWith(uri, '/author')} ? 'page' : null" th:text="#{nav.author}">Author</a>
             <a th:href="@{/about}"
                th:classappend="${#strings.startsWith(uri, '/about')} ? 'active'"
-               th:attr="aria-current=${#strings.startsWith(uri, '/about')} ? 'page' : null">About</a>
+               th:attr="aria-current=${#strings.startsWith(uri, '/about')} ? 'page' : null" th:text="#{nav.about}">About</a>
             <span class="drawer-extra">
-        <a class="btn btn-ghost" th:href="@{/search}">Search</a>
-        <a class="btn" th:href="@{/subscribe}">Subscribe</a>
+        <a class="btn btn-ghost" th:href="@{/search}" th:text="#{nav.search}">Search</a>
+        <a class="btn" th:href="@{/subscribe}" th:text="#{nav.subscribe}">Subscribe</a>
       </span>
         </nav>
         <div class="head-actions">
-            <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">☰</button>
+            <button class="nav-toggle" data-nav-toggle th:aria-label="#{common.menu}" aria-expanded="false">☰</button>
             <button class="btn btn-ghost btn-sm" data-search-open>
                 <span class="lbl-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>
-                <span class="lbl">Search</span>
+                <span class="lbl" th:text="#{nav.search}">Search</span>
             </button>
-            <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">☀</button>
-            <a class="btn btn-sm cta" th:href="@{/subscribe}">Subscribe</a>
+            <div th:replace="~{fragments/lang-switch :: langSwitch}"></div>
+            <button class="icon-btn" data-theme-toggle th:aria-label="#{common.toggle_theme}">☀</button>
+            <a class="btn btn-sm cta" th:href="@{/subscribe}" th:text="#{nav.subscribe}">Subscribe</a>
         </div>
     </div>
     <div class="progress"></div>
 
     <div class="overlay">
         <div class="box">
-            <form class="top" method="get" th:action="@{/search}" role="search" data-live-search th:attr="data-live-url=@{/search/live}">
+            <form class="top" method="get" th:action="@{/search}" role="search" th:aria-label="#{public.search.aria}" data-live-search th:attr="data-live-url=@{/search/live}">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-                <input type="text" name="q" placeholder="Search guides and news" maxlength="100" autocomplete="off" aria-label="Search">
+                <input type="text" name="q" th:placeholder="#{public.search.placeholder}" maxlength="100" autocomplete="off" th:aria-label="#{public.search.aria}">
                 <button type="button" class="btn btn-ghost btn-xs" data-search-close>ESC</button>
             </form>
             <th:block th:if="${suggestedPosts != null and !suggestedPosts.isEmpty()}">
                 <div data-search-latest>
-                <p class="kicker" style="padding:20px 0">Latest reading</p>
+                <p class="kicker" style="padding:20px 0" th:text="#{public.search.latest}">Latest reading</p>
                 <a class="res" th:each="p : ${suggestedPosts}" th:href="@{/article/{slug}(slug=${p.slug})}"><span class="kicker" th:text="${p.category.name}">Category</span><span style="font-size:18px;font-weight:600" th:text="${p.title}">Title</span></a>
                 </div>
             </th:block>

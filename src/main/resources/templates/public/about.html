@@ -2,22 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/public-master}">
 <head>
-    <title>About</title>
+    <title th:text="#{nav.about}">About</title>
 </head>
 <body>
 <main layout:fragment="content">
     <section class="wrap" style="padding-top:56px">
-        <h1 class="page-title page-title-narrow" th:text="|About ${site['site.domain'] ?: siteTitle}|">About</h1>
+        <h1 class="page-title page-title-narrow" th:text="#{public.about.title(${site['site.domain'] ?: siteTitle})}">About</h1>
         <div class="about-grid">
             <div style="font-size:19px;line-height:1.65;color:var(--body);display:flex;flex-direction:column;gap:24px">
                 <p th:text="${siteDescription}">Site description</p>
-                <p>Two kinds of posts: step-by-step guides you can follow in an afternoon, and short news notes on what changed in the tools you already use.</p>
-                <p>Written for beginners, developers, and people who use AI at work.</p>
+                <p th:text="#{public.about.body1}">Two kinds of posts.</p>
+                <p th:text="#{public.about.body2}">Written for people who use AI at work.</p>
             </div>
             <div style="border-top:1px solid var(--line)">
-                <div class="fact-row"><span class="kicker">Site</span><span th:text="${siteTitle}">Kienhee</span></div>
-                <div th:if="${site['site.domain'] != null and !site['site.domain'].isBlank()}" class="fact-row"><span class="kicker">Domain</span><span th:text="${site['site.domain']}">kienhee.com</span></div>
-                <div class="fact-row"><span class="kicker">Language</span><span>English</span></div>
+                <div class="fact-row"><span class="kicker" th:text="#{footer.site}">Site</span><span th:text="${siteTitle}">Kienhee</span></div>
+                <div th:if="${site['site.domain'] != null and !site['site.domain'].isBlank()}" class="fact-row"><span class="kicker" th:text="#{public.about.domain}">Domain</span><span th:text="${site['site.domain']}">kienhee.com</span></div>
+                <div class="fact-row"><span class="kicker" th:text="#{lang.label}">Language</span><span th:text="#{public.about.languages}">Tiếng Việt, English</span></div>
             </div>
         </div>
     </section>

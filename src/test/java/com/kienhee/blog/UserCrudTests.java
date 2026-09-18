@@ -7,6 +7,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,8 +55,11 @@ public class UserCrudTests {
 
     @BeforeEach
     void setUp() {
+        // See AuthValidationTests: direct Validator calls need an explicit language.
+        org.springframework.context.i18n.LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault())
                 .build();
 
         userRepository.findByEmail("test-owner@kienhee.test").ifPresentOrElse(
@@ -278,7 +282,8 @@ public class UserCrudTests {
                             .with(csrf())
                             .param("fullName", "")
                             .param("email", "bad-email")
-                            .param("password", ""))
+                            .param("password", "")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(view().name("admin/user/users"))
                     .andExpect(model().hasErrors())

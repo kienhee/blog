@@ -2,22 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Categories</title>
+    <title th:text="#{nav.admin.categories}">Categories</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Categories</strong>
+    <a th:href="@{/admin/dashboard}" class="dim" th:text="#{nav.admin.dashboard}">Dashboard</a><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.categories}">Categories</strong>
 </div>
 
 <div layout:fragment="content">
       <div class="dt-root">
         <div class="page-head">
           <div>
-            <h1>Categories</h1>
-            <p class="dim" style="margin-top:6px" th:text="${categories != null ? categories.size() + ' categories' : '0 categories'}">0 categories</p>
+            <h1 th:text="#{nav.admin.categories}">Categories</h1>
+            <p class="dim" style="margin-top:6px" th:text="#{admin.category.count(${categories != null ? categories.size() : 0})}">0 categories</p>
           </div>
-          <button th:if="${perms.contains('categories:create')}" type="button" class="btn" id="btn-create-category" data-oc-open>New category</button>
+          <button th:if="${perms.contains('categories:create')}" type="button" class="btn" id="btn-create-category" data-oc-open th:text="#{admin.category.new}">New category</button>
         </div>
 
         <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
@@ -28,38 +28,38 @@
         </div>
 
         <div class="bulk">
-          <span class="n">0 selected</span>
-          <button th:if="${perms.contains('categories:delete')}" class="btn btn-ghost btn-xs btn-danger" data-bulk="Delete">Delete</button>
-                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <span class="n" th:text="#{admin.common.selected(0)}">0 selected</span>
+          <button th:if="${perms.contains('categories:delete')}" class="btn btn-ghost btn-xs btn-danger" th:data-bulk="#{admin.dialog.delete}" th:text="#{admin.dialog.delete}">Delete</button>
+                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" th:text="#{admin.common.clear}">Clear</button>
         </div>
 
         <div class="table-wrap">
-          <table class="dt" th:data-bulk-delete-url="@{/admin/categories/bulk-delete}" data-bulk-noun="categories" data-bulk-delete-note="They move to the trash, where you can restore them. Categories that still have subcategories or posts are skipped.">
+          <table class="dt" th:data-bulk-delete-url="@{/admin/categories/bulk-delete}" th:data-bulk-noun="#{nav.admin.categories}" th:data-bulk-delete-note="#{admin.category.bulk_note}">
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
-                <th style="width:18%">Name</th>
-                <th style="width:16%">Slug</th>
-                <th style="width:26%">Description</th>
-                <th style="width:14%">Parent</th>
-                <th style="width:110px">Visibility</th>
-                <th style="width:140px">Created</th>
-                <th style="width:96px;text-align:right"><span class="kicker">Actions</span></th>
+                <th style="width:18%" th:text="#{admin.common.name}">Name</th>
+                <th style="width:16%" th:text="#{admin.common.slug}">Slug</th>
+                <th style="width:26%" th:text="#{admin.common.description}">Description</th>
+                <th style="width:14%" th:text="#{admin.category.parent}">Parent</th>
+                <th style="width:110px" th:text="#{admin.category.visibility}">Visibility</th>
+                <th style="width:140px" th:text="#{admin.common.created}">Created</th>
+                <th style="width:96px;text-align:right"><span class="kicker" th:text="#{admin.common.actions}">Actions</span></th>
               </tr>
               <tr class="filters">
                 <th></th>
-                <th><input class="input" data-col="1" placeholder="Filter…"></th>
-                <th><input class="input" data-col="2" placeholder="Filter…"></th>
-                <th><input class="input" data-col="3" placeholder="Filter…"></th>
-                <th><input class="input" data-col="4" placeholder="Filter…"></th>
+                <th><input class="input" data-col="1" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="2" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="3" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="4" th:placeholder="#{admin.common.filter}"></th>
                 <th>
                   <select class="select" data-col="5">
-                    <option value="">All</option>
-                    <option value="Published">Published</option>
-                    <option value="Draft">Draft</option>
+                    <option value="" th:text="#{common.all}">All</option>
+                    <option value="Published" th:value="#{admin.common.published}" th:text="#{admin.common.published}">Published</option>
+                    <option value="Draft" th:value="#{admin.common.draft}" th:text="#{admin.common.draft}">Draft</option>
                   </select>
                 </th>
-                <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th><input class="input" data-col="6" th:placeholder="#{admin.common.filter}"></th>
                 <th></th>
               </tr>
             </thead>
@@ -71,7 +71,7 @@
                 <td class="dim" th:text="${c.description != null and !c.description.isEmpty() ? c.description : '—'}">—</td>
                 <td class="dim" th:text="${c.parent != null ? c.parent.name : '—'}">—</td>
                 <td>
-                  <span class="badge" th:style="${c.visible ? 'color:#5ee38a' : 'color:#a0a0a0'}" th:text="${c.visible ? 'Published' : 'Draft'}">Published</span>
+                  <span class="badge" th:style="${c.visible ? 'color:#5ee38a' : 'color:#a0a0a0'}" th:text="${c.visible} ? #{admin.common.published} : #{admin.common.draft}">Published</span>
                 </td>
                 <td class="dim" th:text="${c.createdAt != null ? #temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
                 <td class="right">
@@ -82,10 +82,10 @@
                             th:data-slug="${c.slug}"
                             th:data-description="${c.description}"
                             th:data-parent-id="${c.parent != null ? c.parent.id : ''}"
-                            th:data-visible="${c.visible}">Edit</button>
+                            th:data-visible="${c.visible}" th:text="#{admin.common.edit}">Edit</button>
                     <button th:if="${perms.contains('categories:delete')}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-category"
                             th:data-id="${c.id}"
-                            th:data-name="${c.name}">Del</button>
+                            th:data-name="${c.name}" th:text="#{admin.common.del}">Del</button>
                   </span>
                 </td>
               </tr>
@@ -99,10 +99,10 @@
         <div class="panel" id="oc-category-panel">
           <div class="oc-head">
             <div>
-              <div class="kicker" id="oc-kicker" th:text="${openOffcanvas == 'edit' ? 'Update' : 'Create'}">Create</div>
-              <div class="t" id="oc-title" th:text="${openOffcanvas == 'edit' ? 'Edit Category' : 'New Category'}">New Category</div>
+              <div class="kicker" id="oc-kicker" th:text="${openOffcanvas == 'edit'} ? #{admin.common.update} : #{admin.common.create}">Create</div>
+              <div class="t" id="oc-title" th:text="${openOffcanvas == 'edit'} ? #{admin.category.edit} : #{admin.category.new}">New Category</div>
             </div>
-            <button type="button" class="icon-btn" data-oc-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button type="button" class="icon-btn" data-oc-close th:aria-label="#{admin.common.close}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
 
           <form id="category-form" method="post" th:action="@{/admin/categories}" th:object="${categoryCreateRequest}">
@@ -115,31 +115,31 @@
               </div>
 
               <label class="field" id="field-name" th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''">
-                <span>Name<span class="req"> *</span></span>
-                <input class="input" id="category-name" name="name" th:value="*{name}" data-slug-source="#category-slug" placeholder="Enter category name">
+                <span><span th:text="#{admin.common.name}">Name</span><span class="req"> *</span></span>
+                <input class="input" id="category-name" name="name" th:value="*{name}" data-slug-source="#category-slug" th:placeholder="#{admin.category.name_placeholder}">
                 <span class="err show" id="err-name" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name is required.</span>
-                <span class="err" id="err-name" th:unless="${#fields.hasErrors('name')}">Name is required.</span>
+                <span class="err" id="err-name" th:unless="${#fields.hasErrors('name')}" th:text="#{validation.name.required}">Name is required.</span>
               </label>
 
               <label class="field" id="field-slug" th:classappend="${#fields.hasErrors('slug')} ? 'has-error' : ''">
-                <span>Slug<span class="req"> *</span></span>
-                <input class="input" id="category-slug" name="slug" th:value="*{slug}" placeholder="enter-category-slug">
+                <span><span th:text="#{admin.common.slug}">Slug</span><span class="req"> *</span></span>
+                <input class="input" id="category-slug" name="slug" th:value="*{slug}" th:placeholder="#{admin.category.slug_placeholder}">
                 <span class="err show" id="err-slug" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}">Slug is required.</span>
-                <span class="err" id="err-slug" th:unless="${#fields.hasErrors('slug')}">Slug is required.</span>
-                <span class="dim" style="font-size:12px">Lowercase letters, numbers and hyphens only.</span>
+                <span class="err" id="err-slug" th:unless="${#fields.hasErrors('slug')}" th:text="#{validation.slug.required}">Slug is required.</span>
+                <span class="dim" style="font-size:12px" th:text="#{admin.common.slug_hint}">Lowercase letters, numbers and hyphens only.</span>
               </label>
 
               <label class="field" id="field-description" th:classappend="${#fields.hasErrors('description')} ? 'has-error' : ''">
-                <span>Description</span>
-                <textarea class="textarea" id="category-description" name="description" placeholder="Enter category description..." th:text="*{description}"></textarea>
+                <span th:text="#{admin.common.description}">Description</span>
+                <textarea class="textarea" id="category-description" name="description" th:placeholder="#{admin.category.description_placeholder}" th:text="*{description}"></textarea>
                 <span class="err show" id="err-description" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
                 <span class="err" id="err-description" th:unless="${#fields.hasErrors('description')}"></span>
               </label>
 
               <label class="field" id="field-parentId" th:classappend="${#fields.hasErrors('parentId')} ? 'has-error' : ''">
-                <span>Parent category</span>
+                <span th:text="#{admin.category.parent_category}">Parent category</span>
                 <select class="select" id="category-parentId" name="parentId">
-                  <option value="">— None —</option>
+                  <option value="" th:text="#{admin.common.none}">— None —</option>
                   <option th:each="p : ${categories}" th:value="${p.id}" th:text="${p.name}" th:selected="${categoryCreateRequest.parentId != null and categoryCreateRequest.parentId == p.id}"></option>
                 </select>
                 <span class="err show" id="err-parentId" th:if="${#fields.hasErrors('parentId')}" th:errors="*{parentId}"></span>
@@ -148,13 +148,13 @@
 
               <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
                 <input type="hidden" name="_visible" value="on">
-                <input class="checkbox" type="checkbox" id="category-visible" name="visible" th:checked="*{visible}"> Show in main navigation
+                <input class="checkbox" type="checkbox" id="category-visible" name="visible" th:checked="*{visible}"> <span th:text="#{admin.common.show_in_nav}">Show in main navigation</span>
               </label>
             </div>
 
             <div class="oc-foot">
-              <button class="btn" type="submit" id="category-submit-btn">Create category</button>
-              <button type="button" class="btn btn-ghost" data-oc-close>Cancel</button>
+              <button class="btn" type="submit" id="category-submit-btn" th:text="#{admin.category.submit_create}">Create category</button>
+              <button type="button" class="btn btn-ghost" data-oc-close th:text="#{admin.common.cancel}">Cancel</button>
             </div>
           </form>
         </div>

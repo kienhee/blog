@@ -7,7 +7,7 @@ $(function () {
       if (this.optional(element)) return true;
       if (typeof param === 'string') param = new RegExp('^(?:' + param + ')$');
       return param.test(value);
-    }, 'Invalid format.');
+    }, khT('js.form.invalid_format'));
   }
 
   /* ---- Content: TinyMCE (self-hosted GPL build in scripts/lib/tinymce) ---- */
@@ -40,6 +40,10 @@ $(function () {
       // Chrome is restyled by styles/tinymce-theme.css; the content area follows the public
       // article styles (styles/tinymce-content.css), with .kh-light for the light admin theme.
       skin: light ? 'oxide' : 'oxide-dark',
+      // Editor chrome follows the page language; English is TinyMCE's built-in default, so only
+      // another language needs a langpack under scripts/lib/tinymce/langs (see its README).
+      language: (window.khLang || 'vi') === 'en' ? 'en' : (window.khLang || 'vi'),
+      language_url: (window.khLang || 'vi') === 'en' ? undefined : TINY_BASE + '/langs/' + window.khLang + '.js',
       content_css: '/styles/tinymce-content.css',
       body_class: light ? 'kh-light' : '',
       relative_urls: false,
@@ -170,22 +174,22 @@ $(function () {
       },
       messages: {
         title: {
-          required: 'Title is required.',
-          minlength: 'Title must have at least 3 characters.'
+          required: khT('validation.title.required'),
+          minlength: khT('validation.title.min')
         },
         slug: {
-          required: 'Slug is required.',
-          minlength: 'Slug must have at least 3 characters.',
-          pattern: 'Slug may only contain lowercase letters, numbers and hyphens.'
+          required: khT('validation.slug.required'),
+          minlength: khT('validation.slug.min3'),
+          pattern: khT('validation.slug.pattern')
         },
         content: {
-          required: 'Content is required.'
+          required: khT('validation.content.required')
         },
         categoryId: {
-          required: 'Category is required.'
+          required: khT('validation.category.required')
         },
         status: {
-          required: 'Status is required.'
+          required: khT('validation.status.required')
         }
       },
       errorElement: 'span',
@@ -234,6 +238,9 @@ $(function () {
   if (!$status.length || !$box.length || !$input.length) return;
 
   if (window.flatpickr && !$input.prop('disabled')) {
+    if (window.khFlatpickrLocale && window.flatpickr && window.flatpickr.localize) {
+      window.flatpickr.localize(window.khFlatpickrLocale);
+    }
     window.flatpickr($input[0], {
       enableTime: true,
       time_24hr: true,
@@ -254,7 +261,7 @@ $(function () {
   if (validator && !$input.prop('disabled')) {
     $input.rules('add', {
       required: function () { return $status.val() === 'SCHEDULED'; },
-      messages: { required: 'Choose when the post should go live.' }
+      messages: { required: khT('js.post.schedule_required') }
     });
   }
 });

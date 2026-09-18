@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.entity.Media;
 import com.kienhee.blog.entity.MediaFolder;
 import com.kienhee.blog.repository.MediaFolderRepository;
@@ -125,7 +126,7 @@ public class MediaStorageLayout {
 
     public void requireLength(StoragePath path) {
         if (path.toString().length() > MAX_PATH_LENGTH) {
-            throw new IllegalArgumentException("The file path is too long. Use shorter folder or file names.");
+            throw new BusinessException("error.media.path_too_long");
         }
     }
 
@@ -194,7 +195,7 @@ public class MediaStorageLayout {
             }
         } catch (StorageException e) {
             log.warn("Could not move media {} {} -> {}: {}", media.getId(), from, to, e.getMessage());
-            throw new IllegalArgumentException("Could not move the file \"" + media.getOriginalFilename() + "\".");
+            throw new BusinessException("error.media.move_file_failed", media.getOriginalFilename());
         }
         media.setStoragePath(to.toString());
         media.setStoredFilename(name);
@@ -211,7 +212,7 @@ public class MediaStorageLayout {
             storageTx.createDirectory(dir);
         } catch (StorageException e) {
             log.warn("Could not create directory {}: {}", dir, e.getMessage());
-            throw new IllegalArgumentException("Could not create the folder on disk (a file with that name may already exist).");
+            throw new BusinessException("error.media.create_dir_failed");
         }
     }
 
@@ -237,7 +238,7 @@ public class MediaStorageLayout {
             }
         } catch (StorageException e) {
             log.warn("Could not move directory {} -> {}: {}", from, to, e.getMessage());
-            throw new IllegalArgumentException("Could not move the folder on disk (the destination may already exist).");
+            throw new BusinessException("error.media.move_dir_failed");
         }
         String oldPrefix = from + "/";
         String newPrefix = to + "/";

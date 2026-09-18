@@ -7,14 +7,14 @@
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:56px">
-    <a class="kicker" th:href="@{/categories}">← All categories</a>
+    <a class="kicker" th:href="@{/categories}" th:text="#{public.category.all}">← All categories</a>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-top:24px;padding-bottom:24px;border-bottom:2px solid var(--rule)">
       <h1 class="page-title" th:text="${category.name}">Category</h1>
-      <span class="dim" style="font-size:13px;padding-bottom:10px" th:text="|${posts.totalElements} ${posts.totalElements == 1 ? 'article' : 'articles'}|">3 articles</span>
+      <span class="dim" style="font-size:13px;padding-bottom:10px" th:text="${posts.totalElements == 1} ? #{common.article_count.one(${posts.totalElements})} : #{common.article_count.other(${posts.totalElements})}">3 articles</span>
     </div>
     <p class="dim" th:if="${category.description != null and !category.description.isBlank()}" style="margin-top:20px;font-size:17px;max-width:60ch" th:text="${category.description}">Description</p>
-    <div th:if="${posts.isEmpty()}" th:replace="~{fragments/public/pagination :: empty('No articles in this category yet.')}"></div>
-    <a class="post-row simple" th:each="p : ${posts}" th:href="@{/article/{slug}(slug=${p.slug})}"><span><span class="ttl" th:text="${p.title}">Title</span><span class="dek" th:text="${@publicView.dek(p)}">Summary</span></span><span class="meta" style="padding-top:0"><span th:text="${@publicView.date(p.publishedAt)}">Sep 5, 2026</span><br><span th:text="|${@publicView.readMinutes(p)} min read|">11 min read</span></span></a>
+    <div th:if="${posts.isEmpty()}" th:replace="~{fragments/public/pagination :: empty(#{public.category.empty})}"></div>
+    <a class="post-row simple" th:each="p : ${posts}" th:href="@{/article/{slug}(slug=${p.slug})}"><span><span class="ttl" th:text="${p.title}">Title</span><span class="dek" th:text="${@publicView.dek(p)}">Summary</span></span><span class="meta" style="padding-top:0"><span th:text="${@publicView.date(p.publishedAt)}">Sep 5, 2026</span><br><span th:text="#{common.read_minutes(${@publicView.readMinutes(p)})}">11 min read</span></span></a>
     <nav th:replace="~{fragments/public/pagination :: pager(${posts}, |/category/${category.slug}|, null)}"></nav>
   </section>
 </main>

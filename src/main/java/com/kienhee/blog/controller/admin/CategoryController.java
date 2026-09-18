@@ -1,5 +1,7 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.CategoryCreateRequest;
 import com.kienhee.blog.dto.CategoryUpdateRequest;
 import com.kienhee.blog.entity.Category;
@@ -22,6 +24,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String listCategories(Model model) {
@@ -43,7 +46,7 @@ public class CategoryController {
                                   Model model,
                                   RedirectAttributes redirectAttributes) {
         if (!bindingResult.hasFieldErrors("slug") && categoryService.existsBySlug(request.getSlug())) {
-            bindingResult.rejectValue("slug", "error.slug", "Slug already in use.");
+            bindingResult.rejectValue("slug", "error.slug", messages.get("msg.slug_taken"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -57,7 +60,7 @@ public class CategoryController {
 
         try {
             categoryService.createCategory(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Category created successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.category.created"));
             return "redirect:/admin/categories";
         } catch (IllegalArgumentException e) {
             applyServiceError(bindingResult, e);
@@ -78,7 +81,7 @@ public class CategoryController {
                                   Model model,
                                   RedirectAttributes redirectAttributes) {
         if (!bindingResult.hasFieldErrors("slug") && categoryService.existsBySlugExcluding(request.getSlug(), id)) {
-            bindingResult.rejectValue("slug", "error.slug", "Slug already in use.");
+            bindingResult.rejectValue("slug", "error.slug", messages.get("msg.slug_taken"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -92,7 +95,7 @@ public class CategoryController {
 
         try {
             categoryService.updateCategory(id, request);
-            redirectAttributes.addFlashAttribute("successMessage", "Category updated successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.category.updated"));
             return "redirect:/admin/categories";
         } catch (IllegalArgumentException e) {
             applyServiceError(bindingResult, e);
@@ -110,18 +113,20 @@ public class CategoryController {
     public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             categoryService.deleteCategory(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Category moved to trash.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.category.trashed"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/categories";
     }
 
     private void applyServiceError(BindingResult bindingResult, IllegalArgumentException e) {
-        String message = e.getMessage();
-        if (message != null && message.toLowerCase().contains("slug")) {
+        String message = messages.text(e);
+        // Which field to blame comes from the message code; the text itself is translated.
+        String code = e instanceof BusinessException business ? business.getCode() : String.valueOf(message).toLowerCase();
+        if (code.contains("slug")) {
             bindingResult.rejectValue("slug", "error.slug", message);
-        } else if (message != null && message.toLowerCase().contains("parent")) {
+        } else if (code.contains("parent")) {
             bindingResult.rejectValue("parentId", "error.parentId", message);
         } else {
             bindingResult.reject("categoryError", message);
@@ -133,7 +138,7 @@ public class CategoryController {
     public String bulkDelete(@org.springframework.web.bind.annotation.RequestParam(name = "ids", required = false) java.util.List<Long> ids,
                              RedirectAttributes redirectAttributes) {
         java.util.Map<Long, String> names = categoryService.getAllCategories().stream().collect(java.util.stream.Collectors.toMap(c -> c.getId(), c -> c.getName(), (a, b) -> a));
-        BulkDelete.run(ids, "category", "categories", names, categoryService::deleteCategory, redirectAttributes);
+        BulkDelete.run(messages, ids, "bulk.noun.categories", names, categoryService::deleteCategory, redirectAttributes);
         return "redirect:/admin/categories";
     }
 }

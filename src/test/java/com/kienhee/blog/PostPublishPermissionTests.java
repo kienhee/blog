@@ -8,6 +8,7 @@ import com.kienhee.blog.repository.CategoryRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,8 @@ class PostPublishPermissionTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Publish " + tag).slug("publish-" + tag).visible(true).build());
     }
@@ -109,7 +111,7 @@ class PostPublishPermissionTests {
     @Test
     @DisplayName("the editor only offers Draft to someone without posts:publish")
     void editorHidesPublishOptions() throws Exception {
-        mockMvc.perform(get("/admin/post/new").with(TestAuth.withPermissions(author.getEmail(), CONTRIBUTOR)))
+        mockMvc.perform(get("/admin/post/new").with(TestAuth.withPermissions(author.getEmail(), CONTRIBUTOR)).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("value=\"PUBLISHED\""))))
                 .andExpect(content().string(containsString("Publishing needs the")));

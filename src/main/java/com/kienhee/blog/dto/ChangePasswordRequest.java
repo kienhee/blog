@@ -11,13 +11,13 @@ import lombok.*;
 @Builder
 public class ChangePasswordRequest {
 
-    @NotBlank(message = "Current password is required.")
+    @NotBlank(message = "{validation.password.current_required}")
     private String currentPassword;
 
-    @NotBlank(message = "New password is required.")
-    @Size(min = 6, message = "New password must have at least 6 characters.")
+    @NotBlank(message = "{validation.password.new_required}")
+    @Size(min = 6, message = "{validation.password.new_min6}")
     private String newPassword;
 
-    @NotBlank(message = "Confirm password is required.")
+    @NotBlank(message = "{validation.password.confirm_required}")
     private String confirmPassword;
 }

@@ -4,6 +4,7 @@ import com.kienhee.blog.entity.SiteSetting;
 import com.kienhee.blog.repository.SiteSettingRepository;
 import com.kienhee.blog.service.SettingService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,8 @@ class SettingCrudTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         originals = new HashMap<>(settingService.getAll());
     }
 
@@ -79,7 +81,7 @@ class SettingCrudTests {
         @Test
         @DisplayName("renders the seeded settings into fields named settings[<key>]")
         void rendersSeededValues() throws Exception {
-            mockMvc.perform(get("/admin/settings").with(TestAuth.owner()))
+            mockMvc.perform(get("/admin/settings").with(TestAuth.owner()).with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(view().name("admin/setting/settings"))
                     .andExpect(model().attribute("settings", hasKey("site.title")))
@@ -91,7 +93,7 @@ class SettingCrudTests {
         @Test
         @DisplayName("a view-only user sees read-only fields and no save button")
         void viewOnly() throws Exception {
-            mockMvc.perform(get("/admin/settings").with(TestAuth.withPermissions("viewer@test.com", "settings:view")))
+            mockMvc.perform(get("/admin/settings").with(TestAuth.withPermissions("viewer@test.com", "settings:view")).with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("readonly")))
                     .andExpect(content().string(not(containsString("Save settings"))));

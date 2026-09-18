@@ -75,18 +75,18 @@ $(function () {
   });
 
   /* ---- delete confirmation dialog ---- */
-  var DEFAULT_DIALOG_DESC = 'This cannot be undone.';
+  function defaultDialogDesc() { return khT('js.dialog.irreversible'); }
 
   /**
    * @param what         what is being deleted, e.g. 'post "Hello"'
    * @param formSelector form to submit, or a callback to run, once the user confirms
-   * @param description  what this delete actually does; defaults to "This cannot be undone."
+   * @param description  what this delete actually does; defaults to js.dialog.irreversible
    */
   function openDialog(what, formSelector, description) {
     var $dlg = $('.dialog');
     if (!$dlg.length) return;
-    $dlg.find('.t').text('Delete ' + (what || 'this record') + '?');
-    $dlg.find('[data-dialog-desc]').text(description || DEFAULT_DIALOG_DESC);
+    $dlg.find('.t').text(khT('js.dialog.title', what || khT('js.dialog.this_record')));
+    $dlg.find('[data-dialog-desc]').text(description || defaultDialogDesc());
     // Either a form selector to submit or a callback to run once the user confirms.
     $dlg.data('targetForm', formSelector || null);
     $dlg.addClass('open');
@@ -94,7 +94,7 @@ $(function () {
   window.khDialog = openDialog;
 
   $(document).on('click', '[data-del]', function () {
-    openDialog($(this).attr('data-del') || 'this record');
+    openDialog($(this).attr('data-del') || khT('js.dialog.this_record'));
   });
 
   $('.dialog').on('click', '[data-dialog-close]', function () {
@@ -120,7 +120,7 @@ $(function () {
       }
     }
     // No target form: the static demo pages (data-del buttons) have nothing to submit.
-    toast('Deleted');
+    toast(khT('js.toast.deleted'));
   });
 
   /* ---- keyboard shortcuts ---- */

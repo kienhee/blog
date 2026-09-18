@@ -1,5 +1,7 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.ChangePasswordRequest;
 import com.kienhee.blog.dto.ProfileUpdateRequest;
 import com.kienhee.blog.entity.Media;
@@ -32,6 +34,7 @@ public class ProfileController {
     private final UserRepository userRepository;
     private final MediaService mediaService;
     private final MediaFolderService mediaFolderService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String profile(Principal principal,
@@ -65,10 +68,10 @@ public class ProfileController {
 
         try {
             authService.updateProfile(principal.getName(), profileRequest);
-            redirectAttributes.addFlashAttribute("profileSuccess", "Profile updated successfully.");
+            redirectAttributes.addFlashAttribute("profileSuccess", messages.get("msg.profile.updated"));
             return "redirect:/admin/profile?tab=info";
-        } catch (Exception e) {
-            bindingResult.reject("profileError", e.getMessage() != null ? e.getMessage() : "Failed to update profile.");
+        } catch (RuntimeException e) {
+            bindingResult.reject("profileError", messages.text(e));
             if (!model.containsAttribute("changePasswordRequest")) {
                 model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
             }
@@ -91,7 +94,7 @@ public class ProfileController {
                 !changePasswordRequest.getNewPassword().isBlank() &&
                 changePasswordRequest.getConfirmPassword() != null &&
                 !changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
-            bindingResult.rejectValue("confirmPassword", "error.confirmPassword", "Passwords do not match.");
+            bindingResult.rejectValue("confirmPassword", "error.confirmPassword", messages.get("error.auth.passwords_differ"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -102,16 +105,18 @@ public class ProfileController {
 
         try {
             authService.changePassword(principal.getName(), changePasswordRequest.getCurrentPassword(), changePasswordRequest.getNewPassword());
-            redirectAttributes.addFlashAttribute("passwordSuccess", "Password updated successfully.");
+            redirectAttributes.addFlashAttribute("passwordSuccess", messages.get("msg.profile.password_updated"));
             return "redirect:/admin/profile?tab=security";
         } catch (IllegalArgumentException e) {
-            String msg = e.getMessage();
-            if (msg != null && msg.contains("Current password")) {
+            String msg = messages.text(e);
+            // The field to blame comes from the code, so it survives translation.
+            String code = e instanceof BusinessException business ? business.getCode() : "";
+            if (code.equals("error.auth.wrong_password")) {
                 bindingResult.rejectValue("currentPassword", "error.currentPassword", msg);
-            } else if (msg != null && msg.contains("New password")) {
+            } else if (code.equals("error.auth.same_password")) {
                 bindingResult.rejectValue("newPassword", "error.newPassword", msg);
             } else {
-                bindingResult.reject("passwordError", msg != null ? msg : "Failed to change password.");
+                bindingResult.reject("passwordError", msg);
             }
             populateProfileRequest(principal, model);
             model.addAttribute("activeTab", "security");
@@ -129,11 +134,11 @@ public class ProfileController {
 
         String contentType = file != null ? file.getContentType() : null;
         if (file == null || file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Please choose a photo to upload.");
+            redirectAttributes.addFlashAttribute("errorMessage", messages.get("error.profile.choose_photo"));
             return "redirect:/admin/profile?tab=info";
         }
         if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Avatar must be an image (JPG, PNG, WEBP, GIF or SVG).");
+            redirectAttributes.addFlashAttribute("errorMessage", messages.get("error.profile.avatar_type"));
             return "redirect:/admin/profile?tab=info";
         }
 
@@ -142,13 +147,13 @@ public class ProfileController {
             Media media = mediaService.uploadMedia(file, principal.getName(), avatarsFolder.getId());
 
             User user = userRepository.findByEmail(principal.getName().trim().toLowerCase())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                    .orElseThrow(() -> new BusinessException("error.user.not_found_plain"));
             user.setAvatarUrl(media.getUrl());
             userRepository.save(user);
 
-            redirectAttributes.addFlashAttribute("profileSuccess", "Profile photo updated successfully.");
+            redirectAttributes.addFlashAttribute("profileSuccess", messages.get("msg.profile.photo_updated"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/profile?tab=info";
     }

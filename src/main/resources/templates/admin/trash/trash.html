@@ -2,25 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Trash</title>
+    <title th:text="#{nav.admin.trash}">Trash</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span class="crumb-sep">/</span><strong>Trash</strong>
+    <a th:href="@{/admin/dashboard}" class="dim" th:text="#{nav.admin.dashboard}">Dashboard</a><span class="crumb-sep">/</span><strong th:text="#{nav.admin.trash}">Trash</strong>
 </div>
 
-<div layout:fragment="content">
+<div layout:fragment="content" th:with="selectedLabel=#{'admin.trash.type.' + ${selected.slug}}">
     <!-- One page for every kind of trashed item, including media (files and folders), which used to have
          a page of its own at /admin/media/trash. The columns follow the selected tab. -->
     <div class="page-head page-head-ruled">
         <div>
-            <h1>Trash</h1>
-            <p class="dim trash-lede">Deleted items wait here until you restore them or delete them permanently.</p>
+            <h1 th:text="#{nav.admin.trash}">Trash</h1>
+            <p class="dim trash-lede" th:text="#{admin.trash.lede}">Deleted items wait here until you restore them or delete them permanently.</p>
         </div>
         <form id="trash-empty-form" method="post" th:action="@{/admin/trash/{t}/empty(t=${selected.slug})}">
             <button type="button" class="btn danger" id="btn-empty-trash" th:if="${canPurge}" th:disabled="${items.isEmpty()}"
-                    th:text="|Empty ${#strings.toLowerCase(selected.label)} trash|">Empty trash</button>
+                    th:text="#{admin.trash.empty_button(${selectedLabel})}">Empty trash</button>
         </form>
     </div>
 
@@ -31,47 +31,47 @@
         <span th:text="${errorMessage}">Error message</span>
     </div>
 
-    <nav class="trash-tabs" aria-label="Trash sections">
+    <nav class="trash-tabs" th:aria-label="#{admin.trash.sections}">
         <a th:each="t : ${tabs}" th:href="@{/admin/trash(type=${t.slug})}"
            th:attr="aria-current=${t.slug == selected.slug} ? 'page' : null">
-            <span th:text="${t.label}">Posts</span><span class="count" th:text="${t.count}">0</span>
+            <span th:text="#{'admin.trash.type.' + ${t.slug}}">Posts</span><span class="count" th:text="${t.count}">0</span>
         </a>
     </nav>
 
     <!-- Media keeps its own retention window (app.media.trash.*), so it is stated on its tabs only. -->
     <p th:if="${selected.isMedia()}" class="dim trash-note">
         <span th:if="${mediaTrashSummary != null}"
-              th:text="|Trashed files still use ${#numbers.formatDecimal(mediaTrashSummary.totalBytes() / 1048576.0, 1, 2)} MB of storage and still count against the uploader's quota.|">Storage note.</span>
-        <span th:if="${mediaAutoPurge}" th:text="|Deleted automatically after ${mediaRetentionDays} days.|">Retention.</span>
+              th:text="#{admin.trash.media_storage(${#numbers.formatDecimal(mediaTrashSummary.totalBytes() / 1048576.0, 1, 2)})}">Storage note.</span>
+        <span th:if="${mediaAutoPurge}" th:text="#{admin.trash.media_retention(${mediaRetentionDays})}">Retention.</span>
     </p>
 
     <p th:if="${items.isEmpty()}" class="dim trash-empty"
-       th:text="|No ${#strings.toLowerCase(selected.label)} in the trash.|">Nothing in the trash.</p>
+       th:text="#{admin.trash.empty(${selectedLabel})}">Nothing in the trash.</p>
 
     <th:block th:unless="${items.isEmpty()}">
         <div class="trash-bulk">
-            <span class="dim trash-selected" id="trash-selected">0 selected</span>
+            <span class="dim trash-selected" id="trash-selected" th:text="#{admin.common.selected(0)}">0 selected</span>
             <button type="button" class="btn btn-ghost btn-xs" data-trash-bulk="restore" disabled
-                    th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}">Restore</button>
+                    th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}" th:text="#{admin.trash.restore}">Restore</button>
             <button type="button" class="btn btn-ghost btn-xs danger" data-trash-bulk="purge" disabled th:if="${canPurge}"
-                    th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}">Delete permanently</button>
+                    th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}" th:text="#{admin.trash.purge}">Delete permanently</button>
         </div>
         <div class="trash-scroll">
             <table class="trash-table">
                 <thead>
                 <tr>
-                    <th class="col-check"><input type="checkbox" id="trash-check-all" aria-label="Select all"></th>
-                    <th class="col-preview" th:if="${selected.slug == 'media-files'}"><span class="sr-only">Preview</span></th>
-                    <th th:text="${selected.slug == 'comments'} ? 'Author' : 'Name'">Name</th>
-                    <th th:text="${selected.isMedia()} ? 'Folder' : 'Details'">Details</th>
-                    <th class="col-size" th:if="${selected.slug == 'media-files'}">Size</th>
-                    <th class="col-when">Deleted</th>
-                    <th class="col-actions">Actions</th>
+                    <th class="col-check"><input type="checkbox" id="trash-check-all" th:aria-label="#{admin.common.select_all}"></th>
+                    <th class="col-preview" th:if="${selected.slug == 'media-files'}"><span class="sr-only" th:text="#{admin.trash.preview}">Preview</span></th>
+                    <th th:text="${selected.slug == 'comments'} ? #{admin.post.author} : #{admin.common.name}">Name</th>
+                    <th th:text="${selected.isMedia()} ? #{admin.trash.folder} : #{admin.trash.details}">Details</th>
+                    <th class="col-size" th:if="${selected.slug == 'media-files'}" th:text="#{admin.trash.size}">Size</th>
+                    <th class="col-when" th:text="#{admin.trash.deleted}">Deleted</th>
+                    <th class="col-actions" th:text="#{admin.common.actions}">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="i : ${items}">
-                    <td><input type="checkbox" class="trash-check" th:value="${i.id}" th:attr="aria-label=|Select ${i.name}|"></td>
+                    <td><input type="checkbox" class="trash-check" th:value="${i.id}" th:aria-label="#{admin.trash.select_row(${i.name})}"></td>
                     <td th:if="${selected.slug == 'media-files'}">
                         <img class="trash-thumb" th:if="${i.previewUrl != null}" th:src="${i.previewUrl}" th:alt="${i.name}">
                         <span class="trash-thumb trash-thumb-none" th:if="${i.previewUrl == null}" aria-hidden="true">FILE</span>
@@ -84,10 +84,10 @@
                     <td class="trash-actions">
                         <button type="button" class="btn btn-ghost btn-xs" data-trash-row="restore"
                                 th:data-id="${i.id}" th:data-name="${i.name}"
-                                th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}">Restore</button>
+                                th:data-action="@{/admin/trash/{t}/restore(t=${selected.slug})}" th:text="#{admin.trash.restore}">Restore</button>
                         <button type="button" class="btn btn-ghost btn-xs danger" data-trash-row="purge" th:if="${canPurge}"
                                 th:data-id="${i.id}" th:data-name="${i.name}"
-                                th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}">Delete permanently</button>
+                                th:data-action="@{/admin/trash/{t}/purge(t=${selected.slug})}" th:text="#{admin.trash.purge}">Delete permanently</button>
                     </td>
                 </tr>
                 </tbody>

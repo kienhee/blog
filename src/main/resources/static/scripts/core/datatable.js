@@ -50,17 +50,17 @@ $(function () {
       ],
       language: {
         search: '',
-        searchPlaceholder: 'Search records…',
-        lengthMenu: 'Show _MENU_ entries',
-        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-        infoEmpty: 'Showing 0 of 0 entries',
-        infoFiltered: '(filtered from _MAX_ total)',
-        zeroRecords: 'No matching records found',
-        emptyTable: 'No data available in table',
+        searchPlaceholder: khT('js.table.search'),
+        lengthMenu: khT('js.table.length_menu'),
+        info: khT('js.table.info'),
+        infoEmpty: khT('js.table.info_empty'),
+        infoFiltered: khT('js.table.info_filtered'),
+        zeroRecords: khT('js.table.no_match'),
+        emptyTable: khT('js.table.empty'),
         paginate: {
           first: '«',
-          previous: 'Prev',
-          next: 'Next',
+          previous: khT('js.table.prev'),
+          next: khT('js.table.next'),
           last: '»'
         }
       },
@@ -122,7 +122,7 @@ $(function () {
         if (!url) return;
         var ids = $(dt.rows().nodes()).find('.rowcheck:checked').map(function () { return this.value; }).get();
         if (!ids.length) {
-          if (window.khToast) window.khToast('Select at least one row');
+          if (window.khToast) window.khToast(khT('js.table.select_row'));
           return;
         }
         var $form = $('#dt-bulk-delete-form');
@@ -132,10 +132,10 @@ $(function () {
         $form.empty().attr('action', url);
         $('<input type="hidden" name="_csrf">').val($('meta[name="_csrf"]').attr('content') || '').appendTo($form);
         $.each(ids, function (_, id) { $('<input type="hidden" name="ids">').val(id).appendTo($form); });
-        var noun = $table.attr('data-bulk-noun') || 'records';
+        var noun = $table.attr('data-bulk-noun') || khT('js.table.records');
         if (window.khDialog) {
-          window.khDialog(ids.length + ' selected ' + noun, '#dt-bulk-delete-form',
-            $table.attr('data-bulk-delete-note') || 'This cannot be undone.');
+          window.khDialog(khT('js.table.selected_count', ids.length, noun), '#dt-bulk-delete-form',
+            $table.attr('data-bulk-delete-note') || khT('js.dialog.irreversible'));
         }
       });
 

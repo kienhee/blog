@@ -11,8 +11,8 @@ import lombok.*;
 @Builder
 public class ForgotPasswordRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "{validation.email.required_short}")
+    @Email(message = "{validation.email.invalid_short}")
     private String email;
 
 }

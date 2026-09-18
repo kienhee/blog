@@ -11,6 +11,8 @@ spring:
     locations: classpath:db/migration
   thymeleaf:
     cache: true
+  messages:
+    cache-duration: 1h
   devtools:
     restart:
       enabled: false
@@ -22,6 +24,9 @@ server:
   forward-headers-strategy: framework
 
 app:
+  i18n:
+    # HTTPS only in production, so the language cookie may be marked secure.
+    cookie-secure: true
   mail:
     enabled: ${MAIL_ENABLED:true}
   media:

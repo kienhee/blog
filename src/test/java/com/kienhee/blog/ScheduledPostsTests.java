@@ -10,6 +10,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.PostService;
 import com.kienhee.blog.service.impl.ScheduledPostPublisher;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -80,7 +81,8 @@ class ScheduledPostsTests {
 
         @BeforeEach
         void setUp() {
-            mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+            mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
             author = userRepository.findAll().get(0);
             category = categoryRepository.save(Category.builder().name("Sched " + tag).slug("sched-" + tag).visible(true).build());
         }

@@ -12,6 +12,7 @@ import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.SettingService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +64,8 @@ class CommentTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Comments " + tag).slug("c-" + tag).visible(true).build());
         post = savePost("live", PostStatus.PUBLISHED);
@@ -135,13 +137,13 @@ class CommentTests {
         assertEquals("guest@example.com", c.getAuthorEmail(), "email is normalised");
         assertNotNull(c.getIpAddress());
 
-        mockMvc.perform(get("/article/" + post.getSlug()))
+        mockMvc.perform(get("/article/" + post.getSlug()).with(TestLocale.en()))
                 .andExpect(content().string(not(containsString(text))))
                 .andExpect(content().string(containsString("0 comments")));
 
         approve(c.getId()).andExpect(status().is3xxRedirection());
 
-        mockMvc.perform(get("/article/" + post.getSlug()))
+        mockMvc.perform(get("/article/" + post.getSlug()).with(TestLocale.en()))
                 .andExpect(content().string(containsString(text)))
                 .andExpect(content().string(containsString("1 comment")))
                 .andExpect(content().string(not(containsString("guest@example.com"))));
@@ -163,7 +165,7 @@ class CommentTests {
         assertEquals(rootId, saved.get(2).getParentId());
         assertTrue(saved.stream().allMatch(c -> c.getStatus() == CommentStatus.APPROVED), "moderation is off");
 
-        mockMvc.perform(get("/article/" + post.getSlug()))
+        mockMvc.perform(get("/article/" + post.getSlug()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Reply to reply " + tag)))
                 .andExpect(content().string(containsString("3 comments")));
     }
@@ -182,7 +184,7 @@ class CommentTests {
         assertEquals(author.getFullName(), c.getAuthorName());
         assertEquals(author.getEmail(), c.getAuthorEmail());
 
-        mockMvc.perform(get("/article/" + post.getSlug()))
+        mockMvc.perform(get("/article/" + post.getSlug()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Staff note " + tag)))
                 .andExpect(content().string(containsString("class=\"tag\">Author</span>")));
     }
@@ -192,10 +194,11 @@ class CommentTests {
     void validation() throws Exception {
         mockMvc.perform(post("/article/" + post.getSlug() + "/comments")
                         .param("authorName", "Guest").param("authorEmail", "not-an-email").param("content", "Keep me")
-                        .with(csrf()).with(freshIp()))
+                        .with(csrf()).with(freshIp())
+                        .with(TestLocale.en()))
                 .andExpect(flash().attribute("commentError", "Please enter a valid email."))
                 .andExpect(flash().attributeExists("commentForm"));
-        mockMvc.perform(guestComment(post, "   ", null).with(freshIp()))
+        mockMvc.perform(guestComment(post, "   ", null).with(freshIp()).with(TestLocale.en()))
                 .andExpect(flash().attribute("commentError", "Please write a comment."));
         mockMvc.perform(guestComment(post, "x".repeat(2001), null).with(freshIp()))
                 .andExpect(flash().attributeExists("commentError"));
@@ -278,7 +281,7 @@ class CommentTests {
     @DisplayName("admin list shows comments with the pending count")
     void adminList() throws Exception {
         mockMvc.perform(guestComment(post, "Visible in admin " + tag, null).with(freshIp()));
-        mockMvc.perform(get("/admin/comments").with(TestAuth.owner()))
+        mockMvc.perform(get("/admin/comments").with(TestAuth.owner()).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Visible in admin " + tag)))
                 .andExpect(content().string(containsString("awaiting moderation")))
@@ -299,7 +302,7 @@ class CommentTests {
 
         mockMvc.perform(post("/admin/comments/bulk-status").param("ids", ids).param("status", "spam")
                         .with(TestAuth.withPermissions("mod@test.com", "comments:view", "comments:edit")).with(csrf()))
-                .andExpect(flash().attribute("successMessage", "2 comments marked as spam."));
+                .andExpect(flash().attribute("successMessage", "2 comments marked as Spam."));
         assertTrue(commentsOf(post).stream().allMatch(c -> c.getStatus() == CommentStatus.SPAM));
 
         mockMvc.perform(post("/admin/comments/bulk-delete").param("ids", ids)

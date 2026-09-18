@@ -2,6 +2,7 @@ package com.kienhee.blog;
 
 import com.kienhee.blog.repository.SiteSettingRepository;
 import com.kienhee.blog.service.SettingService;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +40,8 @@ class FooterSocialLinksTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         for (String key : KEYS) {
             originals.put(key, settingService.get(key));
         }
@@ -60,7 +62,7 @@ class FooterSocialLinksTests {
     @DisplayName("an https link is shown; a javascript: value is never rendered")
     void rendersOnlySafeLinks() throws Exception {
         settingService.saveAll(Map.of("social.x", "https://x.com/kienhee", "social.youtube", "javascript:alert(1)"));
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/").with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("href=\"https://x.com/kienhee\"")))
                 .andExpect(content().string(containsString("Elsewhere")))
@@ -73,7 +75,7 @@ class FooterSocialLinksTests {
     @DisplayName("with no links set, the Elsewhere column disappears")
     void hiddenWhenEmpty() throws Exception {
         settingService.saveAll(Map.of("social.x", "", "social.youtube", ""));
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/").with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("Elsewhere"))));
     }

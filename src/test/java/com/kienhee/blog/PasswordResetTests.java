@@ -7,6 +7,7 @@ import com.kienhee.blog.repository.PasswordResetTokenRepository;
 import com.kienhee.blog.repository.RoleRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.MailService;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +58,8 @@ class PasswordResetTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findAll().stream().findFirst().orElseThrow();
         user = userRepository.save(User.builder()
                 .fullName("Reset Tester")
@@ -92,7 +94,7 @@ class PasswordResetTests {
     @SuppressWarnings("unchecked")
     private String lastEmailedToken() {
         ArgumentCaptor<Map<String, Object>> vars = ArgumentCaptor.forClass(Map.class);
-        verify(mailService, atLeastOnce()).send(eq(user.getEmail()), anyString(), eq("password-reset"), vars.capture());
+        verify(mailService, atLeastOnce()).send(eq(user.getEmail()), any(), eq("password-reset"), anyString(), vars.capture(), any());
         String url = (String) vars.getValue().get("resetUrl");
         assertTrue(url.contains("/auth/reset?token="), url);
         return url.substring(url.indexOf("token=") + "token=".length());
@@ -118,7 +120,7 @@ class PasswordResetTests {
     @DisplayName("an unknown email gets the same answer and no email")
     void unknownEmailLooksTheSame() throws Exception {
         requestLink("nobody-" + System.nanoTime() + "@test.com");
-        verify(mailService, never()).send(anyString(), anyString(), anyString(), anyMap());
+        verify(mailService, never()).send(anyString(), any(), anyString(), anyString(), anyMap(), any());
     }
 
     @Test
@@ -139,7 +141,7 @@ class PasswordResetTests {
         requestLink(user.getEmail());
         String token = lastEmailedToken();
 
-        mockMvc.perform(get("/auth/reset").param("token", token))
+        mockMvc.perform(get("/auth/reset").param("token", token).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Referrer-Policy", "no-referrer"))
                 .andExpect(content().string(containsString("Choose a new password")));
@@ -157,7 +159,7 @@ class PasswordResetTests {
 
         // single use
         mockMvc.perform(post("/auth/reset").param("token", token)
-                        .param("password", "AnotherPass9").param("confirmPassword", "AnotherPass9").with(csrf()))
+                        .param("password", "AnotherPass9").param("confirmPassword", "AnotherPass9").with(csrf()).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Link expired")));
         assertTrue(passwordEncoder.matches("BrandNewPass9", userRepository.findById(user.getId()).orElseThrow().getPassword()));
@@ -172,18 +174,18 @@ class PasswordResetTests {
         String second = lastEmailedToken();
         assertNotEquals(first, second);
 
-        mockMvc.perform(get("/auth/reset").param("token", first))
+        mockMvc.perform(get("/auth/reset").param("token", first).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Link expired")));
-        mockMvc.perform(get("/auth/reset").param("token", second.substring(0, 42) + (second.endsWith("A") ? "B" : "A")))
+        mockMvc.perform(get("/auth/reset").param("token", second.substring(0, 42) + (second.endsWith("A") ? "B" : "A")).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Link expired")));
-        mockMvc.perform(get("/auth/reset")).andExpect(content().string(containsString("Link expired")));
+        mockMvc.perform(get("/auth/reset").with(TestLocale.en())).andExpect(content().string(containsString("Link expired")));
 
         PasswordResetToken open = tokenRepository.findByUser_IdOrderByIdAsc(user.getId()).stream()
                 .filter(t -> t.getUsedAt() == null).findFirst().orElseThrow();
         open.setExpiresAt(LocalDateTime.now().minusMinutes(1));
         tokenRepository.save(open);
         mockMvc.perform(post("/auth/reset").param("token", second)
-                        .param("password", "BrandNewPass9").param("confirmPassword", "BrandNewPass9").with(csrf()))
+                        .param("password", "BrandNewPass9").param("confirmPassword", "BrandNewPass9").with(csrf()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Link expired")));
         assertTrue(passwordEncoder.matches("OldPassword1", userRepository.findById(user.getId()).orElseThrow().getPassword()));
     }
@@ -199,11 +201,12 @@ class PasswordResetTests {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("don&#39;t match")));
         mockMvc.perform(post("/auth/reset").param("token", token)
-                        .param("password", "short").param("confirmPassword", "short").with(csrf()))
+                        .param("password", "short").param("confirmPassword", "short").with(csrf())
+                        .with(TestLocale.en()))
                 .andExpect(content().string(containsString("8 to 72 characters")));
 
         assertTrue(passwordEncoder.matches("OldPassword1", userRepository.findById(user.getId()).orElseThrow().getPassword()));
-        mockMvc.perform(get("/auth/reset").param("token", token))
+        mockMvc.perform(get("/auth/reset").param("token", token).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Choose a new password")));
     }
 
@@ -213,7 +216,7 @@ class PasswordResetTests {
         for (int i = 0; i < 5; i++) {
             requestLink(user.getEmail());
         }
-        verify(mailService, times(3)).send(eq(user.getEmail()), anyString(), eq("password-reset"), anyMap());
+        verify(mailService, times(3)).send(eq(user.getEmail()), any(), eq("password-reset"), anyString(), anyMap(), any());
     }
 
     @Test
@@ -221,6 +224,6 @@ class PasswordResetTests {
     void csrfRequired() throws Exception {
         mockMvc.perform(post("/auth/forgot").param("email", user.getEmail()).with(freshIp()))
                 .andExpect(status().isForbidden());
-        verify(mailService, never()).send(anyString(), anyString(), anyString(), anyMap());
+        verify(mailService, never()).send(anyString(), any(), anyString(), anyString(), anyMap(), any());
     }
 }

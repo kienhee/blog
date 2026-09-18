@@ -5,13 +5,13 @@
 <div th:fragment="dialog" class="dialog">
     <div class="box">
         <div class="h">
-            <div class="t">Delete this record?</div>
+            <div class="t" th:text="#{admin.dialog.title}">Delete this record?</div>
             <!-- Default only: each caller passes a description of what this particular delete does (khDialog's 3rd argument). -->
-            <p class="dim" style="font-size:14px;line-height:1.55" data-dialog-desc>This cannot be undone.</p>
+            <p class="dim" style="font-size:14px;line-height:1.55" data-dialog-desc th:text="#{admin.dialog.irreversible}">This cannot be undone.</p>
         </div>
         <div class="a">
-            <button class="btn btn-delete" data-dialog-confirm>Delete</button>
-            <button class="btn btn-ghost" data-dialog-close>Keep it</button>
+            <button class="btn btn-delete" data-dialog-confirm th:text="#{admin.dialog.delete}">Delete</button>
+            <button class="btn btn-ghost" data-dialog-close th:text="#{admin.dialog.keep}">Keep it</button>
         </div>
     </div>
 </div>

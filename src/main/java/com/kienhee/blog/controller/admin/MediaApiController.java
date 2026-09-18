@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.dto.MediaFolderCreateRequest;
 import com.kienhee.blog.dto.MediaUpdateRequest;
 import com.kienhee.blog.entity.Media;
@@ -58,6 +59,7 @@ public class MediaApiController {
     private final MediaService mediaService;
     private final MediaFolderService mediaFolderService;
     private final Validator validator;
+    private final BusinessMessages messages;
 
     // ---------------------------------------------------------------- read
 
@@ -122,12 +124,12 @@ public class MediaApiController {
                     uploaded.add(mediaService.uploadMedia(file, uploaderEmail, folderId).getId());
                 } catch (IllegalArgumentException e) {
                     String name = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file";
-                    errors.add(name + ": " + e.getMessage());
+                    errors.add(name + ": " + messages.text(e));
                 }
             }
         }
         if (uploaded.isEmpty()) {
-            return unprocessable(errors.isEmpty() ? "Please choose a file to upload." : String.join(" ", errors), errors);
+            return unprocessable(errors.isEmpty() ? messages.get("error.media.choose_file") : String.join(" ", errors), errors);
         }
 
         String message = uploaded.size() + (uploaded.size() == 1 ? " file uploaded." : " files uploaded.")
@@ -158,13 +160,13 @@ public class MediaApiController {
         try {
             mediaService.updateMedia(id, request);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         List<Map<String, Object>> updated = filesByIds(List.of(id));
         if (updated.isEmpty()) {
-            return unprocessable("Media not found with id: " + id);
+            return unprocessable(messages.get("error.media.not_found", id));
         }
-        return ResponseEntity.ok(Map.of("message", "File updated.", "file", updated.get(0)));
+        return ResponseEntity.ok(Map.of("message", messages.get("msg.media.file_updated_short"), "file", updated.get(0)));
     }
 
     /** Image editor, "Replace original": same id, URL and format; see {@link MediaService#replaceImage}. */
@@ -176,13 +178,13 @@ public class MediaApiController {
         try {
             mediaService.replaceImage(id, file, principal != null ? principal.getName() : null);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         List<Map<String, Object>> updated = filesByIds(List.of(id));
         if (updated.isEmpty()) {
-            return unprocessable("Media not found with id: " + id);
+            return unprocessable(messages.get("error.media.not_found", id));
         }
-        return ResponseEntity.ok(Map.of("message", "Image updated.", "file", updated.get(0)));
+        return ResponseEntity.ok(Map.of("message", messages.get("msg.media.image_updated"), "file", updated.get(0)));
     }
 
     /** Image editor, "Save as copy": a normal upload into the source image's folder (format may change). */
@@ -193,20 +195,20 @@ public class MediaApiController {
                                                          Principal principal) {
         List<Map<String, Object>> source = filesByIds(List.of(id));
         if (source.isEmpty()) {
-            return unprocessable("Media not found with id: " + id);
+            return unprocessable(messages.get("error.media.not_found", id));
         }
         if (!"image".equals(source.get(0).get("kind"))) {
-            return unprocessable("Only images can be edited.");
+            return unprocessable(messages.get("error.media.images_only"));
         }
         if (file == null || file.isEmpty()) {
-            return unprocessable("Please choose an image.");
+            return unprocessable(messages.get("error.media.choose_image"));
         }
         try {
             Long folderId = (Long) source.get(0).get("folderId");
             Media copy = mediaService.uploadMedia(file, principal != null ? principal.getName() : null, folderId);
-            return ResponseEntity.ok(Map.of("message", "Saved as a new image.", "file", filesByIds(List.of(copy.getId())).get(0)));
+            return ResponseEntity.ok(Map.of("message", messages.get("msg.media.saved_as_copy"), "file", filesByIds(List.of(copy.getId())).get(0)));
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
     }
 
@@ -216,12 +218,12 @@ public class MediaApiController {
     public ResponseEntity<Map<String, Object>> moveFiles(@RequestParam(value = "ids", required = false) List<Long> ids,
                                                          @RequestParam(value = "folderId", required = false) Long folderId) {
         if (ids == null || ids.isEmpty()) {
-            return unprocessable("No files selected.");
+            return unprocessable(messages.get("error.media.none_selected"));
         }
         try {
             mediaService.bulkMoveToFolder(ids, folderId);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         return ResponseEntity.ok(Map.of(
                 "message", ids.size() + (ids.size() == 1 ? " file moved." : " files moved."),
@@ -235,10 +237,10 @@ public class MediaApiController {
         try {
             mediaService.deleteMedia(id);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         return ResponseEntity.ok(Map.of(
-                "message", "File moved to the trash.",
+                "message", messages.get("msg.media.file_trashed"),
                 "mediaIds", List.of(id),
                 "folderIds", List.of()));
     }
@@ -248,7 +250,7 @@ public class MediaApiController {
     @PreAuthorize("hasAuthority('media:delete')")
     public ResponseEntity<Map<String, Object>> deleteFiles(@RequestParam(value = "ids", required = false) List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
-            return unprocessable("No files selected.");
+            return unprocessable(messages.get("error.media.none_selected"));
         }
         List<Long> deleted = new ArrayList<>();
         List<String> errors = new ArrayList<>();
@@ -257,7 +259,7 @@ public class MediaApiController {
                 mediaService.deleteMedia(id);
                 deleted.add(id);
             } catch (IllegalArgumentException e) {
-                errors.add(e.getMessage());
+                errors.add(messages.text(e));
             }
         }
         String message = deleted.isEmpty()
@@ -290,11 +292,11 @@ public class MediaApiController {
         try {
             created = mediaFolderService.createFolder(request);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         List<Map<String, Object>> folders = folderDtos();
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("message", "Folder created.");
+        body.put("message", messages.get("msg.media.folder_created"));
         body.put("folder", folders.stream().filter(f -> created.getId().equals(f.get("id"))).findFirst().orElse(null));
         body.put("folders", folders);
         return ResponseEntity.ok(body);
@@ -307,9 +309,9 @@ public class MediaApiController {
         try {
             mediaFolderService.renameFolder(id, name);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
-        return ResponseEntity.ok(Map.of("message", "Folder renamed.", "folders", folderDtos()));
+        return ResponseEntity.ok(Map.of("message", messages.get("msg.media.folder_renamed"), "folders", folderDtos()));
     }
 
     /** Re-parents a folder ({@code parentId} omitted = Home); the whole subtree moves with it. */
@@ -320,9 +322,9 @@ public class MediaApiController {
         try {
             mediaFolderService.moveFolder(id, parentId);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
-        return ResponseEntity.ok(Map.of("message", "Folder moved.", "folders", folderDtos()));
+        return ResponseEntity.ok(Map.of("message", messages.get("msg.media.folder_moved"), "folders", folderDtos()));
     }
 
     /** Soft delete: the folder, its subfolders and their files move to the trash. */
@@ -333,10 +335,10 @@ public class MediaApiController {
         try {
             result = mediaFolderService.deleteFolder(id);
         } catch (IllegalArgumentException e) {
-            return unprocessable(e.getMessage());
+            return unprocessable(messages.text(e));
         }
         return ResponseEntity.ok(Map.of(
-                "message", "Folder moved to the trash, together with its subfolders and files.",
+                "message", messages.get("msg.media.folder_trashed"),
                 "folderIds", result.folderIds(),
                 "mediaIds", result.mediaIds()));
     }
@@ -455,13 +457,13 @@ public class MediaApiController {
                 .orElse(null);
     }
 
-    private static ResponseEntity<Map<String, Object>> unprocessable(String message) {
-        return ResponseEntity.status(422).body(Map.of("message", message != null ? message : "Request failed."));
+    private ResponseEntity<Map<String, Object>> unprocessable(String message) {
+        return ResponseEntity.status(422).body(Map.of("message", message != null ? message : messages.get("error.request_failed")));
     }
 
-    private static ResponseEntity<Map<String, Object>> unprocessable(String message, List<String> errors) {
+    private ResponseEntity<Map<String, Object>> unprocessable(String message, List<String> errors) {
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("message", message != null ? message : "Request failed.");
+        body.put("message", message != null ? message : messages.get("error.request_failed"));
         body.put("errors", errors);
         return ResponseEntity.status(422).body(body);
     }

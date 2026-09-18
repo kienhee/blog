@@ -102,6 +102,8 @@ table.dt td .thumb{width:64px;height:40px;background:var(--surf);border:1px soli
 .tabs button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:4px;background:var(--accent)}
 .auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
 .auth-card{width:min(460px,100%);border:2px solid var(--rule)}
+/* The language switcher on the auth pages sits outside the form (nested forms are invalid HTML). */
+.auth-lang{position:fixed;top:18px;right:18px;z-index:5}
 .auth-card .h{padding:28px 32px;border-bottom:2px solid var(--rule);display:flex;align-items:baseline;justify-content:space-between}
 .auth-card .b{padding:32px;display:flex;flex-direction:column;gap:18px}
 .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding-top:24px}

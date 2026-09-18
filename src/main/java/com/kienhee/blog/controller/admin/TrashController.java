@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.config.MediaTrashProperties;
 import com.kienhee.blog.entity.MediaFolder;
 import com.kienhee.blog.service.MediaFolderService;
@@ -44,6 +45,7 @@ public class TrashController {
     private final MediaService mediaService;
     private final MediaFolderService mediaFolderService;
     private final MediaTrashProperties mediaTrashProperties;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String trash(@RequestParam(value = "type", required = false) String slug, Authentication authentication, Model model) {
@@ -66,14 +68,14 @@ public class TrashController {
     @PostMapping("/{type}/restore")
     public String restore(@PathVariable String type, @RequestParam(name = "ids", required = false) List<Long> ids,
                           Authentication authentication, RedirectAttributes redirect) {
-        return apply(type, ids, "restored", trashService::restore, authentication, redirect);
+        return apply(type, ids, BulkDelete.RESTORED, trashService::restore, authentication, redirect);
     }
 
     @PostMapping("/{type}/purge")
     public String purge(@PathVariable String type, @RequestParam(name = "ids", required = false) List<Long> ids,
                         Authentication authentication, RedirectAttributes redirect) {
         resolve(type, authentication, true);
-        return apply(type, ids, "deleted permanently", trashService::purge, authentication, redirect);
+        return apply(type, ids, BulkDelete.PURGED, trashService::purge, authentication, redirect);
     }
 
     @PostMapping("/{type}/empty")
@@ -81,19 +83,20 @@ public class TrashController {
         TrashType trashType = resolve(type, authentication, true);
         List<Long> all = trashService.list(trashType).stream().map(TrashService.TrashItem::id).toList();
         if (all.isEmpty()) {
-            redirect.addFlashAttribute("successMessage", "The " + trashType.getSingular() + " trash is already empty.");
+            redirect.addFlashAttribute("successMessage",
+                    messages.get("msg.trash.already_empty", messages.get("admin.trash.type." + trashType.getSlug())));
             return "redirect:/admin/trash?type=" + trashType.getSlug();
         }
-        return apply(type, all, "deleted permanently", trashService::purge, authentication, redirect);
+        return apply(type, all, BulkDelete.PURGED, trashService::purge, authentication, redirect);
     }
 
-    private String apply(String type, List<Long> ids, String verb, BiConsumer<TrashType, Long> action,
+    private String apply(String type, List<Long> ids, String verbKey, BiConsumer<TrashType, Long> action,
                          Authentication authentication, RedirectAttributes redirect) {
         TrashType trashType = resolve(type, authentication);
-        ids = orderFolders(trashType, ids, "deleted permanently".equals(verb));
+        ids = orderFolders(trashType, ids, BulkDelete.PURGED.equals(verbKey));
         Map<Long, String> names = trashService.list(trashType).stream()
                 .collect(Collectors.toMap(TrashService.TrashItem::id, item -> item.name() == null ? "#" + item.id() : item.name(), (a, b) -> a));
-        BulkDelete.run(ids, trashType.getSingular(), trashType.getPlural(), verb, names,
+        BulkDelete.run(messages, ids, "bulk.noun." + trashType.getSlug(), verbKey, names,
                 id -> action.accept(trashType, id), redirect);
         return "redirect:/admin/trash?type=" + trashType.getSlug();
     }

@@ -7,47 +7,47 @@
     <nav>
         <a th:if="${perms.contains('dashboard:view')}" th:href="@{/admin/dashboard}"
            th:attr="aria-current=${uri == '/admin' or #strings.startsWith(uri, '/admin/dashboard') or #strings.contains(uri, 'dashboard')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h7V4H4zM13 20h7v-9h-7zM4 20h7v-4H4zM13 8h7V4h-7z"/></svg></span>Dashboard</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h7V4H4zM13 20h7v-9h-7zM4 20h7v-4H4zM13 8h7V4h-7z"/></svg></span><span th:text="#{nav.admin.dashboard}">Dashboard</span></span>
         </a>
         <a th:if="${perms.contains('posts:view')}" th:href="@{/admin/posts}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/post') or #strings.contains(uri, 'post')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M8 9h8"/><path d="M8 13h8"/><path d="M8 17h5"/></svg></span>Posts</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M8 9h8"/><path d="M8 13h8"/><path d="M8 17h5"/></svg></span><span th:text="#{nav.admin.posts}">Posts</span></span>
         </a>
         <a th:if="${perms.contains('categories:view')}" th:href="@{/admin/categories}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/categor') or #strings.contains(uri, 'categor')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></span>Categories</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></span><span th:text="#{nav.admin.categories}">Categories</span></span>
         </a>
         <a th:if="${perms.contains('hashtags:view')}" th:href="@{/admin/hashtags}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/hashtag') or #strings.contains(uri, 'hashtag')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14"/><path d="M5 15h14"/><path d="M10 4 8 20"/><path d="M16 4l-2 16"/></svg></span>Hashtags</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14"/><path d="M5 15h14"/><path d="M10 4 8 20"/><path d="M16 4l-2 16"/></svg></span><span th:text="#{nav.admin.hashtags}">Hashtags</span></span>
         </a>
         <a th:if="${perms.contains('media:view')}" th:href="@{/admin/media}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/media') or #strings.contains(uri, 'media')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m4 16 5-5 4 4 3-3 4 4"/></svg></span>Media library</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m4 16 5-5 4 4 3-3 4 4"/></svg></span><span th:text="#{nav.admin.media}">Media library</span></span>
         </a>
         <a th:if="${perms.contains('comments:view')}" th:href="@{/admin/comments}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/comment') or #strings.contains(uri, 'comment')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span>Comments</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><span th:text="#{nav.admin.comments}">Comments</span></span>
         </a>
         <a th:if="${perms.contains('users:view')}" th:href="@{/admin/users}"
            th:attr="aria-current=${(#strings.startsWith(uri, '/admin/user') or #strings.contains(uri, 'user')) and !#strings.contains(uri, 'profile')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>Users</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span th:text="#{nav.admin.users}">Users</span></span>
         </a>
         <a th:if="${perms.contains('roles:view')}" th:href="@{/admin/roles}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/role') or #strings.contains(uri, 'role')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v6c0 5 8 8 8 8s8-3 8-8V7z"/><path d="m9 12 2 2 4-4"/></svg></span>Roles</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v6c0 5 8 8 8 8s8-3 8-8V7z"/><path d="m9 12 2 2 4-4"/></svg></span><span th:text="#{nav.admin.roles}">Roles</span></span>
         </a>
         <a th:if="${perms.contains('subscribers:view')}" th:href="@{/admin/subscribers}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/subscribers')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span>Newsletter</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span><span th:text="#{nav.admin.newsletter}">Newsletter</span></span>
         </a>
         <a th:if="${perms.contains('posts:delete') or perms.contains('categories:delete') or perms.contains('hashtags:delete') or perms.contains('comments:delete')}" th:href="@{/admin/trash}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/trash')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></span>Trash</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></span><span th:text="#{nav.admin.trash}">Trash</span></span>
         </a>
         <a th:if="${perms.contains('settings:view')}" th:href="@{/admin/settings}"
            th:attr="aria-current=${#strings.startsWith(uri, '/admin/setting') or #strings.contains(uri, 'setting')} ? 'page' : null">
-            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1V3.5h-4v2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1v2.6h4v-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5c.1-.3.1-.7.1-1"/></svg></span>Settings</span>
+            <span class="l"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1V3.5h-4v2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1v2.6h4v-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5c.1-.3.1-.7.1-1"/></svg></span><span th:text="#{nav.admin.settings}">Settings</span></span>
         </a>
     </nav>
     <div class="foot">
@@ -56,7 +56,7 @@
             <span th:unless="${currentUser != null and currentUser.avatarUrl != null and !currentUser.avatarUrl.isEmpty()}" class="av"></span>
             <span><span style="display:block;font-size:13px;font-weight:700" th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Kienhee</span><span class="dim" style="font-size:11px" th:text="${currentUser != null ? currentUser.email : 'Owner'}">Owner</span></span>
         </a>
-        <a class="kicker" th:href="@{/auth/logout}">Sign out</a>
+        <a class="kicker" th:href="@{/auth/logout}" th:text="#{nav.admin.sign_out}">Sign out</a>
     </div>
 </aside>
 

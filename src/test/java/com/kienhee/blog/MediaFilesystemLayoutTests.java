@@ -20,6 +20,7 @@ import com.kienhee.blog.storage.StoragePath;
 import com.kienhee.blog.storage.StorageTransactionHelper;
 import com.kienhee.blog.support.MediaFolderCleanup;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -112,7 +113,8 @@ class MediaFilesystemLayoutTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         tag = "fs" + System.nanoTime();
         Role role = roleRepository.findAll().stream().findFirst().orElseThrow();
         uploader = userRepository.save(User.builder()

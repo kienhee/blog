@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.validation.rules;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.service.validation.FileValidator;
 import com.kienhee.blog.service.validation.MediaTypeCatalog;
 import com.kienhee.blog.service.validation.UploadValidationContext;
@@ -21,10 +22,10 @@ public class FileSizeValidator implements FileValidator {
     @Override
     public void validate(UploadValidationContext context) {
         if (context == null || context.getSizeBytes() <= 0) {
-            throw new IllegalArgumentException("Please choose a file to upload.");
+            throw new BusinessException("error.media.choose_file");
         }
         if (context.getSizeBytes() > MediaTypeCatalog.MAX_FILE_SIZE_BYTES) {
-            throw new IllegalArgumentException("File is too large. Maximum size is 10MB.");
+            throw new BusinessException("error.media.too_large");
         }
     }
 }

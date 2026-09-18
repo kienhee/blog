@@ -13,6 +13,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.DashboardService;
 import com.kienhee.blog.service.DashboardService.DashboardStats;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +55,8 @@ class DashboardTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Dash " + tag).slug("dash-" + tag).visible(true).build());
     }
@@ -129,7 +131,7 @@ class DashboardTests {
         Post fresh = post(PostStatus.PUBLISHED, null, LocalDateTime.now());
         pendingComment(fresh, "Secret Reader " + tag);
 
-        mockMvc.perform(get("/admin/dashboard").with(TestAuth.withPermissions("poster@test.com", "dashboard:view", "posts:view")))
+        mockMvc.perform(get("/admin/dashboard").with(TestAuth.withPermissions("poster@test.com", "dashboard:view", "posts:view")).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Published posts by category")))
                 .andExpect(content().string(not(containsString("Secret Reader " + tag))))

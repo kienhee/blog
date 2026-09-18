@@ -8,17 +8,17 @@ $(function () {
     $('#user-id').val('');
     $('#user-fullName').val('');
     $('#user-email').val('').prop('readonly', false).css({ opacity: '', cursor: '' });
-    $('#user-password').val('').attr('placeholder', 'Enter password');
+    $('#user-password').val('').attr('placeholder', khT('js.user.password_placeholder'));
     $('#user-pw-req').show();
-    $('#user-pw-hint').text('At least 6 characters.');
+    $('#user-pw-hint').text(khT('js.user.password_hint'));
     $('#user-phone').val('');
     $('#user-address').val('');
     $('#user-bio').val('');
     $('#user-roleId').val('');
     $('#user-form').attr('action', '/admin/users');
     $('#oc-kicker').text('Create');
-    $('#oc-title').text('New User');
-    $('#user-submit-btn').text('Create user');
+    $('#oc-title').text(khT('js.user.new'));
+    $('#user-submit-btn').text(khT('js.user.submit_create'));
 
     if ($.fn.validate) {
       var validator = $('#user-form').validate();
@@ -44,17 +44,17 @@ $(function () {
     $('#user-id').val(id);
     $('#user-fullName').val(name);
     $('#user-email').val(email).prop('readonly', true).css({ opacity: '0.75', cursor: 'not-allowed' });
-    $('#user-password').val('').attr('placeholder', 'Leave blank to keep current password');
+    $('#user-password').val('').attr('placeholder', khT('js.user.password_keep'));
     $('#user-pw-req').hide();
-    $('#user-pw-hint').text('Leave blank to keep current password.');
+    $('#user-pw-hint').text(khT('js.user.password_keep_hint'));
     $('#user-phone').val(phone);
     $('#user-address').val(address);
     $('#user-bio').val(bio);
     $('#user-roleId').val(roleId ? String(roleId) : '');
     $('#user-form').attr('action', '/admin/users/' + id + '/edit');
     $('#oc-kicker').text('Update');
-    $('#oc-title').text('Edit User');
-    $('#user-submit-btn').text('Save changes');
+    $('#oc-title').text(khT('js.user.edit'));
+    $('#user-submit-btn').text(khT('js.form.save_changes'));
 
     if ($.fn.validate) {
       var validator = $('#user-form').validate();
@@ -74,7 +74,7 @@ $(function () {
     $('#delete-user-form').attr('action', '/admin/users/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'user "' + name + '"' : 'this user', '#delete-user-form',
-        'This cannot be undone. The account will no longer be able to sign in.');
+        khT('js.user.delete_note'));
     }
   });
 
@@ -99,16 +99,16 @@ $(function () {
       },
       messages: {
         fullName: {
-          required: 'Full name is required.',
-          minlength: 'Full name must have at least 2 characters.'
+          required: khT('validation.full_name.required'),
+          minlength: khT('validation.full_name.min')
         },
         email: {
-          required: 'Email is required.',
-          email: 'Invalid email format.'
+          required: khT('validation.email.required'),
+          email: khT('validation.email.invalid')
         },
         password: {
-          required: 'Password is required.',
-          minlength: 'Password must have at least 6 characters.'
+          required: khT('validation.password.required'),
+          minlength: khT('validation.password.min6')
         }
       },
       errorElement: 'span',

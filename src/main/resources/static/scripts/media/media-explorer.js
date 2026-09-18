@@ -136,7 +136,7 @@
   var TEMPLATE =
     '<div class="media-explorer mx">' +
     '  <aside class="media-sidebar">' +
-    '    <div class="ms-head"><span class="kicker">Folders</span></div>' +
+    '    <div class="ms-head"><span class="kicker">' + khT('js.mx.folders') + '</span></div>' +
     '    <ul class="folder-list" data-mx="folders"></ul>' +
     '    <p class="dim mx-hint" data-mx="hint"></p>' +
     '    <a class="trash-link mx-trash-link" data-mx="trash-link">' +
@@ -152,7 +152,7 @@
     '        New Folder</button>' +
     '      <button type="button" class="btn-icon-label" data-mx="upload">' +
     I('<path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 21h16"/>') +
-    '        <span data-mx="upload-label">Upload</span></button>' +
+    '        <span data-mx="upload-label">' + khT('js.mx.upload') + '</span></button>' +
     '      <span class="spacer"></span>' +
     '      <span class="mx-count" data-mx="count"></span>' +
     '      <button type="button" class="icon-btn-plain" data-mx="refresh" title="Refresh">' +
@@ -160,17 +160,17 @@
     '    </div>' +
     '    <input type="file" data-mx="file-input" multiple hidden>' +
     '    <div class="dropzone mx-dropzone" data-mx="dropzone">' +
-    '      <div><strong>Click to choose files</strong> or drag and drop them here</div>' +
+    '      <div>' + khT('js.mx.dropzone') + '</div>' +
     '      <div class="mx-dropzone-sub" data-mx="dropzone-sub"></div>' +
     '    </div>' +
     '    <div class="explorer-breadcrumb" data-mx="breadcrumb"></div>' +
     '    <div class="selection-bar" data-mx="selection-bar">' +
     '      <span class="count" data-mx="selection-count"></span>' +
-    '      <button type="button" data-mx="sel-rename" data-manage data-perm="edit">' + I('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>') + 'Rename</button>' +
+    '      <button type="button" data-mx="sel-rename" data-manage data-perm="edit">' + I('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>') + khT('js.mx.rename') + '</button>' +
     '      <select class="select mx-move-select" data-mx="sel-move-folder" data-manage data-perm="edit"></select>' +
-    '      <button type="button" data-mx="sel-move" data-manage data-perm="edit">' + I('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>') + 'Move</button>' +
-    '      <button type="button" data-mx="sel-download" data-manage>' + I('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>') + 'Download</button>' +
-    '      <button type="button" class="danger" data-mx="sel-delete" data-manage data-perm="delete">' + I('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>') + 'Delete</button>' +
+    '      <button type="button" data-mx="sel-move" data-manage data-perm="edit">' + I('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>') + khT('js.mx.move') + '</button>' +
+    '      <button type="button" data-mx="sel-download" data-manage>' + I('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>') + khT('js.mx.download') + '</button>' +
+    '      <button type="button" class="danger" data-mx="sel-delete" data-manage data-perm="delete">' + I('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>') + khT('js.mx.delete') + '</button>' +
     '      <span class="spacer"></span>' +
     '      <button type="button" class="close-x" data-mx="sel-clear" title="Clear selection">' +
     I('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', ' width="14" height="14"') + '</button>' +
@@ -178,18 +178,18 @@
     '    <div class="explorer-filters">' +
     '      <input class="input mx-f-search" data-mx="search" placeholder="Search by name…">' +
     '      <select class="select mx-f-kind" data-mx="filter-kind">' +
-    '        <option value="">All kinds</option><option value="image">Images only</option><option value="file">Files only</option>' +
+    '        <option value="">' + khT('js.mx.all_kinds') + '</option><option value="image">' + khT('js.mx.images_only') + '</option><option value="file">' + khT('js.mx.files_only') + '</option>' +
     '      </select>' +
     '      <select class="select mx-f-type" data-mx="filter-type"></select>' +
     '      <select class="select mx-f-usage" data-mx="filter-usage">' +
-    '        <option value="">Any usage</option><option value="used">Used in a post</option><option value="unused">Unused</option>' +
+    '        <option value="">' + khT('js.mx.any_usage') + '</option><option value="used">' + khT('js.mx.used') + '</option><option value="unused">' + khT('js.mx.unused') + '</option>' +
     '      </select>' +
     '      <select class="select mx-f-uploader" data-mx="filter-uploader"></select>' +
     '      <input class="input mx-f-date" type="text" autocomplete="off" placeholder="From date" title="Uploaded from" data-mx="filter-from">' +
     '      <input class="input mx-f-date" type="text" autocomplete="off" placeholder="To date" title="Uploaded to" data-mx="filter-to">' +
     '      <select class="select mx-f-sort" data-mx="sort">' +
-    '        <option value="newest">Newest first</option><option value="oldest">Oldest first</option>' +
-    '        <option value="largest">Largest first</option><option value="smallest">Smallest first</option>' +
+    '        <option value="newest">' + khT('js.mx.newest') + '</option><option value="oldest">' + khT('js.mx.oldest') + '</option>' +
+    '        <option value="largest">' + khT('js.mx.largest') + '</option><option value="smallest">' + khT('js.mx.smallest') + '</option>' +
     '        <option value="name">Name (A-Z)</option>' +
     '      </select>' +
     '    </div>' +
@@ -202,45 +202,45 @@
     // Pager sits below the scrolling grid, always visible.
     '    <div class="mx-pager" data-mx="pager">' +
     '      <span class="dim mx-pager-info" data-mx="page-info"></span>' +
-    '      <label class="mx-pager-size"><span class="dim">Per page</span>' +
+    '      <label class="mx-pager-size"><span class="dim">' + khT('js.mx.per_page') + '</span>' +
     '        <select class="select" data-mx="page-size" aria-label="Files per page"></select></label>' +
     '      <nav class="mx-pages" data-mx="pages" aria-label="Pages"></nav>' +
     '    </div>' +
     '    <div class="mx-pick-foot" data-mx="pick-foot">' +
     '      <span class="dim" data-mx="pick-summary"></span>' +
     '      <span class="spacer"></span>' +
-    '      <button type="button" class="btn btn-ghost" data-mx="pick-cancel">Cancel</button>' +
-    '      <button type="button" class="btn" data-mx="pick-confirm" disabled>Use selected</button>' +
+    '      <button type="button" class="btn btn-ghost" data-mx="pick-cancel">' + khT('js.cancel') + '</button>' +
+    '      <button type="button" class="btn" data-mx="pick-confirm" disabled>' + khT('js.mx.use_selected') + '</button>' +
     '    </div>' +
     '  </div>' +
     '  <div class="context-menu" data-mx="menu"></div>' +
     '  <form class="rename-popover" data-mx="rename-form" novalidate>' +
-    '    <div class="dim mx-popover-title">Rename folder</div>' +
+    '    <div class="dim mx-popover-title">' + khT('js.mx.rename_folder') + '</div>' +
     '    <input class="input mx-rename-input" name="name" data-mx="rename-input" autocomplete="off">' +
     '    <div class="mx-popover-actions">' +
     '      <button class="btn btn-xs" type="submit">Save</button>' +
-    '      <button class="btn btn-ghost btn-xs" type="button" data-mx="rename-cancel">Cancel</button>' +
+    '      <button class="btn btn-ghost btn-xs" type="button" data-mx="rename-cancel">' + khT('js.cancel') + '</button>' +
     '    </div>' +
     '  </form>' +
     '  <div class="folder-modal" data-mx="folder-modal" role="dialog" aria-modal="true">' +
     '    <form class="box" data-mx="folder-form" novalidate>' +
     '      <div class="h">' +
-    '        <div class="t" data-mx="folder-title">New folder</div>' +
+    '        <div class="t" data-mx="folder-title">' + khT('js.mx.new_folder') + '</div>' +
     '        <p class="dim mx-folder-location" data-mx="folder-location">Creates the folder at Home.</p>' +
     '      </div>' +
     '      <div class="mx-folder-body">' +
     '        <input class="input mx-folder-input" name="name" data-mx="folder-input" placeholder="Folder name" autocomplete="off">' +
     '      </div>' +
     '      <div class="a">' +
-    '        <button class="btn" type="submit">Create folder</button>' +
-    '        <button class="btn btn-ghost" type="button" data-mx="folder-cancel">Cancel</button>' +
+    '        <button class="btn" type="submit">' + khT('js.mx.create_folder') + '</button>' +
+    '        <button class="btn btn-ghost" type="button" data-mx="folder-cancel">' + khT('js.cancel') + '</button>' +
     '      </div>' +
     '    </form>' +
     '  </div>' +
     '  <div class="offcanvas" data-mx="detail" data-manage>' +
     '    <div class="panel">' +
     '      <div class="oc-head">' +
-    '        <div><div class="kicker">File details</div><div class="t" data-mx="detail-title">File</div></div>' +
+    '        <div><div class="kicker">' + khT('js.mx.file_details') + '</div><div class="t" data-mx="detail-title"></div></div>' +
     '        <button type="button" class="icon-btn" data-oc-close aria-label="Close">' +
     I('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', ' width="14" height="14"') + '</button>' +
     '      </div>' +
@@ -250,20 +250,20 @@
     '          <div class="ph mx-detail-preview-file" data-mx="detail-preview-file"><span class="badge mx-detail-ext" data-mx="detail-ext">FILE</span></div>' +
     '          <div class="dim mx-detail-meta" data-mx="detail-meta"></div>' +
     '          <button type="button" class="btn btn-ghost btn-sm mx-detail-edit" data-mx="detail-edit">' +
-    I('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>') + '<span>Edit image</span></button>' +
-    '          <label class="field"><span>Display name<span class="req"> *</span></span>' +
+    I('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>') + '<span>' + khT('js.ie.title') + '</span></button>' +
+    '          <label class="field"><span>' + khT('js.mx.display_name') + '<span class="req"> *</span></span>' +
     '            <input class="input" name="displayName" data-mx="detail-name" placeholder="File name"></label>' +
-    '          <label class="field"><span>Alt text</span>' +
+    '          <label class="field"><span>' + khT('js.mx.alt_text') + '</span>' +
     '            <input class="input" name="altText" data-mx="detail-alt" placeholder="Describe this image for SEO &amp; accessibility"></label>' +
-    '          <label class="field"><span>Folder</span>' +
+    '          <label class="field"><span>' + khT('js.mx.folder') + '</span>' +
     '            <select class="select" name="folderId" data-mx="detail-folder"></select></label>' +
     '          <label class="field"><span>Public URL</span>' +
     '            <span class="mx-url-row"><input class="input" data-mx="detail-url" readonly>' +
     '            <button type="button" class="btn btn-ghost" data-mx="detail-copy">Copy</button></span></label>' +
     '        </div>' +
     '        <div class="oc-foot">' +
-    '          <button class="btn" type="submit">Save changes</button>' +
-    '          <button type="button" class="btn btn-ghost" data-oc-close>Cancel</button>' +
+    '          <button class="btn" type="submit">' + khT('js.form.save_changes') + '</button>' +
+    '          <button type="button" class="btn btn-ghost" data-oc-close>' + khT('js.cancel') + '</button>' +
     '        </div>' +
     '      </form>' +
     '    </div>' +
@@ -325,11 +325,11 @@
       this.$root.find('[data-manage]').remove();
       this.$('trash-link').remove();
       this.$('trash-note').remove();
-      this.$('hint').text(this.opts.multiple ? 'Click files to select them, then “Use selected”.' : 'Click a file to select it, double-click to use it right away.');
-      this.$('pick-confirm').text(this.opts.multiple ? 'Use selected' : 'Use this file');
+      this.$('hint').text(this.opts.multiple ? khT('js.mx.hint_multi') : khT('js.mx.hint_single'));
+      this.$('pick-confirm').text(this.opts.multiple ? khT('js.mx.use_selected') : khT('js.mx.use_this'));
     } else {
       this.$('pick-foot').remove();
-      this.$('hint').text('Right-click a folder for more options.');
+      this.$('hint').text(khT('js.mx.hint_manage'));
       this.$('trash-link').attr('href', this.opts.trashUrl);
     }
 
@@ -337,19 +337,19 @@
     if (images) {
       this.$('filter-kind').remove();
       this.$('file-input').attr('accept', IMAGE_TYPES.map(function (t) { return t[0]; }).join(','));
-      this.$('dropzone-sub').text('Images (JPG, PNG, WEBP, GIF, SVG) — up to 10MB each');
+      this.$('dropzone-sub').text(khT('js.mx.dropzone_images'));
     } else {
       this.$('file-input').attr('accept', IMAGE_TYPES.concat(FILE_TYPES).map(function (t) { return t[0]; }).join(','));
-      this.$('dropzone-sub').text('Images (JPG, PNG, WEBP, GIF, SVG) or files (PDF, DOC(X), XLS(X), ZIP, TXT) — up to 10MB each');
+      this.$('dropzone-sub').text(khT('js.mx.dropzone_all'));
     }
 
-    var $type = this.$('filter-type').append($('<option>').val('').text('All types'));
+    var $type = this.$('filter-type').append($('<option>').val('').text(khT('js.mx.all_types')));
     var addGroup = function (label, list) {
       var $g = $('<optgroup>').attr('label', label);
       list.forEach(function (t) { $('<option>').val(t[0]).text(t[1]).appendTo($g); });
       $type.append($g);
     };
-    addGroup('Images', IMAGE_TYPES);
+    addGroup(khT('js.mx.images'), IMAGE_TYPES);
     if (!images) addGroup('Files', FILE_TYPES);
 
     this.$grid = this.$('grid');
@@ -381,7 +381,7 @@
       })
       .fail(function (xhr) {
         self.$grid.empty();
-        self.$('empty').text(errorOf(xhr, 'Could not load the media library.')).show();
+        self.$('empty').text(errorOf(xhr, khT('js.mx.load_failed'))).show();
       });
   };
 
@@ -442,7 +442,7 @@
     var map = this.state.folderMap;
     var node = map[norm(folderId)];
     if (!node) return [];
-    return segments(node.path).map(function (id) { return map[id] || { id: id, name: 'Folder' }; });
+    return segments(node.path).map(function (id) { return map[id] || { id: id, name: khT('js.mx.folder') }; });
   };
 
   P.isSelfOrDescendant = function (folderId, candidateId) {
@@ -462,8 +462,8 @@
     this.renderSidebar();
     this.renderBreadcrumb();
     var name = this.state.current === '' ? '' : this.state.folderMap[this.state.current].name;
-    this.$('folder-title').text(name ? 'New folder in ' + name : 'New folder');
-    this.$('folder-location').text(name ? 'Creates the folder inside "' + name + '".' : 'Creates the folder at Home.');
+    this.$('folder-title').text(name ? khT('js.mx.new_folder_in', name) : khT('js.mx.new_folder'));
+    this.$('folder-location').text(name ? khT('js.mx.creates_in', name) : khT('js.mx.creates_home'));
     this.resetAndRender();
   };
 
@@ -496,14 +496,14 @@
       });
       if (value !== null && $select.find('option').filter(function () { return this.value === value; }).length) $select.val(value);
     };
-    fill(this.$('sel-move-folder'), 'Move to: Home', 'Move to: ');
-    fill(this.$('detail-folder'), 'Home (unfiled)', '');
+    fill(this.$('sel-move-folder'), khT('js.mx.move_to_home'), khT('js.mx.move_to_prefix'));
+    fill(this.$('detail-folder'), khT('js.mx.home_unfiled'), '');
   };
 
   P.renderUploaders = function () {
     var $sel = this.$('filter-uploader');
     var value = $sel.val();
-    $sel.empty().append($('<option>').val('').text('All uploaders'));
+    $sel.empty().append($('<option>').val('').text(khT('js.mx.all_uploaders')));
     this.state.uploaders.forEach(function (u) { $('<option>').val(String(u.id)).text(u.name).appendTo($sel); });
     if (value) $sel.val(value);
   };
@@ -514,7 +514,7 @@
     var items = (t.fileCount || 0) + (t.folderCount || 0);
     this.$('trash-count').text(items > 0 ? String(items) : '');
     this.$('trash-note').text(t.totalBytes > 0
-      ? 'Trash holds ' + (t.totalBytes / 1048576).toFixed(2) + ' MB — still counted against quota.'
+      ? khT('js.mx.trash_holds', (t.totalBytes / 1048576).toFixed(2))
       : '');
   };
 
@@ -593,12 +593,12 @@
     var $tile = $('<div class="icon-tile file-tile">').attr('data-id', file.id).attr('data-name', file.name)
       .toggleClass('selected', selected);
     $('<input class="checkbox tile-check" type="checkbox">').val(file.id).prop('checked', selected)
-      .attr('aria-label', 'Select ' + file.name).appendTo($tile);
+      .attr('aria-label', khT('js.mx.select_file', file.name)).appendTo($tile);
     var $wrap = $('<div class="icon-wrap">').appendTo($tile);
     if (file.kind === 'image') {
       $('<img loading="lazy" alt="">').attr('src', versioned(file.thumbUrl || file.url, file)).appendTo($wrap);
       if (window.lightbox) {
-        $('<button type="button" class="tile-preview">').attr({ title: 'Preview', 'aria-label': 'Preview ' + file.name })
+        $('<button type="button" class="tile-preview">').attr({ title: khT('js.mx.preview'), 'aria-label': khT('js.mx.preview_file', file.name) })
           .html(I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6"/><path d="M8 11h6"/>', ' width="13" height="13"')).appendTo($tile);
       }
     } else {
@@ -631,8 +631,8 @@
     var $empty = this.$('empty');
     if (!folders.length && !files.length) {
       $empty.text(this.state.files.length + this.state.folders.length === 0
-        ? (this.opts.accept === 'image' ? 'No images uploaded yet.' : 'No files uploaded yet.')
-        : 'Nothing here matches these filters.').show();
+        ? (this.opts.accept === 'image' ? khT('js.mx.no_images') : khT('js.mx.no_files'))
+        : khT('js.mx.no_match')).show();
     } else {
       $empty.hide();
     }
@@ -645,14 +645,15 @@
 
     this.renderPager(files.length, pageCount, start, slice.length);
     var total = this.state.files.length;
-    this.$('count').text(total + (total === 1 ? ' file' : ' files'));
+    this.$('count').text(khT(total === 1 ? 'js.mx.file_count.one' : 'js.mx.file_count.other', total));
     this.syncSelection();
   };
 
   P.renderPager = function (total, pageCount, start, shown) {
     var $pager = this.$('pager').toggle(total > 0);
     if (!total) return $pager;
-    this.$('page-info').text('Showing ' + (start + 1) + '–' + (start + shown) + ' of ' + total + (total === 1 ? ' file' : ' files'));
+    this.$('page-info').text(khT('js.mx.page_info', start + 1, start + shown,
+        khT(total === 1 ? 'js.mx.file_count.one' : 'js.mx.file_count.other', total)));
 
     var page = this.state.page;
     var $pages = this.$('pages').empty();
@@ -663,12 +664,12 @@
       if (extra.title) $b.attr({ title: extra.title, 'aria-label': extra.title });
       return $b.appendTo($pages);
     };
-    button('‹', page - 1, { disabled: page <= 1, title: 'Previous page' });
+    button('‹', page - 1, { disabled: page <= 1, title: khT('js.mx.prev_page') });
     pageList(page, pageCount).forEach(function (n) {
       if (n === '…') $('<span class="mx-gap dim">').text('…').appendTo($pages);
       else button(String(n), n, { current: n === page, title: 'Page ' + n });
     });
-    button('›', page + 1, { disabled: page >= pageCount, title: 'Next page' });
+    button('›', page + 1, { disabled: page >= pageCount, title: khT('js.mx.next_page') });
     return $pager;
   };
 
@@ -731,7 +732,8 @@
     this.$('selection-count').text(n + (n === 1 ? ' item selected' : ' items selected'));
     if (this.pick) {
       this.$('pick-confirm').prop('disabled', n === 0);
-      this.$('pick-summary').text(n === 0 ? 'Nothing selected' : n + (n === 1 ? ' file selected' : ' files selected'));
+      this.$('pick-summary').text(n === 0 ? khT('js.mx.nothing_selected')
+          : khT(n === 1 ? 'js.mx.selected_files.one' : 'js.mx.selected_files.other', n));
     }
   };
 
@@ -752,7 +754,7 @@
     if (this.state.current) fd.append('folderId', this.state.current);
     $.each(fileList, function (_, file) { fd.append('files', file); });
 
-    var $label = this.$('upload-label').text('Uploading…');
+    var $label = this.$('upload-label').text(khT('js.mx.uploading'));
     this.$('upload').prop('disabled', true);
     $.ajax({
       url: API + '/files',
@@ -778,9 +780,9 @@
       }
       notify(res.message);
     }).fail(function (xhr) {
-      notify(errorOf(xhr, 'Upload failed. Please try again.'));
+      notify(errorOf(xhr, khT('js.mx.upload_failed')));
     }).always(function () {
-      $label.text('Upload');
+      $label.text(khT('js.mx.upload'));
       self.$('upload').prop('disabled', false);
       self.$('file-input').val('');
     });
@@ -828,22 +830,24 @@
     var perms = this.state.permissions;
     this.menuItem($menu, 'open', 'Open', false, function () { self.goToFolder(folder.id); });
     if (perms.create) {
-      this.menuItem($menu, 'folder', 'New subfolder', false, function () {
+      this.menuItem($menu, 'folder', khT('js.mx.new_subfolder'), false, function () {
         self.goToFolder(folder.id);
         self.openFolderModal();
       });
     }
     if (this.pick) return;
     if (perms.edit) {
-      this.menuItem($menu, 'rename', 'Rename', false, function () { self.openRename(folder, event.clientX, event.clientY); });
+      this.menuItem($menu, 'rename', khT('js.mx.rename'), false, function () { self.openRename(folder, event.clientX, event.clientY); });
     }
-    this.menuItem($menu, 'info', 'View info', false, function () {
+    this.menuItem($menu, 'info', khT('js.mx.view_info'), false, function () {
       var count = self.state.files.filter(function (f) { return norm(f.folderId) === folder.id; }).length;
-      notify(folder.name + ' — ' + count + (count === 1 ? ' file' : ' files') + ' — created ' + (folder.createdAt || 'unknown date'));
+      notify(khT('js.mx.folder_info', folder.name,
+          khT(count === 1 ? 'js.mx.file_count.one' : 'js.mx.file_count.other', count),
+          folder.createdAt || khT('js.mx.unknown_date')));
     });
     if (perms.edit) {
       $('<hr>').appendTo($menu);
-      $('<div class="cm-label">').text('Move to').appendTo($menu);
+      $('<div class="cm-label">').text(khT('js.mx.move_to')).appendTo($menu);
       if (folder.parentId !== '') {
         this.menuItem($menu, 'move', 'Home', false, function () { self.moveFolder(folder.id, ''); });
       }
@@ -857,7 +861,7 @@
     }
     if (perms.delete) {
       $('<hr>').appendTo($menu);
-      this.menuItem($menu, 'delete', 'Delete', true, function () { self.deleteFolder(folder); });
+      this.menuItem($menu, 'delete', khT('js.mx.delete'), true, function () { self.deleteFolder(folder); });
     }
   };
 
@@ -866,24 +870,24 @@
     var perms = this.state.permissions;
     if (this.pick) {
       if (this.canPreview(file)) {
-        this.menuItem($menu, 'preview', 'Preview', false, function () { self.previewImage(file); });
+        this.menuItem($menu, 'preview', khT('js.mx.preview'), false, function () { self.previewImage(file); });
       }
-      this.menuItem($menu, 'select', this.opts.multiple ? 'Select' : 'Use this file', false, function () {
+      this.menuItem($menu, 'select', this.opts.multiple ? khT('js.mx.select') : khT('js.mx.use_this'), false, function () {
         if (self.opts.multiple) self.setSelected(file.id, true); else self.choose([file]);
       });
       return;
     }
     this.menuItem($menu, 'open', 'Open', false, function () { self.openDetail(file); });
     if (this.canPreview(file)) {
-      this.menuItem($menu, 'preview', 'Preview', false, function () { self.previewImage(file); });
+      this.menuItem($menu, 'preview', khT('js.mx.preview'), false, function () { self.previewImage(file); });
     }
     if (this.canEditImage(file)) {
-      this.menuItem($menu, 'edit', 'Edit image', false, function () { self.editImage(file); });
+      this.menuItem($menu, 'edit', khT('js.ie.title'), false, function () { self.editImage(file); });
     }
     if (perms.edit) {
       this.menuItem($menu, 'rename', 'Rename', false, function () { self.openDetail(file, true); });
       $('<hr>').appendTo($menu);
-      $('<div class="cm-label">').text('Move to').appendTo($menu);
+      $('<div class="cm-label">').text(khT('js.mx.move_to')).appendTo($menu);
       this.menuItem($menu, 'move', 'Home', false, function () { self.moveFiles([file.id], ''); });
       this.state.folders.forEach(function (target) {
         self.menuItem($menu, 'move', new Array(target.depth + 1).join('— ') + target.name, false, function () {
@@ -892,9 +896,9 @@
       });
     }
     $('<hr>').appendTo($menu);
-    this.menuItem($menu, 'download', 'Download', false, function () { self.download([file]); });
+    this.menuItem($menu, 'download', khT('js.mx.download'), false, function () { self.download([file]); });
     if (perms.delete) {
-      this.menuItem($menu, 'delete', 'Delete', true, function () { self.deleteFiles([file]); });
+      this.menuItem($menu, 'delete', khT('js.mx.delete'), true, function () { self.deleteFiles([file]); });
     }
   };
 
@@ -947,10 +951,12 @@
     }
     var meta = [];
     if (file.kind === 'image' && file.width && file.height) meta.push(file.width + ' × ' + file.height + ' px');
-    meta.push(kb(file.sizeBytes) + (file.optimized && file.originalSizeBytes ? ' (was ' + kb(file.originalSizeBytes) + ' before optimization)' : ''));
-    if (file.kind === 'image') meta.push(file.optimized ? 'Optimized via TinyPNG' : 'Not optimized');
+    meta.push(kb(file.sizeBytes) + (file.optimized && file.originalSizeBytes
+        ? ' ' + khT('js.mx.was_before', kb(file.originalSizeBytes)) : ''));
+    if (file.kind === 'image') meta.push(khT(file.optimized ? 'js.mx.optimized' : 'js.mx.not_optimized'));
     if (file.createdAt) {
-      meta.push('Uploaded ' + String(file.createdAt).replace('T', ' ').slice(0, 16) + (file.uploaderName ? ' by ' + file.uploaderName : ''));
+      var when = String(file.createdAt).replace('T', ' ').slice(0, 16);
+      meta.push(file.uploaderName ? khT('js.mx.uploaded_by', when, file.uploaderName) : khT('js.mx.uploaded', when));
     }
     this.$('detail-edit').toggle(this.canEditImage(file));
     var $meta = this.$('detail-meta').empty();
@@ -1025,7 +1031,7 @@
     window.lightbox.option({
       sanitizeTitle: true, // captions are file names: never insert them as HTML
       wrapAround: images.length > 1,
-      albumLabel: 'Image %1 of %2',
+      albumLabel: khT('js.mx.album_label'),
       fadeDuration: 200,
       imageFadeDuration: 200,
       resizeDuration: 250
@@ -1060,12 +1066,12 @@
 
   P.moveFiles = function (ids, folderId) {
     var self = this;
-    if (!ids.length) return notify('No files selected');
+    if (!ids.length) return notify(khT('js.mx.none_selected'));
     var data = { ids: ids };
     if (folderId) data.folderId = folderId;
     post(API + '/files/move', data)
       .done(function (res) { self.replaceFiles(res.files); self.clearSelection(true); self.render(); notify(res.message); })
-      .fail(function (xhr) { notify(errorOf(xhr, 'Could not move the files.')); });
+      .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.move_files_failed'))); });
   };
 
   P.moveFolder = function (folderId, parentId) {
@@ -1074,7 +1080,7 @@
     if (parentId) data.parentId = parentId;
     post(API + '/folders/' + folderId + '/move', data)
       .done(function (res) { self.setFolders(res.folders); self.goToFolder(self.state.current, true); notify(res.message); })
-      .fail(function (xhr) { notify(errorOf(xhr, 'Could not move the folder.')); });
+      .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.move_folder_failed'))); });
   };
 
   P.removeDeleted = function (mediaIds, folderIds) {
@@ -1102,26 +1108,24 @@
     var self = this;
     if (!files.length || !window.khDialog) return;
     var single = files.length === 1;
-    window.khDialog(single ? 'file "' + files[0].name + '"' : files.length + ' selected files', function () {
+    window.khDialog(single ? khT('js.mx.file_named', files[0].name) : khT('js.mx.selected_files.other', files.length), function () {
       var request = single
         ? post(API + '/files/' + files[0].id + '/delete')
         : post(API + '/files/delete', { ids: files.map(function (f) { return f.id; }) });
       request
         .done(function (res) { self.removeDeleted(res.mediaIds, []); notify(res.message); })
-        .fail(function (xhr) { notify(errorOf(xhr, 'Delete failed. Please try again.')); });
-    }, single
-      ? 'The file moves to the trash. You can restore it from Trash until it is deleted permanently.'
-      : 'The files move to the trash. You can restore them from Trash until they are deleted permanently.');
+        .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.delete_failed'))); });
+    }, khT(single ? 'js.mx.delete_note_one' : 'js.mx.delete_note_many'));
   };
 
   P.deleteFolder = function (folder) {
     var self = this;
     if (!window.khDialog) return;
-    window.khDialog('folder "' + folder.name + '" and everything inside it', function () {
+    window.khDialog(khT('js.mx.folder_and_contents', folder.name), function () {
       post(API + '/folders/' + folder.id + '/delete')
         .done(function (res) { self.removeDeleted(res.mediaIds, res.folderIds); notify(res.message); })
-        .fail(function (xhr) { notify(errorOf(xhr, 'Delete failed. Please try again.')); });
-    }, 'The folder, its subfolders and all their files move to the trash. You can restore them from Trash.');
+        .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.delete_failed'))); });
+    }, khT('js.mx.delete_folder_note'));
   };
 
   P.download = function (files) {
@@ -1168,7 +1172,7 @@
       var folder = $item.length ? self.state.folderMap[norm($item.attr('data-folder'))] : null;
       self.openMenu(e.clientX, e.clientY, function ($menu) {
         if (folder) self.folderMenu($menu, folder, e);
-        else if (self.state.permissions.create) self.menuItem($menu, 'folder', 'New folder', false, function () { self.openFolderModal(); });
+        else if (self.state.permissions.create) self.menuItem($menu, 'folder', khT('js.mx.new_folder'), false, function () { self.openFolderModal(); });
       });
     });
 
@@ -1204,7 +1208,7 @@
           var file = self.fileById($fileTile.attr('data-id'));
           if (file) self.fileMenu($menu, file);
         } else if (self.state.permissions.create) {
-          self.menuItem($menu, 'folder', 'New folder', false, function () { self.openFolderModal(); });
+          self.menuItem($menu, 'folder', khT('js.mx.new_folder'), false, function () { self.openFolderModal(); });
         }
       });
     });
@@ -1233,18 +1237,18 @@
     this.$('sel-clear').on('click', function () { self.clearSelection(); });
     this.$('sel-rename').on('click', function () {
       var files = self.selectedFiles();
-      if (files.length !== 1) return notify('Select exactly one file to rename.');
+      if (files.length !== 1) return notify(khT('js.mx.rename_one'));
       self.openDetail(files[0], true);
     });
     this.$('sel-move').on('click', function () { self.moveFiles(self.selectedIds(), self.$('sel-move-folder').val()); });
     this.$('sel-download').on('click', function () {
       var files = self.selectedFiles();
-      if (!files.length) return notify('No files selected');
+      if (!files.length) return notify(khT('js.mx.none_selected'));
       self.download(files);
     });
     this.$('sel-delete').on('click', function () {
       var files = self.selectedFiles();
-      if (!files.length) return notify('No files selected');
+      if (!files.length) return notify(khT('js.mx.none_selected'));
       self.deleteFiles(files);
     });
 
@@ -1273,7 +1277,7 @@
     });
     this.$('detail-copy').on('click', function () {
       var url = self.$('detail-url').val();
-      var done = function () { notify('URL copied'); };
+      var done = function () { notify(khT('js.mx.url_copied')); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
       else { self.$('detail-url')[0].select(); try { document.execCommand('copy'); } catch (err) { /* ignore */ } done(); }
     });
@@ -1307,9 +1311,9 @@
     var trim = function (v) { return $.trim(v); };
     var nameRules = { required: true, normalizer: trim, minlength: 2, maxlength: 150 };
     var nameMessages = {
-      required: 'Folder name is required.',
-      minlength: 'Folder name must have at least 2 characters.',
-      maxlength: 'Folder name must be at most 150 characters.'
+      required: khT('validation.folder.name_required'),
+      minlength: khT('validation.folder.name_min'),
+      maxlength: khT('js.mx.folder_name_max')
     };
 
     var validate = function ($form, config, submit) {
@@ -1325,14 +1329,14 @@
       if (self.state.current) data.parentId = self.state.current;
       post(API + '/folders', data)
         .done(function (res) { self.closeFolderModal(); self.setFolders(res.folders); self.render(); notify(res.message); })
-        .fail(function (xhr) { notify(errorOf(xhr, 'Could not create the folder.')); });
+        .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.create_folder_failed'))); });
     });
 
     validate(this.$renameForm, { rules: { name: nameRules }, messages: { name: nameMessages } }, function () {
       var id = self.state.renameFolderId;
       post(API + '/folders/' + id + '/rename', { name: $.trim(self.$('rename-input').val()) })
         .done(function (res) { self.closeMenus(); self.setFolders(res.folders); self.renderBreadcrumb(); self.render(); notify(res.message); })
-        .fail(function (xhr) { notify(errorOf(xhr, 'Could not rename the folder.')); });
+        .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.rename_folder_failed'))); });
     });
 
     var $edit = this.$('edit-form');
@@ -1343,8 +1347,8 @@
           altText: { maxlength: 255 }
         },
         messages: {
-          displayName: { required: 'Display name is required.', maxlength: 'Display name must be at most 255 characters.' },
-          altText: { maxlength: 'Alt text must be at most 255 characters.' }
+          displayName: { required: khT('validation.display_name.required'), maxlength: khT('validation.display_name.max') },
+          altText: { maxlength: khT('validation.alt.max') }
         }
       }, function () {
         var id = self.state.detailFileId;
@@ -1358,7 +1362,7 @@
             self.render();
             notify(res.message);
           })
-          .fail(function (xhr) { notify(errorOf(xhr, 'Could not save the file.')); });
+          .fail(function (xhr) { notify(errorOf(xhr, khT('js.mx.save_file_failed'))); });
       });
     }
   };

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/public-master}">
 <head>
-    <title>Newsletter</title>
+    <title th:text="#{public.newsletter_status.kicker}">Newsletter</title>
     <meta name="referrer" content="no-referrer">
     <meta name="robots" content="noindex">
 </head>
@@ -12,35 +12,35 @@
     <div style="max-width:620px;display:flex;flex-direction:column;gap:18px">
 
       <th:block th:if="${state == 'confirmed'}">
-        <span class="kicker" style="color:var(--accent)">Newsletter</span>
-        <h1 style="font-size:48px;line-height:1.05">You are subscribed</h1>
-        <p class="dim" style="font-size:18px;line-height:1.55">Thanks for confirming. The next issue lands in your inbox. Every email has a one-click way to leave.</p>
-        <div><a class="btn" th:href="@{/}">Back to the site</a></div>
+        <span class="kicker" style="color:var(--accent)" th:text="#{public.newsletter_status.kicker}">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05" th:text="#{public.newsletter_status.confirmed.title}">You are subscribed</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55" th:text="#{public.newsletter_status.confirmed.body}">Thanks for confirming.</p>
+        <div><a class="btn" th:href="@{/}" th:text="#{public.newsletter_status.back}">Back to the site</a></div>
       </th:block>
 
       <th:block th:if="${state == 'unsubscribe'}">
-        <span class="kicker" style="color:var(--accent)">Newsletter</span>
-        <h1 style="font-size:48px;line-height:1.05">Unsubscribe?</h1>
-        <p class="dim" style="font-size:18px;line-height:1.55">You will stop receiving the newsletter. You can sign up again at any time.</p>
+        <span class="kicker" style="color:var(--accent)" th:text="#{public.newsletter_status.kicker}">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05" th:text="#{public.newsletter_status.unsubscribe.title}">Unsubscribe?</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55" th:text="#{public.newsletter_status.unsubscribe.body}">You will stop receiving the newsletter.</p>
         <form method="post" th:action="@{/subscribe/unsubscribe}">
           <input type="hidden" name="token" th:value="${token}">
-          <button class="btn" type="submit">Unsubscribe</button>
-          <a class="btn btn-ghost" th:href="@{/}" style="margin-left:8px">Keep me subscribed</a>
+          <button class="btn" type="submit" th:text="#{public.newsletter_status.unsubscribe.submit}">Unsubscribe</button>
+          <a class="btn btn-ghost" th:href="@{/}" style="margin-left:8px" th:text="#{public.newsletter_status.unsubscribe.keep}">Keep me subscribed</a>
         </form>
       </th:block>
 
       <th:block th:if="${state == 'unsubscribed'}">
-        <span class="kicker" style="color:var(--accent)">Newsletter</span>
-        <h1 style="font-size:48px;line-height:1.05">You are unsubscribed</h1>
-        <p class="dim" style="font-size:18px;line-height:1.55">You won't receive any more issues. Changed your mind? Sign up again whenever you like.</p>
-        <div><a class="btn btn-ghost" th:href="@{/subscribe}">Subscribe again</a></div>
+        <span class="kicker" style="color:var(--accent)" th:text="#{public.newsletter_status.kicker}">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05" th:text="#{public.newsletter_status.unsubscribed.title}">You are unsubscribed</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55" th:text="#{public.newsletter_status.unsubscribed.body}">You will not receive any more issues.</p>
+        <div><a class="btn btn-ghost" th:href="@{/subscribe}" th:text="#{public.newsletter_status.unsubscribed.again}">Subscribe again</a></div>
       </th:block>
 
       <th:block th:if="${state == 'invalid'}">
-        <span class="kicker" style="color:var(--accent)">Newsletter</span>
-        <h1 style="font-size:48px;line-height:1.05">Link expired</h1>
-        <p class="dim" style="font-size:18px;line-height:1.55">This link is invalid or has expired. Confirmation links work for 7 days.</p>
-        <div><a class="btn" th:href="@{/subscribe}">Sign up again</a></div>
+        <span class="kicker" style="color:var(--accent)" th:text="#{public.newsletter_status.kicker}">Newsletter</span>
+        <h1 style="font-size:48px;line-height:1.05" th:text="#{public.newsletter_status.invalid.title}">Link expired</h1>
+        <p class="dim" style="font-size:18px;line-height:1.55" th:text="#{public.newsletter_status.invalid.body}">This link is invalid or has expired.</p>
+        <div><a class="btn" th:href="@{/subscribe}" th:text="#{public.newsletter_status.invalid.again}">Sign up again</a></div>
       </th:block>
 
     </div>

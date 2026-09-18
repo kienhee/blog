@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${currentLang} ?: 'vi'" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>Choose a new password — Kienhee Admin</title>
+<title th:text="#{auth.reset.page_title}">Choose a new password</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" th:href="@{/styles/main.css}">
@@ -12,18 +12,19 @@
 </head>
 <body>
 <div class="auth-shell">
+  <div class="auth-lang" th:replace="~{fragments/lang-switch :: langSwitch}"></div>
 
   <!-- Unknown, used or expired link -->
   <div class="auth-card" th:if="${!tokenValid}">
     <div class="h"><span style="font-size:22px;font-weight:800;letter-spacing:-.02em">Kienhee</span></div>
     <div class="b">
       <div>
-        <h1 style="font-size:32px;line-height:1.05">Link expired</h1>
-        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5">This reset link is invalid or has expired. Links work once and only for 30 minutes.</p>
+        <h1 style="font-size:32px;line-height:1.05" th:text="#{auth.reset.expired_title}">Link expired</h1>
+        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5" th:text="#{auth.reset.expired_body}">This reset link is invalid or has expired.</p>
       </div>
-      <a class="btn" th:href="@{/auth/forgot}" style="height:50px;display:flex;align-items:center;justify-content:center">Request a new link</a>
+      <a class="btn" th:href="@{/auth/forgot}" style="height:50px;display:flex;align-items:center;justify-content:center" th:text="#{auth.reset.request_new}">Request a new link</a>
       <div style="display:flex;justify-content:space-between;gap:16px;padding-top:18px;border-top:1px solid var(--line)">
-        <a class="dim" style="font-size:13px" th:href="@{/auth/login}">Back to sign in</a>
+        <a class="dim" style="font-size:13px" th:href="@{/auth/login}" th:text="#{auth.link.back_to_login}">Back to sign in</a>
       </div>
     </div>
   </div>
@@ -32,8 +33,8 @@
     <div class="h"><span style="font-size:22px;font-weight:800;letter-spacing:-.02em">Kienhee</span></div>
     <div class="b">
       <div>
-        <h1 style="font-size:32px;line-height:1.05">Choose a new password</h1>
-        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5">Use 8 to 72 characters. You'll sign in with it right after.</p>
+        <h1 style="font-size:32px;line-height:1.05" th:text="#{auth.reset.title}">Choose a new password</h1>
+        <p class="dim" style="margin-top:8px;font-size:14px;line-height:1.5" th:text="#{auth.reset.subtitle}">Use 8 to 72 characters.</p>
       </div>
 
       <div th:if="${errorMessage}" style="padding:12px 14px;background:rgba(255,77,77,0.12);border:1px solid #ff4d4d;color:#ff6b6b;border-radius:6px;font-size:13px;font-weight:600">
@@ -42,21 +43,23 @@
 
       <input type="hidden" th:field="*{token}">
       <label class="field">
-        <span>New password<span class="req"> *</span></span>
-        <input class="input" type="password" id="password" name="password" autocomplete="new-password" maxlength="72" placeholder="At least 8 characters">
+        <span><span th:text="#{auth.field.new_password}">New password</span><span class="req"> *</span></span>
+        <input class="input" type="password" id="password" name="password" autocomplete="new-password" maxlength="72" th:placeholder="#{auth.placeholder.new_password}">
       </label>
       <label class="field">
-        <span>Confirm new password<span class="req"> *</span></span>
-        <input class="input" type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" maxlength="72" placeholder="Type it again">
+        <span><span th:text="#{auth.field.confirm_password}">Confirm new password</span><span class="req"> *</span></span>
+        <input class="input" type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" maxlength="72" th:placeholder="#{auth.placeholder.confirm_password}">
       </label>
-      <button class="btn" type="submit" style="height:50px">Change password</button>
+      <button class="btn" type="submit" style="height:50px" th:text="#{auth.reset.submit}">Change password</button>
       <div style="display:flex;justify-content:space-between;gap:16px;padding-top:18px;border-top:1px solid var(--line)">
-        <a class="dim" style="font-size:13px" th:href="@{/auth/login}">Back to sign in</a>
+        <a class="dim" style="font-size:13px" th:href="@{/auth/login}" th:text="#{auth.link.back_to_login}">Back to sign in</a>
       </div>
     </div>
   </form>
 </div>
 <div class="toast"><span>✓</span><span class="msg"></span></div>
+<div th:replace="~{fragments/i18n :: dictionary}"></div>
+<script th:src="@{/scripts/core/i18n.js}"></script>
 <script th:src="@{/scripts/lib/jquery.min.js}"></script>
 <script th:src="@{/scripts/lib/jquery.validate.min.js}"></script>
 <script th:src="@{/scripts/core/admin.js}"></script>

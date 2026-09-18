@@ -40,6 +40,15 @@ spring:
     open-in-view: false
     show-sql: false
 
+  # ===== i18n =====
+  # messages.properties = Vietnamese (the default, and the fallback for a key missing from _en).
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+    # A missing key must fail loudly in dev instead of rendering its own name.
+    use-code-as-default-message: false
+
   # ===== Thymeleaf =====
   thymeleaf:
     prefix: classpath:/templates/

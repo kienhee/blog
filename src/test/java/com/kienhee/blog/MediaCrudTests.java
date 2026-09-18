@@ -16,6 +16,7 @@ import com.kienhee.blog.storage.FilesystemStorage;
 import com.kienhee.blog.storage.StoragePath;
 import com.kienhee.blog.support.MediaFolderCleanup;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +77,8 @@ class MediaCrudTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findAll().stream().findFirst().orElseThrow();
         tag = "Crud" + System.nanoTime();
         user = userRepository.save(User.builder()

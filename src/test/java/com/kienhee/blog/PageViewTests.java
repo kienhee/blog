@@ -10,6 +10,7 @@ import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.DashboardService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +55,8 @@ class PageViewTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Views " + tag).slug(tag + "-cat").visible(true).build());
         post = postRepository.save(Post.builder().title("Most read " + tag).slug(tag + "-post").content("<p>x</p>")
@@ -120,7 +122,7 @@ class PageViewTests {
         assertEquals(before.viewsPrevious30Days() + 4, after.viewsPrevious30Days(), "40 days ago falls in the previous window");
         assertTrue(after.topPosts().stream().anyMatch(t -> t.id().equals(post.getId()) && t.views() == 3));
 
-        mockMvc.perform(get("/admin/dashboard").with(TestAuth.owner()))
+        mockMvc.perform(get("/admin/dashboard").with(TestAuth.owner()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Most read · last 30 days")))
                 .andExpect(content().string(containsString(post.getTitle())));
     }

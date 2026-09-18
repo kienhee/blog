@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.MediaFolderCreateRequest;
 import com.kienhee.blog.entity.Media;
 import com.kienhee.blog.entity.MediaFolder;
@@ -75,7 +76,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
             return List.of();
         }
         MediaFolder folder = mediaFolderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + folderId));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", folderId));
 
         List<Long> ancestorIds = parsePath(folder.getPath());
         if (ancestorIds.isEmpty()) {
@@ -136,7 +137,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
             return null;
         }
         return mediaFolderRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent folder not found with id: " + parentId));
+                .orElseThrow(() -> new BusinessException("error.media.parent_folder_not_found", parentId));
     }
 
     /**
@@ -147,8 +148,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     private MediaFolder createFolder(String name, MediaFolder parent, boolean uniquifySlug) {
         int depth = parent == null ? 0 : parent.getDepth() + 1;
         if (depth > MAX_DEPTH) {
-            throw new IllegalArgumentException(
-                    "Cannot create: folders can only be nested " + MAX_DEPTH + " levels deep.");
+            throw new BusinessException("error.media.depth_create", MAX_DEPTH);
         }
 
         Long parentId = parent != null ? parent.getId() : null;
@@ -165,7 +165,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
                 suffix++;
             }
         } else if (slugTaken(parentId, slug)) {
-            throw new IllegalArgumentException("A folder named \"" + name + "\" already exists here.");
+            throw new BusinessException("error.media.folder_exists", name);
         }
 
         MediaFolder folder = mediaFolderRepository.save(MediaFolder.builder()
@@ -212,16 +212,16 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     @Transactional
     public MediaFolder renameFolder(Long id, String name) {
         if (name == null || name.trim().length() < 2) {
-            throw new IllegalArgumentException("Folder name must have at least 2 characters.");
+            throw new BusinessException("validation.folder.name_min");
         }
         MediaFolder folder = mediaFolderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", id));
 
         String trimmed = name.trim();
         String slug = slugify(trimmed);
         Long parentId = folder.getParent() != null ? folder.getParent().getId() : null;
         if (slugTakenByOther(parentId, slug, folder.getId())) {
-            throw new IllegalArgumentException("A folder named \"" + trimmed + "\" already exists here.");
+            throw new BusinessException("error.media.folder_exists", trimmed);
         }
 
         StoragePath oldDir = layout.directoryOf(folder);
@@ -240,7 +240,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     @Transactional
     public MediaFolder moveFolder(Long id, Long newParentId) {
         MediaFolder folder = mediaFolderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", id));
         MediaFolder newParent = resolveParent(newParentId);
 
         Long currentParentId = folder.getParent() != null ? folder.getParent().getId() : null;
@@ -253,13 +253,12 @@ public class MediaFolderServiceImpl implements MediaFolderService {
             // branch from the tree. The path prefix answers this without a recursive walk.
             if (newParent.getId().equals(folder.getId())
                     || (newParent.getPath() != null && newParent.getPath().startsWith(folder.getPath()))) {
-                throw new IllegalArgumentException("Cannot move a folder into itself or one of its subfolders.");
+                throw new BusinessException("error.media.folder_into_itself");
             }
         }
 
         if (slugTakenByOther(newParentId, folder.getSlug(), folder.getId())) {
-            throw new IllegalArgumentException(
-                    "A folder named \"" + folder.getName() + "\" already exists in the destination.");
+            throw new BusinessException("error.media.folder_exists_destination", folder.getName());
         }
 
         List<MediaFolder> subtree = mediaFolderRepository.findSubtree(folder.getPath());
@@ -268,8 +267,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
 
         int deepest = subtree.stream().mapToInt(MediaFolder::getDepth).max().orElse(folder.getDepth());
         if (deepest + delta > MAX_DEPTH) {
-            throw new IllegalArgumentException(
-                    "Cannot move: folders can only be nested " + MAX_DEPTH + " levels deep.");
+            throw new BusinessException("error.media.depth_move", MAX_DEPTH);
         }
 
         String oldPath = folder.getPath();
@@ -302,7 +300,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     @Transactional
     public FolderDeleteResult deleteFolder(Long id) {
         MediaFolder folder = mediaFolderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", id));
         if (folder.getStatus() == MediaFolder.Status.TRASHED) {
             return new FolderDeleteResult(List.of(), List.of()); // already in the trash
         }
@@ -342,9 +340,9 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     @Transactional
     public FolderRestoreResult restoreFolder(Long id) {
         MediaFolder folder = mediaFolderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", id));
         if (folder.getStatus() != MediaFolder.Status.TRASHED) {
-            throw new IllegalArgumentException("This folder is not in the trash.");
+            throw new BusinessException("error.media.folder_not_trashed");
         }
         LocalDateTime batchDeletedAt = folder.getDeletedAt();
 
@@ -358,8 +356,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
         }
         if (movedToRoot) {
             if (slugTakenByOther(null, folder.getSlug(), folder.getId())) {
-                throw new IllegalArgumentException(
-                        "Cannot restore: a folder named \"" + folder.getName() + "\" already exists at Home.");
+                throw new BusinessException("error.media.folder_exists_home", folder.getName());
             }
             StoragePath oldDir = layout.directoryOf(folder);
             rehome(folder, null);
@@ -425,7 +422,7 @@ public class MediaFolderServiceImpl implements MediaFolderService {
     @Transactional
     public void purgeFolder(Long id) {
         MediaFolder folder = mediaFolderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.folder_not_found", id));
         if (folder.getStatus() != MediaFolder.Status.TRASHED) {
             throw new IllegalArgumentException(
                     "Cannot permanently delete: move the folder to the trash first.");

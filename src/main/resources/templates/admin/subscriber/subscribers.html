@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Newsletter</title>
+    <title th:text="#{nav.admin.newsletter}">Newsletter</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Newsletter</strong>
+    <a th:href="@{/admin/dashboard}" class="dim" th:text="#{nav.admin.dashboard}">Dashboard</a><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.newsletter}">Newsletter</strong>
 </div>
 
 <div layout:fragment="content"
@@ -15,8 +15,8 @@
     <div class="dt-root">
         <div class="page-head">
             <div>
-                <h1>Newsletter</h1>
-                <p class="dim" style="margin-top:6px">Readers sign up on the home page or /subscribe and confirm by email. Issues go to confirmed subscribers only.</p>
+                <h1 th:text="#{nav.admin.newsletter}">Newsletter</h1>
+                <p class="dim" style="margin-top:6px" th:text="#{admin.subscriber.intro}">Readers sign up and confirm by email.</p>
             </div>
         </div>
 
@@ -28,51 +28,50 @@
         </div>
 
         <div class="stats" style="margin-bottom:28px">
-            <div class="stat"><div class="kicker">Confirmed</div><div class="v" th:text="${confirmedCount}">0</div><div class="d">receive issues</div></div>
-            <div class="stat"><div class="kicker">Pending</div><div class="v" th:text="${pendingCount}">0</div><div class="d">haven't clicked the link yet</div></div>
-            <div class="stat"><div class="kicker">Unsubscribed</div><div class="v" th:text="${unsubscribedCount}">0</div><div class="d">left the list</div></div>
-            <div class="stat"><div class="kicker">Issues sent</div><div class="v" th:text="${issues.size()}">0</div><div class="d">all time</div></div>
+            <div class="stat"><div class="kicker" th:text="#{enum.subscriber.status.CONFIRMED}">Confirmed</div><div class="v" th:text="${confirmedCount}">0</div><div class="d" th:text="#{admin.subscriber.confirmed_note}">receive issues</div></div>
+            <div class="stat"><div class="kicker" th:text="#{enum.subscriber.status.PENDING}">Pending</div><div class="v" th:text="${pendingCount}">0</div><div class="d" th:text="#{admin.subscriber.pending_note}">haven't clicked the link yet</div></div>
+            <div class="stat"><div class="kicker" th:text="#{enum.subscriber.status.UNSUBSCRIBED}">Unsubscribed</div><div class="v" th:text="${unsubscribedCount}">0</div><div class="d" th:text="#{admin.subscriber.unsubscribed_note}">left the list</div></div>
+            <div class="stat"><div class="kicker" th:text="#{admin.subscriber.issues_sent}">Issues sent</div><div class="v" th:text="${issues.size()}">0</div><div class="d" th:text="#{admin.subscriber.all_time}">all time</div></div>
         </div>
 
         <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;margin-bottom:32px">
             <form th:if="${canSend}" id="newsletter-send-form" method="post" th:action="@{/admin/subscribers/send}"
                   style="display:flex;flex-direction:column;gap:14px">
-                <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Send an issue</p>
-                <label class="field"><span>Subject<span class="req"> *</span></span>
-                    <input class="input" id="newsletter-subject" name="subject" maxlength="200" th:value="${draftSubject}" placeholder="This week: …"></label>
-                <label class="field"><span>Message<span class="req"> *</span></span>
+                <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.subscriber.send_issue}">Send an issue</p>
+                <label class="field"><span><span th:text="#{admin.subscriber.subject}">Subject</span><span class="req"> *</span></span>
+                    <input class="input" id="newsletter-subject" name="subject" maxlength="200" th:value="${draftSubject}" th:placeholder="#{admin.subscriber.subject_placeholder}"></label>
+                <label class="field"><span><span th:text="#{admin.subscriber.message}">Message</span><span class="req"> *</span></span>
                     <textarea class="textarea" id="newsletter-body" name="body" rows="10" maxlength="20000" th:text="${draftBody}"
-                              placeholder="Plain text. Leave a blank line between paragraphs."></textarea></label>
-                <p class="dim" style="font-size:12px;line-height:1.5">
-                    Goes to <strong th:text="${confirmedCount}">0</strong> confirmed subscriber(s), each with their own unsubscribe link.
-                    Gmail sends at most about 500 emails a day, so keep the list below that on the default setup.
+                              th:placeholder="#{admin.subscriber.message_placeholder}"></textarea></label>
+                <p class="dim" style="font-size:12px;line-height:1.5" th:text="#{admin.subscriber.send_hint(${confirmedCount})}">
+                    Goes to confirmed subscribers, each with their own unsubscribe link.
                 </p>
-                <div><button class="btn" type="submit" id="btn-send-newsletter" th:disabled="${confirmedCount == 0}">Send issue</button></div>
+                <div><button class="btn" type="submit" id="btn-send-newsletter" th:disabled="${confirmedCount == 0}" th:text="#{admin.subscriber.send}">Send issue</button></div>
             </form>
 
             <div>
-                <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Past issues</p>
-                <p th:if="${issues.isEmpty()}" class="dim" style="padding:16px 0">Nothing sent yet.</p>
+                <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.subscriber.past_issues}">Past issues</p>
+                <p th:if="${issues.isEmpty()}" class="dim" style="padding:16px 0" th:text="#{admin.subscriber.no_issues}">Nothing sent yet.</p>
                 <div th:each="i : ${issues}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)">
                     <strong style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${i.subject}">Subject</strong>
                     <span class="dim" style="font-size:12px;white-space:nowrap" th:text="${#temporals.format(i.sentAt, 'yyyy-MM-dd HH:mm')}">2026-09-15 10:00</span>
                     <span class="dim" style="font-size:12px"
-                          th:text="|${i.recipients} recipient${i.recipients == 1 ? '' : 's'}${i.sentBy != null ? ' · by ' + i.sentBy.fullName : ''}|">12 recipients</span>
+                          th:text="${i.sentBy != null} ? #{admin.subscriber.recipients_by(${i.recipients},${i.sentBy.fullName})} : #{admin.subscriber.recipients(${i.recipients})}">12 recipients</span>
                 </div>
             </div>
         </div>
 
-        <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Subscribers</p>
+        <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.subscriber.list}">Subscribers</p>
         <div class="table-wrap">
             <table class="dt" data-order-col="2" data-order-dir="desc">
                 <thead>
                 <tr>
                     <th style="width:44px"></th>
-                    <th>Email</th>
-                    <th style="width:150px">Signed up</th>
-                    <th style="width:130px">Status</th>
-                    <th style="width:150px">Confirmed</th>
-                    <th style="width:90px;text-align:right"><span class="kicker">Actions</span></th>
+                    <th th:text="#{admin.common.email}">Email</th>
+                    <th style="width:150px" th:text="#{admin.subscriber.signed_up}">Signed up</th>
+                    <th style="width:130px" th:text="#{admin.common.status}">Status</th>
+                    <th style="width:150px" th:text="#{enum.subscriber.status.CONFIRMED}">Confirmed</th>
+                    <th style="width:90px;text-align:right"><span class="kicker" th:text="#{admin.common.actions}">Actions</span></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -82,11 +81,11 @@
                     <td class="dim" th:text="${#temporals.format(s.createdAt, 'yyyy-MM-dd HH:mm')}">2026-09-15 10:00</td>
                     <td><span class="badge"
                               th:style="${s.status.name() == 'CONFIRMED'} ? 'color:#5ee38a' : (${s.status.name() == 'PENDING'} ? 'color:#ffc94d' : 'color:#a0a0a0')"
-                              th:text="${#strings.capitalize(#strings.toLowerCase(s.status.name()))}">Confirmed</span></td>
+                              th:text="#{'enum.subscriber.status.' + ${s.status.name()}}">Confirmed</span></td>
                     <td class="dim" th:text="${s.confirmedAt != null ? #temporals.format(s.confirmedAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
                     <td class="right">
                         <button th:if="${canDelete}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-subscriber"
-                                th:data-id="${s.id}" th:data-name="${s.email}">Del</button>
+                                th:data-id="${s.id}" th:data-name="${s.email}" th:text="#{admin.common.del}">Del</button>
                     </td>
                 </tr>
                 </tbody>

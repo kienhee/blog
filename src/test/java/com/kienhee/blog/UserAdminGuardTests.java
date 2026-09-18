@@ -12,6 +12,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.UserService;
 import com.kienhee.blog.service.impl.UserServiceImpl;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -126,7 +127,7 @@ class UserAdminGuardTests {
             account(15, contributor);
             when(posts.existsByAuthor_Id(15L)).thenReturn(true);
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> service.deleteUser(15L, "admin@test.com", true));
-            assertTrue(e.getMessage().contains("still has posts"));
+            assertEquals("error.user.has_posts", e.getMessage());
         }
     }
 
@@ -148,7 +149,8 @@ class UserAdminGuardTests {
 
         @BeforeEach
         void setUp() {
-            mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+            mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         }
 
         @AfterEach
@@ -175,7 +177,7 @@ class UserAdminGuardTests {
                             .param("fullName", "Sneaky Admin").param("email", target).param("password", "Password123")
                             .param("roleId", roleRepository.findBySlug("admin").orElseThrow().getId().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(content().string(containsString(UserService.ADMIN_ONLY)));
+                    .andExpect(content().string(containsString("Only admins can grant the Admin role")));
             assertTrue(userRepository.findByEmail(target).isEmpty());
         }
 
@@ -188,7 +190,7 @@ class UserAdminGuardTests {
                             .param("id", victim.getId().toString()).param("fullName", "Hijacked").param("email", victim.getEmail())
                             .param("password", "NewPassword1").param("roleId", roleRepository.findBySlug("user").orElseThrow().getId().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(content().string(containsString(UserService.ADMIN_ONLY)));
+                    .andExpect(content().string(containsString("Only admins can grant the Admin role")));
             User reloaded = userRepository.findByEmailWithRole(victim.getEmail()).orElseThrow();
             assertEquals("Guard victim", reloaded.getFullName());
             assertEquals("admin", reloaded.getRole().getSlug());

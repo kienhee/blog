@@ -11,6 +11,7 @@ import com.kienhee.blog.repository.UserStorageQuotaRepository;
 import com.kienhee.blog.service.MediaService;
 import com.kienhee.blog.service.QuotaService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +64,8 @@ class MediaImageEditTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findAll().stream().findFirst().orElseThrow();
         String tag = "Edit" + System.nanoTime();
         user = userRepository.save(User.builder()

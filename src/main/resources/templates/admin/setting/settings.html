@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Settings</title>
+    <title th:text="#{nav.admin.settings}">Settings</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Settings</strong>
+    <span class="dim" th:text="#{nav.admin.dashboard}">Dashboard</span><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.settings}">Settings</strong>
 </div>
 
 <!--
@@ -17,8 +17,8 @@
 -->
 <div layout:fragment="content" th:with="canEdit=${perms.contains('settings:edit')}">
     <form id="settings-form" method="post" th:action="@{/admin/settings}" style="max-width:760px" novalidate>
-        <h1 style="font-size:34px">Settings</h1>
-        <p class="dim" style="margin:6px 0 28px">Site-wide configuration for kienhee.com</p>
+        <h1 style="font-size:34px" th:text="#{nav.admin.settings}">Settings</h1>
+        <p class="dim" style="margin:6px 0 28px" th:text="#{admin.setting.intro(${siteDomain})}">Site-wide configuration</p>
 
         <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
             <span th:text="${successMessage}">Success message</span>
@@ -28,34 +28,53 @@
         </div>
 
         <div style="display:flex;flex-direction:column;gap:22px">
-            <label class="field"><span>Site title<span class="req"> *</span></span>
+            <label class="field"><span><span th:text="#{admin.setting.site_title}">Site title</span><span class="req"> *</span></span>
                 <input class="input" name="settings[site.title]" th:value="${settings['site.title']}" th:readonly="${!canEdit}"
-                       data-rule-required="true" data-msg-required="✕ Site title is required." maxlength="120"></label>
-            <label class="field"><span>Domain<span class="req"> *</span></span>
+                       data-rule-required="true" th:data-msg-required="#{admin.setting.site_title_required}" maxlength="120"></label>
+            <label class="field"><span><span th:text="#{admin.setting.domain}">Domain</span><span class="req"> *</span></span>
                 <input class="input" name="settings[site.domain]" th:value="${settings['site.domain']}" th:readonly="${!canEdit}"
-                       data-rule-required="true" data-msg-required="✕ Domain is required." maxlength="255"></label>
-            <label class="field"><span>Meta description</span>
+                       data-rule-required="true" th:data-msg-required="#{admin.setting.domain_required}" maxlength="255"></label>
+            <!-- Per-language overrides of the two texts the public site shows. Empty = use the
+                 plain key above (PublicSiteAdvice.perLanguage); no migration needed, the settings
+                 store takes any key. -->
+            <div class="cmt-fields">
+                <label class="field"><span th:text="#{admin.setting.title_vi}">Site title (vi)</span>
+                    <input class="input" name="settings[site.title.vi]" th:value="${settings['site.title.vi']}" th:readonly="${!canEdit}"
+                           th:placeholder="#{admin.setting.per_language_hint}" maxlength="120"></label>
+                <label class="field"><span th:text="#{admin.setting.title_en}">Site title (en)</span>
+                    <input class="input" name="settings[site.title.en]" th:value="${settings['site.title.en']}" th:readonly="${!canEdit}"
+                           th:placeholder="#{admin.setting.per_language_hint}" maxlength="120"></label>
+            </div>
+            <label class="field"><span th:text="#{admin.setting.meta_description}">Meta description</span>
                 <textarea class="textarea" name="settings[site.meta_description]" th:text="${settings['site.meta_description']}" th:readonly="${!canEdit}" maxlength="500"></textarea></label>
-            <label class="field" style="max-width:220px"><span>Posts per page</span>
+            <div class="cmt-fields">
+                <label class="field"><span th:text="#{admin.setting.meta_vi}">Meta description (vi)</span>
+                    <textarea class="textarea" name="settings[site.meta_description.vi]" th:text="${settings['site.meta_description.vi']}" th:readonly="${!canEdit}"
+                              th:placeholder="#{admin.setting.per_language_hint}" maxlength="500"></textarea></label>
+                <label class="field"><span th:text="#{admin.setting.meta_en}">Meta description (en)</span>
+                    <textarea class="textarea" name="settings[site.meta_description.en]" th:text="${settings['site.meta_description.en']}" th:readonly="${!canEdit}"
+                              th:placeholder="#{admin.setting.per_language_hint}" maxlength="500"></textarea></label>
+            </div>
+            <label class="field" style="max-width:220px"><span th:text="#{admin.setting.posts_per_page}">Posts per page</span>
                 <input class="input" type="number" min="1" max="100" name="settings[blog.posts_per_page]" th:value="${settings['blog.posts_per_page']}" th:readonly="${!canEdit}"
-                       data-rule-digits="true" data-rule-min="1" data-rule-max="100" data-msg="✕ Enter a whole number from 1 to 100."></label>
-            <label class="field"><span>X / Twitter link</span>
+                       data-rule-digits="true" data-rule-min="1" data-rule-max="100" th:data-msg="#{admin.setting.posts_per_page_msg}"></label>
+            <label class="field"><span th:text="#{admin.setting.x_link}">X / Twitter link</span>
                 <input class="input" type="url" name="settings[social.x]" th:value="${settings['social.x']}" th:readonly="${!canEdit}"
-                       maxlength="255" placeholder="https://x.com/yourname" data-rule-url="true" data-msg-url="✕ Enter a full link starting with https://"></label>
-            <label class="field"><span>YouTube link</span>
+                       maxlength="255" placeholder="https://x.com/yourname" data-rule-url="true" th:data-msg-url="#{admin.setting.url_msg}"></label>
+            <label class="field"><span th:text="#{admin.setting.youtube_link}">YouTube link</span>
                 <input class="input" type="url" name="settings[social.youtube]" th:value="${settings['social.youtube']}" th:readonly="${!canEdit}"
-                       maxlength="255" placeholder="https://youtube.com/@yourchannel" data-rule-url="true" data-msg-url="✕ Enter a full link starting with https://"></label>
+                       maxlength="255" placeholder="https://youtube.com/@yourchannel" data-rule-url="true" th:data-msg-url="#{admin.setting.url_msg}"></label>
             <!-- Checkbox pattern: the hidden "false" is posted first, the checked box's "true" wins (last value). -->
             <div class="field">
-                <span>Comments</span>
+                <span th:text="#{nav.admin.comments}">Comments</span>
                 <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
                     <input type="hidden" name="settings[comments.moderation]" value="false">
                     <input class="checkbox" type="checkbox" name="settings[comments.moderation]" value="true"
                            th:checked="${settings['comments.moderation'] != 'false'}" th:disabled="${!canEdit}">
-                    <span class="dim">Hold guest comments for approval before they appear</span>
+                    <span class="dim" th:text="#{admin.setting.moderation_label}">Hold guest comments for approval before they appear</span>
                 </label>
             </div>
-            <button th:if="${canEdit}" type="submit" class="btn" style="align-self:flex-start">Save settings</button>
+            <button th:if="${canEdit}" type="submit" class="btn" style="align-self:flex-start" th:text="#{admin.setting.save}">Save settings</button>
         </div>
     </form>
 </div>

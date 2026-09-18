@@ -10,17 +10,17 @@
             <span class="dim" style="font-size:13px;margin-top:12px">© <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> <span th:text="${site != null and site['site.domain'] != null} ? ${site['site.domain']} : 'kienhee.com'">kienhee.com</span></span>
         </div>
         <div class="col">
-            <span class="kicker">Site</span>
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/news}">News</a>
-            <a th:href="@{/categories}">Categories</a>
+            <span class="kicker" th:text="#{footer.site}">Site</span>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a th:href="@{/news}" th:text="#{nav.news}">News</a>
+            <a th:href="@{/categories}" th:text="#{nav.categories}">Categories</a>
         </div>
         <div class="col">
-            <span class="kicker">More</span>
-            <a th:href="@{/author}">Author</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/subscribe}">Subscribe</a>
-            <a th:href="@{/rss.xml}">RSS</a>
+            <span class="kicker" th:text="#{footer.more}">More</span>
+            <a th:href="@{/author}" th:text="#{nav.author}">Author</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/subscribe}" th:text="#{nav.subscribe}">Subscribe</a>
+            <a th:href="@{/rss.xml}" th:text="#{nav.rss}">RSS</a>
         </div>
         <th:block th:with="xUrl=${site != null ? site['social.x'] : null},
                       ytUrl=${site != null ? site['social.youtube'] : null},
@@ -28,7 +28,7 @@
                       ytOk=${ytUrl != null and (#strings.startsWith(ytUrl, 'https://') or #strings.startsWith(ytUrl, 'http://'))}">
         <!-- Links come from Settings (social.x, social.youtube); only http(s) URLs are rendered. -->
         <div class="col" th:if="${xOk or ytOk}">
-            <span class="kicker">Elsewhere</span>
+            <span class="kicker" th:text="#{footer.elsewhere}">Elsewhere</span>
             <a th:if="${xOk}" th:href="${xUrl}" target="_blank" rel="me noopener noreferrer">X / Twitter</a>
             <a th:if="${ytOk}" th:href="${ytUrl}" target="_blank" rel="me noopener noreferrer">YouTube</a>
         </div>

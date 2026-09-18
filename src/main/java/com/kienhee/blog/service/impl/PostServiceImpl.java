@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.PostCreateRequest;
 import com.kienhee.blog.dto.PostUpdateRequest;
 import com.kienhee.blog.entity.Category;
@@ -48,20 +49,20 @@ public class PostServiceImpl implements PostService {
     public Post createPost(PostCreateRequest request, String authorEmail) {
         String slug = request.getSlug().trim().toLowerCase();
         if (postRepository.existsBySlug(slug)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.post.slug_taken", slug);
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found."));
+                .orElseThrow(() -> new BusinessException("error.post.category_not_found"));
 
         User author = userRepository.findByEmail(authorEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Author not found."));
+                .orElseThrow(() -> new BusinessException("error.post.author_not_found"));
 
         Set<Hashtag> hashtags = resolveHashtags(request.getHashtagIds());
 
         boolean scheduled = request.getStatus() == PostStatus.SCHEDULED;
         if (scheduled && request.getScheduledAt() == null) {
-            throw new IllegalArgumentException("Choose when the post should go live.");
+            throw new BusinessException("error.post.schedule_required");
         }
 
         Post post = Post.builder()
@@ -87,21 +88,21 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Post updatePost(Long id, PostUpdateRequest request) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.post.not_found", id));
 
         String slug = request.getSlug().trim().toLowerCase();
         if (postRepository.existsBySlugAndIdNot(slug, id)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.post.slug_taken", slug);
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found."));
+                .orElseThrow(() -> new BusinessException("error.post.category_not_found"));
 
         Set<Hashtag> hashtags = resolveHashtags(request.getHashtagIds());
 
         boolean scheduled = request.getStatus() == PostStatus.SCHEDULED;
         if (scheduled && request.getScheduledAt() == null) {
-            throw new IllegalArgumentException("Choose when the post should go live.");
+            throw new BusinessException("error.post.schedule_required");
         }
         boolean becomingPublished = request.getStatus() == PostStatus.PUBLISHED && post.getPublishedAt() == null;
 
@@ -134,7 +135,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void deletePost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.post.not_found", id));
         // To the Trash (restore or purge there). Comments stay attached and come back with the post.
         postRepository.moveToTrash(post.getId(), LocalDateTime.now());
     }
@@ -159,7 +160,7 @@ public class PostServiceImpl implements PostService {
         }
         List<Hashtag> found = hashtagRepository.findAllById(hashtagIds);
         if (found.size() != hashtagIds.size()) {
-            throw new IllegalArgumentException("One or more selected hashtags were not found.");
+            throw new BusinessException("error.post.hashtag_missing");
         }
         return new LinkedHashSet<>(found);
     }

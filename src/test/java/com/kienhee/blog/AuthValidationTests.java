@@ -11,6 +11,7 @@ import com.kienhee.blog.service.MailService;
 import com.kienhee.blog.service.RegistrationPolicy;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -66,9 +67,14 @@ public class AuthValidationTests {
 
     @BeforeEach
     void setUp() {
+        // Constraint messages are message codes now, interpolated for the current locale. A test
+        // that calls the Validator directly has no request, so pin the language instead of
+        // inheriting the machine's default.
+        org.springframework.context.i18n.LocaleContextHolder.setLocale(java.util.Locale.ENGLISH);
         org.mockito.Mockito.when(registrationPolicy.isFirstAccount()).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault())
                 .build();
 
         userRepository.findByEmail("test-owner@kienhee.test").ifPresentOrElse(
@@ -234,7 +240,8 @@ public class AuthValidationTests {
                             .with(csrf())
                             .param("fullName", "")
                             .param("email", "")
-                            .param("password", ""))
+                            .param("password", "")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Full name is required")))
                     .andExpect(content().string(containsString("Email is required")))
@@ -248,7 +255,8 @@ public class AuthValidationTests {
                             .with(csrf())
                             .param("fullName", "X")
                             .param("email", "bad-email")
-                            .param("password", "12"))
+                            .param("password", "12")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Full name must have at least 2 characters")))
                     .andExpect(content().string(containsString("Invalid email format")))
@@ -289,7 +297,8 @@ public class AuthValidationTests {
         void testForgotBlankEmail() throws Exception {
             mockMvc.perform(post("/auth/forgot")
                             .with(csrf())
-                            .param("email", ""))
+                            .param("email", "")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Email is required")));
         }
@@ -299,7 +308,8 @@ public class AuthValidationTests {
         void testForgotInvalidEmailFormat() throws Exception {
             mockMvc.perform(post("/auth/forgot")
                             .with(csrf())
-                            .param("email", "invalid-domain"))
+                            .param("email", "invalid-domain")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(content().string(containsString("Invalid email format")));
         }
@@ -556,7 +566,8 @@ public class AuthValidationTests {
             mockMvc.perform(post("/admin/profile")
                             .with(owner())
                             .with(csrf())
-                            .param("fullName", ""))
+                            .param("fullName", "")
+                            .with(TestLocale.en()))
                     .andExpect(status().isOk())
                     .andExpect(view().name("admin/user/profile"))
                     .andExpect(model().hasErrors())

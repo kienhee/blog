@@ -1,5 +1,8 @@
 package com.kienhee.blog.service.impl;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.config.AppMailProperties;
 import com.kienhee.blog.entity.PasswordResetToken;
 import com.kienhee.blog.entity.User;
@@ -86,7 +89,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                mailService.send(to, "Reset your " + mailProperties.getFromName() + " password", "password-reset", variables);
+                // Captured here, on the request thread: MailService.send is @Async.
+                mailService.send(to, LocaleContextHolder.getLocale(), "password-reset",
+                        "mail.reset.subject", variables, mailProperties.getFromName());
             }
         });
     }
@@ -101,9 +106,9 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = usableToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("This reset link is invalid or has expired. Request a new one."));
+                .orElseThrow(() -> new BusinessException("validation.reset.token"));
         User user = userRepository.findById(resetToken.getUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("This reset link is invalid or has expired. Request a new one."));
+                .orElseThrow(() -> new BusinessException("validation.reset.token"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         // Uses up this link and every other open link of the user.

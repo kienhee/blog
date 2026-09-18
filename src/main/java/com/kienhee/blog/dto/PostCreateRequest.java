@@ -19,29 +19,29 @@ import java.util.Set;
 @Builder
 public class PostCreateRequest {
 
-    @NotBlank(message = "Title is required.")
-    @Size(min = 3, max = 200, message = "Title must have at least 3 characters.")
+    @NotBlank(message = "{validation.title.required}")
+    @Size(min = 3, max = 200, message = "{validation.title.min}")
     private String title;
 
-    @NotBlank(message = "Slug is required.")
-    @Size(min = 3, max = 220, message = "Slug must have at least 3 characters.")
-    @Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "Slug may only contain lowercase letters, numbers and hyphens.")
+    @NotBlank(message = "{validation.slug.required}")
+    @Size(min = 3, max = 220, message = "{validation.slug.min3}")
+    @Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "{validation.slug.pattern}")
     private String slug;
 
-    @Size(max = 500, message = "Excerpt must not exceed 500 characters.")
+    @Size(max = 500, message = "{validation.excerpt.max}")
     private String excerpt;
 
-    @NotBlank(message = "Content is required.")
+    @NotBlank(message = "{validation.content.required}")
     private String content;
 
-    @Size(max = 500, message = "Cover image URL must not exceed 500 characters.")
+    @Size(max = 500, message = "{validation.cover.max}")
     private String coverImage;
 
-    @NotNull(message = "Status is required.")
+    @NotNull(message = "{validation.status.required}")
     @Builder.Default
     private PostStatus status = PostStatus.DRAFT;
 
-    @NotNull(message = "Category is required.")
+    @NotNull(message = "{validation.category.required}")
     private Long categoryId;
 
     @Builder.Default
@@ -51,9 +51,9 @@ public class PostCreateRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", fallbackPatterns = {"yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd'T'HH:mm:ss"})
     private LocalDateTime scheduledAt;
 
-    @Size(max = 60, message = "SEO title must not exceed 60 characters.")
+    @Size(max = 60, message = "{validation.seo_title.max}")
     private String seoTitle;
 
-    @Size(max = 160, message = "SEO description must not exceed 160 characters.")
+    @Size(max = 160, message = "{validation.seo_description.max}")
     private String seoDescription;
 }

@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.RoleCreateRequest;
 import com.kienhee.blog.entity.Permission;
 import com.kienhee.blog.entity.Role;
@@ -35,7 +36,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public Role getRoleWithPermissions(Long id) {
         return roleRepository.findWithPermissionsById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.role.not_found", id));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
     public Role createRole(RoleCreateRequest request) {
         String name = request.getName().trim();
         if (roleRepository.existsByNameIgnoreCase(name)) {
-            throw new IllegalArgumentException("A role with this name already exists.");
+            throw new BusinessException("error.role.name_taken");
         }
 
         Role role = Role.builder()
@@ -77,10 +78,10 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public Role renameRole(Long id, String name, String description) {
         if (name == null || name.trim().length() < 2) {
-            throw new IllegalArgumentException("Role name must have at least 2 characters.");
+            throw new BusinessException("error.role.name_min");
         }
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.role.not_found", id));
 
         role.setName(name.trim());
         role.setDescription(description != null && !description.isBlank() ? description.trim() : null);
@@ -91,10 +92,10 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public Role updatePermissions(Long roleId, List<Long> permissionIds) {
         Role role = roleRepository.findWithPermissionsById(roleId)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + roleId));
+                .orElseThrow(() -> new BusinessException("error.role.not_found", roleId));
 
         if (role.isSystemRole()) {
-            throw new IllegalArgumentException("The " + role.getName() + " role always has full access and cannot be changed.");
+            throw new BusinessException("error.role.system_locked", role.getName());
         }
 
         List<Permission> permissions = (permissionIds == null || permissionIds.isEmpty())
@@ -102,7 +103,7 @@ public class RoleServiceImpl implements RoleService {
                 : permissionRepository.findAllById(permissionIds);
 
         if (permissionIds != null && permissions.size() != permissionIds.size()) {
-            throw new IllegalArgumentException("One or more selected permissions were not found.");
+            throw new BusinessException("error.role.permission_missing");
         }
 
         role.getPermissions().clear();
@@ -114,15 +115,15 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     public void deleteRole(Long id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.role.not_found", id));
 
         if (role.isSystemRole()) {
-            throw new IllegalArgumentException("The " + role.getName() + " role is required and cannot be deleted.");
+            throw new BusinessException("error.role.system_required", role.getName());
         }
 
         long inUse = userRepository.countByRoleId(id);
         if (inUse > 0) {
-            throw new IllegalArgumentException("Cannot delete: " + inUse + " user(s) still have this role. Move them to another role first.");
+            throw new BusinessException("error.role.in_use", inUse);
         }
 
         roleRepository.delete(role);

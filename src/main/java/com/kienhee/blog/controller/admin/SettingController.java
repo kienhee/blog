@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +35,7 @@ public class SettingController {
     private static final Pattern FIELD = Pattern.compile("^settings\\[(.+)]$");
 
     private final SettingService settingService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String settings(Model model) {
@@ -54,9 +56,9 @@ public class SettingController {
 
         try {
             settingService.saveAll(values);
-            redirectAttributes.addFlashAttribute("successMessage", "Settings saved.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.setting.saved"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/settings";
     }

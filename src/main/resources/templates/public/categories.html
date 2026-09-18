@@ -2,17 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/public-master}">
 <head>
-    <title>Categories</title>
+    <title th:text="#{public.categories.title}">Categories</title>
 </head>
 <body>
 <main layout:fragment="content">
   <section class="wrap" style="padding-top:56px">
-    <h1 class="page-title">Categories</h1>
-    <p class="dim" style="margin:16px 0 40px;font-size:17px;max-width:60ch">Start wherever your work is.</p>
-    <div th:if="${categories.isEmpty()}" th:replace="~{fragments/public/pagination :: empty('No categories yet.')}"></div>
+    <h1 class="page-title" th:text="#{public.categories.title}">Categories</h1>
+    <p class="dim" style="margin:16px 0 40px;font-size:17px;max-width:60ch" th:text="#{public.categories.intro}">Start wherever your work is.</p>
+    <div th:if="${categories.isEmpty()}" th:replace="~{fragments/public/pagination :: empty(#{public.categories.empty})}"></div>
     <div class="cell-grid" th:if="${!categories.isEmpty()}">
       <a class="cell" th:each="c : ${categories}" th:href="@{/category/{slug}(slug=${c.category.slug})}">
-        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)" th:text="|${c.postCount} ${c.postCount == 1 ? 'article' : 'articles'}|">3 articles</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)" th:text="${c.postCount == 1} ? #{common.article_count.one(${c.postCount})} : #{common.article_count.other(${c.postCount})}">3 articles</span>
         <span class="n" th:text="${c.category.name}">Category</span>
         <span class="dim" style="font-size:15px;line-height:1.5" th:if="${c.category.description != null}" th:text="${#strings.abbreviate(c.category.description, 120)}">Description</span>
       </a>

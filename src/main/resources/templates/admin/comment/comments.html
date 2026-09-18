@@ -2,20 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Comments</title>
+    <title th:text="#{nav.admin.comments}">Comments</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Comments</strong>
+    <span class="dim" th:text="#{nav.admin.dashboard}">Dashboard</span><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.comments}">Comments</strong>
 </div>
 
 <div layout:fragment="content"
      th:with="canEdit=${perms.contains('comments:edit')}, canDelete=${perms.contains('comments:delete')}">
       <div class="dt-root">
         <div class="page-head">
-          <div><h1>Comments</h1><p class="dim" style="margin-top:6px" th:text="|${pendingCount} awaiting moderation|">0 awaiting moderation</p></div>
-          <a th:if="${perms.contains('settings:view')}" class="btn btn-ghost" th:href="@{/admin/settings}">Moderation settings</a>
+          <div><h1 th:text="#{nav.admin.comments}">Comments</h1><p class="dim" style="margin-top:6px" th:text="#{admin.comment.awaiting(${pendingCount})}">0 awaiting moderation</p></div>
+          <a th:if="${perms.contains('settings:view')}" class="btn btn-ghost" th:href="@{/admin/settings}" th:text="#{admin.comment.moderation_settings}">Moderation settings</a>
         </div>
 
         <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
@@ -26,12 +26,12 @@
         </div>
 
         <div class="bulk">
-          <span class="n">0 selected</span>
-          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="APPROVED">Approve</button>
-          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="PENDING">Unapprove</button>
-          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="SPAM">Spam</button>
-          <button th:if="${canDelete}" class="btn btn-ghost btn-xs btn-danger" data-comment-bulk="delete">Delete</button>
-          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <span class="n" th:text="#{admin.common.selected(0)}">0 selected</span>
+          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="APPROVED" th:text="#{admin.comment.approve}">Approve</button>
+          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="PENDING" th:text="#{admin.comment.unapprove}">Unapprove</button>
+          <button th:if="${canEdit}" class="btn btn-ghost btn-xs" data-comment-bulk="SPAM" th:text="#{admin.comment.spam}">Spam</button>
+          <button th:if="${canDelete}" class="btn btn-ghost btn-xs btn-danger" data-comment-bulk="delete" th:text="#{admin.dialog.delete}">Delete</button>
+          <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" th:text="#{admin.common.clear}">Clear</button>
         </div>
         <div class="table-wrap">
           <!-- Newest first: column 5 is the date (yyyy-MM-dd HH:mm sorts as text). -->
@@ -39,20 +39,20 @@
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
-                <th style="width:170px"><button data-sort="0">Author<span class="ar"></span></button></th>
-                <th style="width:34%"><button data-sort="1">Comment<span class="ar"></span></button></th>
-                <th style="width:20%"><button data-sort="2">On post<span class="ar"></span></button></th>
-                <th style="width:118px"><button data-sort="3">Status<span class="ar"></span></button></th>
-                <th style="width:130px"><button data-sort="4">Date<span class="ar"></span></button></th>
-                <th style="width:170px;text-align:right"><span class="kicker">Actions</span></th>
+                <th style="width:170px"><button data-sort="0"><span th:text="#{admin.post.author}">Author</span><span class="ar"></span></button></th>
+                <th style="width:34%"><button data-sort="1"><span th:text="#{admin.comment.comment}">Comment</span><span class="ar"></span></button></th>
+                <th style="width:20%"><button data-sort="2"><span th:text="#{admin.comment.on_post}">On post</span><span class="ar"></span></button></th>
+                <th style="width:118px"><button data-sort="3"><span th:text="#{admin.common.status}">Status</span><span class="ar"></span></button></th>
+                <th style="width:130px"><button data-sort="4"><span th:text="#{admin.common.date}">Date</span><span class="ar"></span></button></th>
+                <th style="width:170px;text-align:right"><span class="kicker" th:text="#{admin.common.actions}">Actions</span></th>
               </tr>
               <tr class="filters">
                 <th></th>
-                <th><input class="input" data-col="0" placeholder="Filter…"></th>
-                <th><input class="input" data-col="1" placeholder="Filter…"></th>
-                <th><input class="input" data-col="2" placeholder="Filter…"></th>
-                <th><select class="select" data-col="3"><option>All</option><option>Approved</option><option>Pending</option><option>Spam</option></select></th>
-                <th><input class="input" data-col="4" placeholder="Filter…"></th>
+                <th><input class="input" data-col="0" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="1" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="2" th:placeholder="#{admin.common.filter}"></th>
+                <th><select class="select" data-col="3"><option th:text="#{common.all}">All</option><option th:text="#{enum.comment.status.APPROVED}">Approved</option><option th:text="#{enum.comment.status.PENDING}">Pending</option><option th:text="#{enum.comment.status.SPAM}">Spam</option></select></th>
+                <th><input class="input" data-col="4" th:placeholder="#{admin.common.filter}"></th>
                 <th></th>
               </tr>
             </thead>
@@ -62,10 +62,10 @@
                 <td>
                   <span class="strong" style="display:block" th:text="${c.authorName}">Name</span>
                   <span class="dim" style="font-size:12px;display:block;overflow-wrap:anywhere" th:text="${c.authorEmail}">email</span>
-                  <span th:if="${c.user != null}" class="badge" style="margin-top:4px">Staff</span>
+                  <span th:if="${c.user != null}" class="badge" style="margin-top:4px" th:text="#{admin.comment.staff}">Staff</span>
                 </td>
                 <td class="dim" th:title="${c.content}">
-                  <span th:if="${c.parentId != null}" class="kicker" style="display:block;margin-bottom:4px">Reply</span>
+                  <span th:if="${c.parentId != null}" class="kicker" style="display:block;margin-bottom:4px" th:text="#{public.comments.reply}">Reply</span>
                   <span th:text="${#strings.abbreviate(c.content, 140)}">Comment</span>
                 </td>
                 <td>
@@ -73,15 +73,15 @@
                 </td>
                 <td><span class="badge"
                           th:style="${c.status.name() == 'APPROVED'} ? 'color:#5ee38a' : (${c.status.name() == 'PENDING'} ? 'color:#ffc94d' : 'color:#ff4d4d')"
-                          th:text="${#strings.capitalize(#strings.toLowerCase(c.status.name()))}">Pending</span></td>
+                          th:text="#{'enum.comment.status.' + ${c.status.name()}}">Pending</span></td>
                 <td class="dim" th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}">2026-09-11 10:00</td>
                 <td class="right">
                   <span style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-                    <button th:if="${canEdit and c.status.name() != 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="APPROVED">Approve</button>
-                    <button th:if="${canEdit and c.status.name() == 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="PENDING">Unapprove</button>
-                    <button th:if="${canEdit and c.status.name() != 'SPAM'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="SPAM">Spam</button>
-                    <button th:if="${canEdit}" type="button" class="btn btn-ghost btn-xs btn-reply-comment" th:data-id="${c.id}" th:data-name="${c.authorName}" th:data-post="${c.post.title}">Reply</button>
-                    <button th:if="${canDelete}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-comment" th:data-id="${c.id}" th:data-name="${c.authorName}">Del</button>
+                    <button th:if="${canEdit and c.status.name() != 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="APPROVED" th:text="#{admin.comment.approve}">Approve</button>
+                    <button th:if="${canEdit and c.status.name() == 'APPROVED'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="PENDING" th:text="#{admin.comment.unapprove}">Unapprove</button>
+                    <button th:if="${canEdit and c.status.name() != 'SPAM'}" type="button" class="btn btn-ghost btn-xs btn-comment-status" th:data-id="${c.id}" data-status="SPAM" th:text="#{admin.comment.spam}">Spam</button>
+                    <button th:if="${canEdit}" type="button" class="btn btn-ghost btn-xs btn-reply-comment" th:data-id="${c.id}" th:data-name="${c.authorName}" th:data-post="${c.post.title}" th:text="#{public.comments.reply}">Reply</button>
+                    <button th:if="${canDelete}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-comment" th:data-id="${c.id}" th:data-name="${c.authorName}" th:text="#{admin.common.del}">Del</button>
                   </span>
                 </td>
               </tr>
@@ -94,18 +94,18 @@
       <div class="folder-modal" id="comment-reply-modal" role="dialog" aria-modal="true" aria-labelledby="reply-title">
         <form class="box" id="comment-reply-form" method="post" th:action="@{/admin/comments/0/reply}" style="width:min(560px,100%)">
           <div class="h">
-            <div class="t" id="reply-title">Reply</div>
+            <div class="t" id="reply-title" th:text="#{public.comments.reply}">Reply</div>
             <p class="dim" id="reply-context" style="font-size:13px;line-height:1.4"></p>
           </div>
           <div style="padding:20px 24px">
-            <label class="kicker" for="reply-content">Your reply</label>
+            <label class="kicker" for="reply-content" th:text="#{admin.comment.your_reply}">Your reply</label>
             <textarea class="textarea" id="reply-content" name="content" maxlength="2000" rows="5" style="width:100%;margin-top:8px"
-                      placeholder="Write your reply"></textarea>
-            <p class="dim" style="font-size:12px;margin-top:8px">Posted under your name and shown right away. A pending comment is approved when you reply.</p>
+                      th:placeholder="#{admin.comment.reply_placeholder}"></textarea>
+            <p class="dim" style="font-size:12px;margin-top:8px" th:text="#{admin.comment.reply_hint}">Posted under your name and shown right away.</p>
           </div>
           <div class="a">
-            <button class="btn" type="submit">Post reply</button>
-            <button class="btn btn-ghost" type="button" id="reply-cancel">Cancel</button>
+            <button class="btn" type="submit" th:text="#{admin.comment.post_reply}">Post reply</button>
+            <button class="btn btn-ghost" type="button" id="reply-cancel" th:text="#{admin.common.cancel}">Cancel</button>
           </div>
         </form>
       </div>

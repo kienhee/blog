@@ -4,6 +4,7 @@ import com.kienhee.blog.dto.RegisterRequest;
 import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.AuthService;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ class BlogApplicationTests {
 		org.mockito.Mockito.when(registrationPolicy.isFirstAccount()).thenReturn(true);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
 				.apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault())
 				.build();
 	}
 
@@ -57,7 +59,7 @@ class BlogApplicationTests {
 
 	@Test
 	void testPublicNewsActive() throws Exception {
-		mockMvc.perform(get("/news"))
+		mockMvc.perform(get("/news").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("aria-current=\"page\" class=\"active\">News</a>")))
 				.andExpect(content().string(not(containsString("aria-current=\"page\" class=\"active\">Home</a>"))));
@@ -65,7 +67,7 @@ class BlogApplicationTests {
 
 	@Test
 	void testPublicHomeActive() throws Exception {
-		mockMvc.perform(get("/"))
+		mockMvc.perform(get("/").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("aria-current=\"page\" class=\"active\">Home</a>")))
 				.andExpect(content().string(not(containsString("aria-current=\"page\" class=\"active\">News</a>"))));
@@ -73,7 +75,7 @@ class BlogApplicationTests {
 
 	@Test
 	void testAdminRequiresAuthentication() throws Exception {
-		mockMvc.perform(get("/admin/dashboard"))
+		mockMvc.perform(get("/admin/dashboard").with(TestLocale.en()))
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/auth/login"));
 	}
@@ -81,7 +83,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminDashboardAuthenticated() throws Exception {
-		mockMvc.perform(get("/admin/dashboard"))
+		mockMvc.perform(get("/admin/dashboard").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Dashboard")))
 				.andExpect(content().string(containsString("href=\"/admin/dashboard\" aria-current=\"page\"")));
@@ -90,7 +92,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminPosts() throws Exception {
-		mockMvc.perform(get("/admin/posts"))
+		mockMvc.perform(get("/admin/posts").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Posts")))
 				.andExpect(content().string(containsString("href=\"/admin/posts\" aria-current=\"page\"")));
@@ -99,7 +101,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminCategories() throws Exception {
-		mockMvc.perform(get("/admin/categories"))
+		mockMvc.perform(get("/admin/categories").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Categories")))
 				.andExpect(content().string(containsString("href=\"/admin/categories\" aria-current=\"page\"")));
@@ -108,7 +110,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminHashtags() throws Exception {
-		mockMvc.perform(get("/admin/hashtags"))
+		mockMvc.perform(get("/admin/hashtags").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Hashtags")))
 				.andExpect(content().string(containsString("href=\"/admin/hashtags\" aria-current=\"page\"")));
@@ -117,7 +119,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminMedia() throws Exception {
-		mockMvc.perform(get("/admin/media"))
+		mockMvc.perform(get("/admin/media").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Media library")))
 				.andExpect(content().string(containsString("href=\"/admin/media\" aria-current=\"page\"")));
@@ -126,7 +128,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminComments() throws Exception {
-		mockMvc.perform(get("/admin/comments"))
+		mockMvc.perform(get("/admin/comments").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Comments")))
 				.andExpect(content().string(containsString("href=\"/admin/comments\" aria-current=\"page\"")));
@@ -135,7 +137,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminUsers() throws Exception {
-		mockMvc.perform(get("/admin/users"))
+		mockMvc.perform(get("/admin/users").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Users")))
 				.andExpect(content().string(containsString("href=\"/admin/users\" aria-current=\"page\"")));
@@ -144,7 +146,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminRoles() throws Exception {
-		mockMvc.perform(get("/admin/roles"))
+		mockMvc.perform(get("/admin/roles").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Roles")))
 				.andExpect(content().string(containsString("href=\"/admin/roles\" aria-current=\"page\"")));
@@ -153,7 +155,7 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminSettings() throws Exception {
-		mockMvc.perform(get("/admin/settings"))
+		mockMvc.perform(get("/admin/settings").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Settings")))
 				.andExpect(content().string(containsString("href=\"/admin/settings\" aria-current=\"page\"")));
@@ -162,24 +164,24 @@ class BlogApplicationTests {
 	@Test
 	@WithOwner
 	void testAdminProfile() throws Exception {
-		mockMvc.perform(get("/admin/profile"))
+		mockMvc.perform(get("/admin/profile").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("My profile")));
 	}
 
 	@Test
 	void testAuthPages() throws Exception {
-		mockMvc.perform(get("/auth/login"))
+		mockMvc.perform(get("/auth/login").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Sign in")))
 				.andExpect(content().string(containsString("href=\"/auth/register\"")));
 
-		mockMvc.perform(get("/auth/register"))
+		mockMvc.perform(get("/auth/register").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Create account")))
 				.andExpect(content().string(containsString("href=\"/auth/login\"")));
 
-		mockMvc.perform(get("/auth/forgot"))
+		mockMvc.perform(get("/auth/forgot").with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Reset password")))
 				.andExpect(content().string(containsString("href=\"/auth/login\"")));
@@ -213,7 +215,8 @@ class BlogApplicationTests {
 						.with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf())
 						.param("fullName", "")
 						.param("email", "invalid-email")
-						.param("password", "123"))
+						.param("password", "123")
+				        .with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Full name is required")))
 				.andExpect(content().string(containsString("Invalid email format")))
@@ -224,7 +227,8 @@ class BlogApplicationTests {
 	void testForgotValidationFailure() throws Exception {
 		mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/auth/forgot")
 						.with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf())
-						.param("email", ""))
+						.param("email", "")
+				        .with(TestLocale.en()))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Email is required")));
 	}

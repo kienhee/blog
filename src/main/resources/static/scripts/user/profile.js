@@ -37,8 +37,8 @@ $(function () {
       },
       messages: {
         fullName: {
-          required: 'Display name is required.',
-          minlength: 'Display name must have at least 2 characters.'
+          required: khT('validation.display_name.required'),
+          minlength: khT('validation.display_name.min')
         }
       },
       errorElement: 'span',
@@ -79,15 +79,15 @@ $(function () {
       },
       messages: {
         currentPassword: {
-          required: 'Current password is required.'
+          required: khT('validation.password.current_required')
         },
         newPassword: {
-          required: 'New password is required.',
-          minlength: 'Use at least 6 characters.'
+          required: khT('validation.password.new_required'),
+          minlength: khT('js.profile.password_min')
         },
         confirmPassword: {
-          required: 'Confirm password is required.',
-          equalTo: 'Passwords do not match.'
+          required: khT('validation.password.confirm_required'),
+          equalTo: khT('js.form.passwords_differ')
         }
       },
       errorElement: 'span',

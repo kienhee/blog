@@ -10,7 +10,7 @@ $(function () {
     var subject = $.trim($('#newsletter-subject').val());
     var body = $.trim($('#newsletter-body').val());
     if (subject.length < 3 || body.length < 10) {
-      if (window.khToast) window.khToast('Add a subject and a few words first');
+      if (window.khToast) window.khToast(khT('js.newsletter.needs_content'));
       return;
     }
     if (!window.khDialog) {
@@ -20,9 +20,9 @@ $(function () {
     }
     window.khDialog('"' + subject + '" to every confirmed subscriber', function () {
       confirmed = true;
-      $('#btn-send-newsletter').prop('disabled', true).text('Sending…');
+      $('#btn-send-newsletter').prop('disabled', true).text(khT('js.newsletter.sending'));
       $send[0].submit();
-    }, 'Emails go out right away and cannot be recalled.');
+    }, khT('js.newsletter.send_note'));
   });
 
   $(document).on('click', '.btn-del-subscriber', function () {
@@ -30,7 +30,7 @@ $(function () {
     $('#delete-subscriber-form').attr('action', '/admin/subscribers/' + $btn.attr('data-id') + '/delete');
     if (window.khDialog) {
       window.khDialog($btn.attr('data-name'), '#delete-subscriber-form',
-        'They are removed from the list completely. To get issues again they must sign up and confirm.');
+        khT('js.newsletter.remove_note'));
     }
   });
 });

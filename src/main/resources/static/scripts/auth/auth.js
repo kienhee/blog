@@ -20,21 +20,21 @@ $(function () {
 
   var validationMessages = {
     email: {
-      required: 'Email is required.',
-      email: 'Invalid email format.'
+      required: khT('validation.email.required'),
+      email: khT('validation.email.invalid')
     }
   };
 
   if (isReset) {
     validationRules.password = { required: true, minlength: 8, maxlength: 72 };
     validationMessages.password = {
-      required: 'Password is required.',
-      minlength: 'Password must be at least 8 characters.',
-      maxlength: 'Password must be at most 72 characters.'
+      required: khT('validation.password.required'),
+      minlength: khT('js.auth.password_min8'),
+      maxlength: khT('js.auth.password_max72')
     };
     validationRules.confirmPassword = { required: true, equalTo: '#password' };
     validationMessages.confirmPassword = {
-      required: 'Please confirm the new password.',
+      required: khT('validation.password.confirm_new'),
       equalTo: "The two passwords don't match."
     };
   } else if (isRegister) {
@@ -43,16 +43,16 @@ $(function () {
       minlength: 2
     };
     validationMessages.fullName = {
-      required: 'Full name is required.',
-      minlength: 'Full name must have at least 2 characters.'
+      required: khT('validation.full_name.required'),
+      minlength: khT('validation.full_name.min')
     };
     validationRules.password = {
       required: true,
       minlength: 6
     };
     validationMessages.password = {
-      required: 'Password is required.',
-      minlength: 'Password must have at least 6 characters.'
+      required: khT('validation.password.required'),
+      minlength: khT('validation.password.min6')
     };
   } else if (!isForgot) {
     // Login form
@@ -60,7 +60,7 @@ $(function () {
       required: true
     };
     validationMessages.password = {
-      required: 'Password is required.'
+      required: khT('validation.password.required')
     };
   }
 

@@ -7,7 +7,7 @@ $(function () {
       if (this.optional(element)) return true;
       if (typeof param === 'string') param = new RegExp('^(?:' + param + ')$');
       return param.test(value);
-    }, 'Invalid format.');
+    }, khT('js.form.invalid_format'));
   }
 
   /* ---- Create Hashtag button ---- */
@@ -20,8 +20,8 @@ $(function () {
     $('#hashtag-active').prop('checked', true);
     $('#hashtag-form').attr('action', '/admin/hashtags');
     $('#oc-kicker').text('Create');
-    $('#oc-title').text('New Hashtag');
-    $('#hashtag-submit-btn').text('Create hashtag');
+    $('#oc-title').text(khT('js.hashtag.new'));
+    $('#hashtag-submit-btn').text(khT('js.hashtag.submit_create'));
 
     if ($.fn.validate) {
       var validator = $('#hashtag-form').validate();
@@ -49,8 +49,8 @@ $(function () {
     $('#hashtag-active').prop('checked', active);
     $('#hashtag-form').attr('action', '/admin/hashtags/' + id + '/edit');
     $('#oc-kicker').text('Update');
-    $('#oc-title').text('Edit Hashtag');
-    $('#hashtag-submit-btn').text('Save changes');
+    $('#oc-title').text(khT('js.hashtag.edit'));
+    $('#hashtag-submit-btn').text(khT('js.form.save_changes'));
 
     if ($.fn.validate) {
       var validator = $('#hashtag-form').validate();
@@ -70,7 +70,7 @@ $(function () {
     $('#delete-hashtag-form').attr('action', '/admin/hashtags/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'hashtag "' + name + '"' : 'this hashtag', '#delete-hashtag-form',
-        'It moves to the trash, where you can restore it.');
+        khT('js.trash.restorable_note'));
     }
   });
 
@@ -90,13 +90,13 @@ $(function () {
       },
       messages: {
         name: {
-          required: 'Name is required.',
-          minlength: 'Name must have at least 2 characters.'
+          required: khT('validation.name.required'),
+          minlength: khT('validation.name.min')
         },
         slug: {
-          required: 'Slug is required.',
-          minlength: 'Slug must have at least 2 characters.',
-          pattern: 'Slug may only contain lowercase letters, numbers and hyphens.'
+          required: khT('validation.slug.required'),
+          minlength: khT('validation.slug.min2'),
+          pattern: khT('validation.slug.pattern')
         }
       },
       errorElement: 'span',

@@ -24,12 +24,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class AuthController {
 
-    /** Shown for every forgot-password request, so the page never reveals which emails have accounts. */
-    static final String RESET_REQUESTED_MESSAGE =
-            "If an account exists for that email, we've sent a link to reset the password. The link expires in 30 minutes.";
+    /**
+     * Shown for every forgot-password request, so the page never reveals which emails have accounts.
+     * A message code: the words come from the catalogue for the visitor's language.
+     */
+    static final String RESET_REQUESTED_MESSAGE = "msg.auth.reset_sent";
 
     private final AuthService authService;
     private final PasswordResetService passwordResetService;
+    private final BusinessMessages messages;
 
     @GetMapping("/login")
     public String login(
@@ -43,27 +46,27 @@ public class AuthController {
             Model model
     ) {
         if (error != null) {
-            model.addAttribute("errorMessage", "Invalid email or password.");
+            model.addAttribute("errorMessage", messages.get("error.auth.bad_credentials"));
         }
         if (logout != null) {
-            model.addAttribute("successMessage", "You have been signed out successfully.");
+            model.addAttribute("successMessage", messages.get("msg.auth.signed_out"));
         }
         if (registered != null) {
             model.addAttribute("successMessage", "pending".equals(registered)
-                    ? "Account created. An administrator needs to approve it before you can sign in."
-                    : "Account created successfully! Please sign in.");
+                    ? messages.get("msg.auth.registered_pending")
+                    : messages.get("msg.auth.registered"));
         }
         if (pending != null) {
-            model.addAttribute("errorMessage", "Your account is waiting for an administrator to approve it.");
+            model.addAttribute("errorMessage", messages.get("error.auth.pending"));
         }
         if (disabled != null) {
-            model.addAttribute("errorMessage", "This account has been disabled. Contact an administrator.");
+            model.addAttribute("errorMessage", messages.get("error.auth.disabled"));
         }
         if (locked != null) {
-            model.addAttribute("errorMessage", "Too many failed sign-in attempts. Wait 10 minutes, or reset your password.");
+            model.addAttribute("errorMessage", messages.get("error.auth.locked"));
         }
         if (reset != null) {
-            model.addAttribute("successMessage", "Your password has been changed. Sign in with the new password.");
+            model.addAttribute("successMessage", messages.get("msg.auth.password_changed"));
         }
         return "admin/authentication/login";
     }
@@ -95,7 +98,7 @@ public class AuthController {
             redirectAttributes.addAttribute("registered", created.getStatus() == UserStatus.ACTIVE ? "true" : "pending");
             return "redirect:/auth/login";
         } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("errorMessage", messages.text(ex));
             model.addAttribute("firstAccount", authService.isFirstAccount());
             return "admin/authentication/register";
         }
@@ -123,7 +126,7 @@ public class AuthController {
             return "admin/authentication/forgot";
         }
         passwordResetService.requestReset(request.getEmail(), httpRequest.getRemoteAddr());
-        redirectAttributes.addFlashAttribute("successMessage", RESET_REQUESTED_MESSAGE);
+        redirectAttributes.addFlashAttribute("successMessage", messages.get(RESET_REQUESTED_MESSAGE));
         return "redirect:/auth/forgot";
     }
 
@@ -160,7 +163,7 @@ public class AuthController {
             return "admin/authentication/reset";
         }
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            model.addAttribute("errorMessage", "The two passwords don't match.");
+            model.addAttribute("errorMessage", messages.get("error.auth.passwords_differ_two"));
             return "admin/authentication/reset";
         }
         try {

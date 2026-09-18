@@ -11,10 +11,10 @@ import lombok.*;
 @Builder
 public class RoleCreateRequest {
 
-    @NotBlank(message = "Role name is required.")
-    @Size(min = 2, max = 100, message = "Role name must have at least 2 characters.")
+    @NotBlank(message = "{validation.role.name_required}")
+    @Size(min = 2, max = 100, message = "{validation.role.name_min}")
     private String name;
 
-    @Size(max = 255, message = "Description must not exceed 255 characters.")
+    @Size(max = 255, message = "{validation.description.max255}")
     private String description;
 }

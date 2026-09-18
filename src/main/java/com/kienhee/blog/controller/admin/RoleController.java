@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.dto.PermissionMatrixRow;
 import com.kienhee.blog.dto.RoleCreateRequest;
 import com.kienhee.blog.entity.Permission;
@@ -52,6 +53,7 @@ public class RoleController {
     private static final List<String> ACTION_ORDER = List.of("view", "create", "edit", "publish", "send", "delete", "purge");
 
     private final RoleService roleService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String roles(@RequestParam(value = "roleId", required = false) Long roleId, Model model) {
@@ -84,10 +86,10 @@ public class RoleController {
         }
         try {
             Role created = roleService.createRole(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Role created.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.role.created"));
             return "redirect:/admin/roles?roleId=" + created.getId();
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
             return "redirect:/admin/roles";
         }
     }
@@ -100,9 +102,9 @@ public class RoleController {
                               RedirectAttributes redirectAttributes) {
         try {
             roleService.renameRole(id, name, description);
-            redirectAttributes.addFlashAttribute("successMessage", "Role updated.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.role.updated"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/roles?roleId=" + id;
     }
@@ -114,9 +116,9 @@ public class RoleController {
                                    RedirectAttributes redirectAttributes) {
         try {
             roleService.updatePermissions(id, permissionIds);
-            redirectAttributes.addFlashAttribute("successMessage", "Permissions saved.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.role.permissions_saved"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/roles?roleId=" + id;
     }
@@ -126,9 +128,9 @@ public class RoleController {
     public String deleteRole(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             roleService.deleteRole(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Role deleted.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.role.deleted"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/roles";
     }

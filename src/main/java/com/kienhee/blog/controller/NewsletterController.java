@@ -22,6 +22,7 @@ public class NewsletterController {
     private static final String STATUS_VIEW = "public/newsletter-status";
 
     private final NewsletterService newsletterService;
+    private final BusinessMessages messages;
 
     @PostMapping("/subscribe")
     public String subscribe(@RequestParam(value = "email", required = false) String email,
@@ -36,7 +37,7 @@ public class NewsletterController {
         }
         String value = email == null ? "" : email.trim();
         if (value.length() > 150 || !EMAIL.matcher(value).matches()) {
-            redirect.addFlashAttribute("newsletterError", "Enter a valid email address.");
+            redirect.addFlashAttribute("newsletterError", messages.get("error.newsletter.bad_email"));
             redirect.addFlashAttribute("newsletterEmail", value);
             return back;
         }

@@ -12,7 +12,7 @@ $(function () {
 
   function sync() {
     var n = selectedIds().length;
-    $('#trash-selected').text(n + ' selected');
+    $('#trash-selected').text(khT('js.selected', n));
     $('[data-trash-bulk]').prop('disabled', n === 0);
     $all.prop('checked', $checks.length > 0 && n === $checks.length);
   }
@@ -22,7 +22,7 @@ $(function () {
     $.each(ids, function (_, id) { $('<input type="hidden" name="ids">').val(id).appendTo($form); });
     if (confirmWhat && window.khDialog) {
       window.khDialog(confirmWhat, function () { $form[0].submit(); },
-        'This deletes it for good and cannot be undone.');
+        khT('js.trash.purge_note'));
     } else {
       $form[0].submit();
     }
@@ -39,20 +39,20 @@ $(function () {
     var ids = selectedIds();
     if (!ids.length) return;
     var purge = $(this).attr('data-trash-bulk') === 'purge';
-    submit($(this).attr('data-action'), ids, purge ? ids.length + ' selected item' + (ids.length === 1 ? '' : 's') : null);
+    submit($(this).attr('data-action'), ids, purge ? khT('js.trash.selected_items', ids.length) : null);
   });
 
   $(document).on('click', '[data-trash-row]', function () {
     var $btn = $(this);
     var purge = $btn.attr('data-trash-row') === 'purge';
-    submit($btn.attr('data-action'), [$btn.attr('data-id')], purge ? '"' + ($btn.attr('data-name') || 'this item') + '"' : null);
+    submit($btn.attr('data-action'), [$btn.attr('data-id')], purge ? '"' + ($btn.attr('data-name') || khT('js.trash.this_item')) + '"' : null);
   });
 
   $('#btn-empty-trash').on('click', function () {
     var $empty = $('#trash-empty-form');
     if (window.khDialog) {
-      window.khDialog('everything in this tab', function () { $empty[0].submit(); },
-        'Every item in this tab is deleted for good. This cannot be undone.');
+      window.khDialog(khT('js.trash.everything'), function () { $empty[0].submit(); },
+        khT('js.trash.empty_note'));
     } else {
       $empty[0].submit();
     }

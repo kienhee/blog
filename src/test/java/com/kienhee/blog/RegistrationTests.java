@@ -8,6 +8,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.MailService;
 import com.kienhee.blog.service.RegistrationPolicy;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,7 +59,8 @@ class RegistrationTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
     }
 
     @AfterEach
@@ -98,7 +100,7 @@ class RegistrationTests {
         assertEquals(UserStatus.ACTIVE, created.getStatus());
         mockMvc.perform(formLogin("/auth/login").userParameter("email").user(address).password("Password123"))
                 .andExpect(authenticated());
-        verify(mailService, never()).send(anyString(), anyString(), eq("account-pending-admin"), anyMap());
+        verify(mailService, never()).send(anyString(), any(), eq("account-pending-admin"), anyString(), anyMap());
     }
 
     @Test
@@ -117,7 +119,7 @@ class RegistrationTests {
         User created = userRepository.findByEmailWithRole(address).orElseThrow();
         assertEquals("user", created.getRole().getSlug());
         assertEquals(UserStatus.PENDING, created.getStatus());
-        verify(mailService, atLeastOnce()).send(anyString(), anyString(), eq("account-pending-admin"), anyMap());
+        verify(mailService, atLeastOnce()).send(anyString(), any(), eq("account-pending-admin"), anyString(), anyMap());
     }
 
     @Test
@@ -145,7 +147,7 @@ class RegistrationTests {
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attribute("successMessage", "Account approved."));
         assertEquals(UserStatus.ACTIVE, userRepository.findById(person.getId()).orElseThrow().getStatus());
-        verify(mailService).send(eq(person.getEmail()), anyString(), eq("account-approved"), anyMap());
+        verify(mailService).send(eq(person.getEmail()), any(), eq("account-approved"), anyString(), anyMap());
         mockMvc.perform(formLogin("/auth/login").userParameter("email").user(person.getEmail()).password("Password123"))
                 .andExpect(authenticated());
 
@@ -157,7 +159,7 @@ class RegistrationTests {
 
         mockMvc.perform(post(path).param("status", "ACTIVE").with(csrf()).with(TestAuth.owner()))
                 .andExpect(flash().attribute("successMessage", "Account enabled."));
-        verify(mailService, times(1)).send(eq(person.getEmail()), anyString(), eq("account-approved"), anyMap());
+        verify(mailService, times(1)).send(eq(person.getEmail()), any(), eq("account-approved"), anyString(), anyMap());
     }
 
     @Test
@@ -186,13 +188,13 @@ class RegistrationTests {
     @DisplayName("the Users page flags pending accounts; sign-up is always offered")
     void pagesShowStatus() throws Exception {
         User pending = saved("listed", "user", UserStatus.PENDING);
-        mockMvc.perform(get("/admin/users").with(TestAuth.owner()))
+        mockMvc.perform(get("/admin/users").with(TestAuth.owner()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("waiting for approval")))
                 .andExpect(content().string(containsString("data-status=\"ACTIVE\"")))
                 .andExpect(content().string(containsString(pending.getEmail())));
-        mockMvc.perform(get("/auth/login")).andExpect(content().string(containsString("Create an account")));
+        mockMvc.perform(get("/auth/login").with(TestLocale.en())).andExpect(content().string(containsString("Create an account")));
         when(registrationPolicy.isFirstAccount()).thenReturn(false);
-        mockMvc.perform(get("/auth/register"))
+        mockMvc.perform(get("/auth/register").with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("An administrator reviews new accounts")));
     }

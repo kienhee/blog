@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface UserService {
 
     /** Shown when someone without admin rights tries to grant the Admin role or touch an admin account. */
-    String ADMIN_ONLY = "Only admins can grant the Admin role or change admin accounts.";
+    String ADMIN_ONLY = "error.user.admin_only";
 
-    String LAST_ADMIN = "This is the last admin account. Give another account the Admin role first.";
+    String LAST_ADMIN = "error.user.last_admin";
 
     List<User> getAllUsers();
 

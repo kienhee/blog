@@ -24,14 +24,14 @@
   var LABEL = { 'image/jpeg': 'JPG', 'image/png': 'PNG', 'image/webp': 'WEBP', 'image/gif': 'GIF' };
   var MAX_SIDE = 10000;
   var RATIOS = [
-    ['Free', 'free'], ['Original', 'original'], ['1:1', 1], ['4:3', 4 / 3], ['3:2', 3 / 2], ['16:9', 16 / 9], ['9:16', 9 / 16]
+    [khT('js.ie.free'), 'free'], [khT('js.ie.original'), 'original'], ['1:1', 1], ['4:3', 4 / 3], ['3:2', 3 / 2], ['16:9', 16 / 9], ['9:16', 9 / 16]
   ];
   // [key, label, min, max, default]
   var ADJUST = [
-    ['brightness', 'Brightness', 0, 200, 100],
-    ['contrast', 'Contrast', 0, 200, 100],
-    ['saturate', 'Saturation', 0, 200, 100],
-    ['grayscale', 'Grayscale', 0, 100, 0],
+    ['brightness', khT('js.ie.brightness'), 0, 200, 100],
+    ['contrast', khT('js.ie.contrast'), 0, 200, 100],
+    ['saturate', khT('js.ie.saturation'), 0, 200, 100],
+    ['grayscale', khT('js.ie.grayscale'), 0, 100, 0],
     ['sepia', 'Sepia', 0, 100, 0]
   ];
 
@@ -39,12 +39,12 @@
     return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
   };
   var TOOLS = [
-    ['rotate-left', 'Rotate left', I('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>')],
-    ['rotate-right', 'Rotate right', I('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>')],
-    ['flip-h', 'Flip horizontal', I('<path d="M12 3v18"/><path d="M8 7 3 12l5 5V7Z"/><path d="m16 7 5 5-5 5V7Z"/>')],
-    ['flip-v', 'Flip vertical', I('<path d="M3 12h18"/><path d="M7 8 12 3l5 5H7Z"/><path d="m7 16 5 5 5-5H7Z"/>')],
-    ['zoom-in', 'Zoom in', I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6"/><path d="M8 11h6"/>')],
-    ['zoom-out', 'Zoom out', I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M8 11h6"/>')]
+    ['rotate-left', khT('js.ie.rotate_left'), I('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>')],
+    ['rotate-right', khT('js.ie.rotate_right'), I('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>')],
+    ['flip-h', khT('js.ie.flip_h'), I('<path d="M12 3v18"/><path d="M8 7 3 12l5 5V7Z"/><path d="m16 7 5 5-5 5V7Z"/>')],
+    ['flip-v', khT('js.ie.flip_v'), I('<path d="M3 12h18"/><path d="M7 8 12 3l5 5H7Z"/><path d="m7 16 5 5 5-5H7Z"/>')],
+    ['zoom-in', khT('js.ie.zoom_in'), I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6"/><path d="M8 11h6"/>')],
+    ['zoom-out', khT('js.ie.zoom_out'), I('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M8 11h6"/>')]
   ];
 
   function csrfToken() {
@@ -86,40 +86,40 @@
     }).join('');
 
     return '' +
-      '<div class="ie-modal" role="dialog" aria-modal="true" aria-label="Edit image">' +
+      '<div class="ie-modal" role="dialog" aria-modal="true" aria-label="' + khT('js.ie.title') + '">' +
       '  <div class="ie-box">' +
       '    <div class="ie-head">' +
-      '      <div class="ie-head-text"><div class="kicker">Edit image</div><div class="ie-title" data-ie="title">Image</div></div>' +
-      '      <button type="button" class="icon-btn" data-ie="close" aria-label="Close">' + I('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') + '</button>' +
+      '      <div class="ie-head-text"><div class="kicker">' + khT('js.ie.title') + '</div><div class="ie-title" data-ie="title"></div></div>' +
+      '      <button type="button" class="icon-btn" data-ie="close" aria-label="' + khT('js.close') + '">' + I('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') + '</button>' +
       '    </div>' +
       '    <div class="ie-main">' +
-      '      <div class="ie-stage"><img data-ie="img" alt=""><div class="ie-loading dim" data-ie="loading">Loading image…</div></div>' +
+      '      <div class="ie-stage"><img data-ie="img" alt=""><div class="ie-loading dim" data-ie="loading">' + khT('js.ie.loading') + '</div></div>' +
       '      <div class="ie-side">' +
-      '        <section><div class="kicker">Crop</div><div class="ie-chips">' + ratios + '</div>' +
+      '        <section><div class="kicker">' + khT('js.ie.crop') + '</div><div class="ie-chips">' + ratios + '</div>' +
       '          <div class="dim ie-hint" data-ie="crop-info"></div></section>' +
-      '        <section><div class="kicker">Rotate &amp; flip</div><div class="ie-tools">' + tools + '</div>' +
-      '          <label class="ie-range"><span>Straighten</span><input type="range" min="-45" max="45" step="1" value="0" data-ie="straighten"><output data-ie="straighten-val">0°</output></label></section>' +
-      '        <section><div class="kicker">Resize</div>' +
+      '        <section><div class="kicker">' + khT('js.ie.rotate_flip') + '</div><div class="ie-tools">' + tools + '</div>' +
+      '          <label class="ie-range"><span>' + khT('js.ie.straighten') + '</span><input type="range" min="-45" max="45" step="1" value="0" data-ie="straighten"><output data-ie="straighten-val">0°</output></label></section>' +
+      '        <section><div class="kicker">' + khT('js.ie.resize') + '</div>' +
       '          <div class="ie-size">' +
-      '            <label><span>Width</span><input class="input" type="number" min="1" max="' + MAX_SIDE + '" data-ie="w"></label>' +
-      '            <button type="button" class="btn btn-ghost btn-xs ie-lock on" data-ie="lock" aria-pressed="true" title="Keep proportions">' + I('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>') + '</button>' +
-      '            <label><span>Height</span><input class="input" type="number" min="1" max="' + MAX_SIDE + '" data-ie="h"></label>' +
+      '            <label><span>' + khT('js.ie.width') + '</span><input class="input" type="number" min="1" max="' + MAX_SIDE + '" data-ie="w"></label>' +
+      '            <button type="button" class="btn btn-ghost btn-xs ie-lock on" data-ie="lock" aria-pressed="true" title="' + khT('js.ie.keep_ratio') + '">' + I('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>') + '</button>' +
+      '            <label><span>' + khT('js.ie.height') + '</span><input class="input" type="number" min="1" max="' + MAX_SIDE + '" data-ie="h"></label>' +
       '          </div>' +
-      '          <p class="dim ie-hint">Output size in pixels. Follows the crop until you change it.</p></section>' +
-      '        <section><div class="kicker">Adjust</div>' + sliders + '</section>' +
-      '        <section><div class="kicker">Export</div>' +
-      '          <label class="field"><span>Format</span><select class="select" data-ie="format"></select></label>' +
-      '          <label class="ie-range" data-ie="quality-row"><span>Quality</span><input type="range" min="40" max="100" value="90" data-ie="quality"><output data-ie="quality-val">90</output></label>' +
+      '          <p class="dim ie-hint">' + khT('js.ie.size_hint') + '</p></section>' +
+      '        <section><div class="kicker">' + khT('js.ie.adjust') + '</div>' + sliders + '</section>' +
+      '        <section><div class="kicker">' + khT('js.ie.export') + '</div>' +
+      '          <label class="field"><span>' + khT('js.ie.format') + '</span><select class="select" data-ie="format"></select></label>' +
+      '          <label class="ie-range" data-ie="quality-row"><span>' + khT('js.ie.quality') + '</span><input type="range" min="40" max="100" value="90" data-ie="quality"><output data-ie="quality-val">90</output></label>' +
       '          <p class="dim ie-hint" data-ie="format-hint"></p></section>' +
       '      </div>' +
       '    </div>' +
       '    <div class="ie-foot">' +
-      '      <button type="button" class="btn btn-ghost" data-ie="reset">Reset</button>' +
+      '      <button type="button" class="btn btn-ghost" data-ie="reset">' + khT('js.ie.reset') + '</button>' +
       '      <span class="ie-spacer"></span>' +
       '      <span class="ie-status dim" data-ie="status" role="status"></span>' +
-      '      <button type="button" class="btn btn-ghost" data-ie="cancel">Cancel</button>' +
-      '      <button type="button" class="btn btn-ghost" data-ie="copy">Save as copy</button>' +
-      '      <button type="button" class="btn" data-ie="replace">Replace original</button>' +
+      '      <button type="button" class="btn btn-ghost" data-ie="cancel">' + khT('js.cancel') + '</button>' +
+      '      <button type="button" class="btn btn-ghost" data-ie="copy">' + khT('js.ie.save_copy') + '</button>' +
+      '      <button type="button" class="btn" data-ie="replace">' + khT('js.ie.replace') + '</button>' +
       '    </div>' +
       '  </div>' +
       '</div>';
@@ -185,8 +185,8 @@
 
     this.$('title').text(file.name || 'Image');
     var $format = this.$('format').empty();
-    var original = LABEL[file.contentType] || 'Original';
-    $('<option value="original">').text('Original (' + original + ')').appendTo($format);
+    var original = LABEL[file.contentType] || khT('js.ie.original');
+    $('<option value="original">').text(khT('js.ie.original_format', original)).appendTo($format);
     ['image/jpeg', 'image/png', 'image/webp'].forEach(function (type) {
       if (type !== file.contentType) $('<option>').val(type).text(LABEL[type]).appendTo($format);
     });
@@ -205,10 +205,10 @@
     this.syncFormat();
 
     this.destroyCropper();
-    this.$('loading').text('Loading image…').show();
+    this.$('loading').text(khT('js.ie.loading')).show();
     this.$img.off('load.ie error.ie')
       .one('load.ie', function () { self.initCropper(); })
-      .one('error.ie', function () { self.$('loading').text('Could not load this image.'); })
+      .one('error.ie', function () { self.$('loading').text(khT('js.ie.load_failed')); })
       .attr('src', withVersion(file.url, file.version));
 
     this.$root.addClass('open');
@@ -256,7 +256,7 @@
   P.onCrop = function (d) {
     var w = Math.max(1, Math.round(d.width));
     var h = Math.max(1, Math.round(d.height));
-    this.$('crop-info').text('Crop: ' + w + ' × ' + h + ' px');
+    this.$('crop-info').text(khT('js.ie.crop_info', w, h));
     if (!this.state.sizeTouched) {
       this.$('w').val(w);
       this.$('h').val(h);
@@ -321,15 +321,15 @@
     var hints = [];
     var sameFormat = type === this.file.contentType;
     if (this.file.contentType === 'image/gif') {
-      hints.push('GIFs are saved as PNG and lose any animation, so a GIF can only be saved as a copy.');
+      hints.push(khT('js.ie.gif_hint'));
     } else if (!sameFormat) {
-      hints.push('Replacing keeps the original format — use Save as copy to convert to ' + LABEL[type] + '.');
+      hints.push(khT('js.ie.format_hint', LABEL[type]));
     }
     if (this.opts.canReplace && this.file.used && sameFormat) {
-      hints.push('This image is used on the site; replacing it updates it everywhere.');
+      hints.push(khT('js.ie.in_use_hint'));
     }
     this.$('format-hint').text(hints.join(' '));
-    this.$('replace').prop('disabled', !sameFormat).attr('title', sameFormat ? '' : 'Only available in the original format');
+    this.$('replace').prop('disabled', !sameFormat).attr('title', sameFormat ? '' : khT('js.ie.replace_disabled'));
   };
 
   /* ---------------- export & save ---------------- */
@@ -371,7 +371,7 @@
       // JPEG has no transparency: straightened corners become white instead of black.
       fillColor: type === 'image/jpeg' ? '#ffffff' : 'transparent'
     });
-    if (!canvas) return deferred.reject('Could not render the image.').promise();
+    if (!canvas) return deferred.reject(khT('js.ie.render_failed')).promise();
 
     if (this.hasAdjustments()) {
       var out = document.createElement('canvas');
@@ -395,9 +395,9 @@
 
     var quality = (parseInt(this.$('quality').val(), 10) || 90) / 100;
     canvas.toBlob(function (blob) {
-      if (!blob) return deferred.reject('Could not encode the image.');
+      if (!blob) return deferred.reject(khT('js.ie.encode_failed'));
       if (blob.type !== type) {
-        return deferred.reject('Your browser cannot save ' + LABEL[type] + ' images. Choose another format.');
+        return deferred.reject(khT('js.ie.format_unsupported', LABEL[type]));
       }
       deferred.resolve(blob, type, w, h);
     }, type, quality);
@@ -409,16 +409,16 @@
     if (this.busy || !this.cropper) return;
     var replacing = mode === 'replace';
     if (replacing && this.outputType() !== this.file.contentType) return;
-    if (replacing && this.file.used && !window.confirm('This image is used on the site. Replace it everywhere?')) return;
+    if (replacing && this.file.used && !window.confirm(khT('js.ie.confirm_replace'))) return;
 
     this.setBusy(true);
-    this.status('Rendering…');
+    this.status(khT('js.ie.rendering'));
     this.exportBlob().done(function (blob, type) {
       var name = replacing ? self.file.name : baseName(self.file.name) + '-edited.' + EXT[type];
       var fd = new FormData();
       fd.append('_csrf', csrfToken());
       fd.append('file', blob, name);
-      self.status('Saving…');
+      self.status(khT('js.saving'));
       $.ajax({
         url: API + '/files/' + self.file.id + (replacing ? '/image' : '/image-copy'),
         method: 'POST',
@@ -434,7 +434,7 @@
         var cb = replacing ? self.opts.onReplaced : self.opts.onCopied;
         if (typeof cb === 'function') cb(res.file);
       }).fail(function (xhr) {
-        var message = (xhr.responseJSON && xhr.responseJSON.message) || 'Could not save the image.';
+        var message = (xhr.responseJSON && xhr.responseJSON.message) || khT('js.ie.save_failed');
         self.setBusy(false);
         self.status(message, true);
         toast(message);
@@ -520,11 +520,11 @@
     },
     open: function (file, opts) {
       if (!window.Cropper) {
-        toast('The image editor could not be loaded.');
+        toast(khT('js.ie.not_loaded'));
         return;
       }
       if (!this.canEdit(file)) {
-        toast('Only JPG, PNG, WEBP and GIF images can be edited.');
+        toast(khT('js.ie.not_editable'));
         return;
       }
       if (!instance) instance = new Editor();

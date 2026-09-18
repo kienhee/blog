@@ -1,9 +1,13 @@
 package com.kienhee.blog.controller;
 
+import com.kienhee.blog.config.I18n;
 import com.kienhee.blog.entity.Post;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -15,7 +19,10 @@ import java.util.Locale;
  * Formatting helpers for public templates, used as {@code ${@publicView.readMinutes(post)}}.
  */
 @Component("publicView")
+@RequiredArgsConstructor
 public class PublicViewHelper {
+
+    private final MessageSource messages;
 
     private static final int WORDS_PER_MINUTE = 220;
     private static final int DEK_LENGTH = 180;
@@ -63,11 +70,19 @@ public class PublicViewHelper {
         return text.length() > DEK_LENGTH ? text.substring(0, DEK_LENGTH).trim() + "…" : text;
     }
 
-    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
+    /**
+     * Date pattern per language: "11 thang 9, 2026" in Vietnamese, "Sep 11, 2026" in English.
+     * Templates can't reach a Locale constant, so the language comes from the request here.
+     */
+    private static DateTimeFormatter dateFormatter(Locale locale) {
+        return I18n.EN.getLanguage().equals(locale.getLanguage())
+                ? DateTimeFormatter.ofPattern("MMM d, yyyy", I18n.EN)
+                : DateTimeFormatter.ofPattern("d MMMM, yyyy", I18n.VI);
+    }
 
-    /** "Sep 11, 2026" regardless of the visitor's locale (templates can't reach Locale.ENGLISH). */
     public String date(LocalDateTime value) {
-        return value == null ? "" : DATE.format(value);
+        if (value == null) return "";
+        return dateFormatter(LocaleContextHolder.getLocale()).format(value);
     }
 
     /** "just now", "5 minutes ago", "2 days ago"; older than 30 days falls back to the date. */
@@ -75,13 +90,22 @@ public class PublicViewHelper {
         if (value == null) return "";
         Duration d = Duration.between(value, LocalDateTime.now());
         long minutes = d.toMinutes();
-        if (minutes < 1) return "just now";
-        if (minutes < 60) return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
+        if (minutes < 1) return say("common.ago.now");
+        if (minutes < 60) return plural("common.ago.minute", minutes);
         long hours = d.toHours();
-        if (hours < 24) return hours + (hours == 1 ? " hour ago" : " hours ago");
+        if (hours < 24) return plural("common.ago.hour", hours);
         long days = d.toDays();
-        if (days < 30) return days + (days == 1 ? " day ago" : " days ago");
+        if (days < 30) return plural("common.ago.day", days);
         return date(value);
+    }
+
+    private String say(String code, Object... args) {
+        return messages.getMessage(code, args, LocaleContextHolder.getLocale());
+    }
+
+    /** English needs "1 minute" vs "2 minutes"; Vietnamese uses the same word either way. */
+    private String plural(String prefix, long count) {
+        return say(prefix + (count == 1 ? ".one" : ".other"), count);
     }
 
     public boolean hasCover(Post post) {

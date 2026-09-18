@@ -7,6 +7,7 @@ import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.CategoryRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,8 @@ class FeedTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         User author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Feed " + tag).slug(tag + "-cat").visible(true).build());
         published = postRepository.save(Post.builder().title("Feeds & <Friends> " + tag).slug(tag + "-live")

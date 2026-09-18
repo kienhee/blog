@@ -59,6 +59,15 @@ p{margin:0}
 .icon-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:transparent;border:1px solid var(--line);color:var(--ink);cursor:pointer}
 .icon-btn:hover{border-color:var(--accent);color:var(--accent)}
 
+/* ---------- language switcher (fragments/lang-switch, used by the public header and the admin topbar) ---------- */
+.lang-switch{display:flex;align-items:center;flex:0 0 auto;height:36px;border:1px solid var(--line)}
+.lang-opt{display:flex;align-items:center;justify-content:center;width:34px;height:100%;padding:0;background:transparent;border:0;cursor:pointer;opacity:.42;transition:opacity .15s,background .15s}
+.lang-opt + .lang-opt{border-left:1px solid var(--line)}
+.lang-opt:hover:not(:disabled){opacity:.9;background:var(--surf)}
+/* The active language is the disabled one - clicking it would only re-post the same choice. */
+.lang-opt.is-active{opacity:1;background:var(--surf2);cursor:default}
+.lang-opt img{width:22px;height:15px;object-fit:cover}
+
 /* ---------- fields ---------- */
 .field{display:flex;flex-direction:column;gap:7px}
 .field > span:first-child{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
@@ -262,6 +271,9 @@ a.badge.tag-link:hover{color:var(--accent);border-color:var(--accent)}
 }
 @media (max-width:560px){
   body{font-size:15px}
+  .lang-switch{height:32px}
+  .lang-opt{width:28px}
+  .lang-opt img{width:18px;height:12px}
   .head-actions .btn-sm.cta{display:none}
   .head-actions .btn-sm[data-search-open]{width:40px;padding:0;justify-content:center}
   .head-actions .btn-sm[data-search-open] .lbl{display:none}

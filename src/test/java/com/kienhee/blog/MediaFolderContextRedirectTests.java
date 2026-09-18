@@ -9,6 +9,7 @@ import com.kienhee.blog.service.impl.MediaStorageLayout;
 import com.kienhee.blog.storage.FilesystemStorage;
 import com.kienhee.blog.support.MediaFolderCleanup;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -64,7 +65,8 @@ class MediaFolderContextRedirectTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         folder = mediaFolderRepository.save(MediaFolder.builder()
                 .name("Redirect Test " + System.currentTimeMillis())
                 .slug("redirect-test-" + System.currentTimeMillis())

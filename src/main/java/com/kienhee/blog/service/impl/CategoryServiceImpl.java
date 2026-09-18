@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import java.time.LocalDateTime;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.dto.CategoryCreateRequest;
@@ -39,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category createCategory(CategoryCreateRequest request) {
         String slug = request.getSlug().trim().toLowerCase();
         if (categoryRepository.existsBySlug(slug)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.category.slug_taken", slug);
         }
 
         Category parent = resolveParent(request.getParentId(), null);
@@ -59,11 +60,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public Category updateCategory(Long id, CategoryUpdateRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.category.not_found", id));
 
         String slug = request.getSlug().trim().toLowerCase();
         if (categoryRepository.existsBySlugAndIdNot(slug, id)) {
-            throw new IllegalArgumentException("Slug already in use: " + slug);
+            throw new BusinessException("error.category.slug_taken", slug);
         }
 
         Category parent = resolveParent(request.getParentId(), category);
@@ -81,13 +82,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.category.not_found", id));
 
         if (categoryRepository.existsByParentId(id)) {
-            throw new IllegalArgumentException("Cannot delete a category that has subcategories (including ones in the trash).");
+            throw new BusinessException("error.category.has_children");
         }
         if (postRepository.existsByCategory_Id(id)) {
-            throw new IllegalArgumentException("Cannot delete a category that still has posts (including posts in the trash). Move or permanently delete them first.");
+            throw new BusinessException("error.category.has_posts");
         }
 
         categoryRepository.moveToTrash(category.getId(), LocalDateTime.now());
@@ -116,17 +117,17 @@ public class CategoryServiceImpl implements CategoryService {
             return null;
         }
         if (self != null && parentId.equals(self.getId())) {
-            throw new IllegalArgumentException("A category cannot be its own parent.");
+            throw new BusinessException("error.category.self_parent");
         }
 
         Category parent = categoryRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent category not found."));
+                .orElseThrow(() -> new BusinessException("error.category.parent_not_found"));
 
         if (self != null) {
             Category ancestor = parent;
             while (ancestor != null) {
                 if (ancestor.getId().equals(self.getId())) {
-                    throw new IllegalArgumentException("Cannot set a descendant category as the parent.");
+                    throw new BusinessException("error.category.descendant_parent");
                 }
                 ancestor = ancestor.getParent();
             }

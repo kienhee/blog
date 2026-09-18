@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  The language switcher, shared by the public header and the admin topbar.
+  A form post (not a ?lang= link) so the choice never lands in a shared URL and CSRF applies;
+  th:action is what makes Spring Security add the hidden _csrf field.
+  `redirect` brings the visitor back to the page they were on, query string included.
+-->
+<form th:fragment="langSwitch" class="lang-switch" method="post" th:action="@{/lang}">
+    <input type="hidden" name="redirect" th:value="${currentUriFull} ?: '/'">
+    <button th:each="c : ${langCodes}" type="submit" name="code" th:value="${c}"
+            class="lang-opt" th:classappend="${currentLang == c} ? 'is-active'"
+            th:disabled="${currentLang == c}"
+            th:with="label=#{'lang.' + ${c}}"
+            th:title="${label}" th:aria-label="${label}"
+            th:attr="aria-current=${currentLang == c} ? 'true' : null">
+        <img th:src="@{'/images/flags/' + ${c == 'vi' ? 'vietnam.png' : 'united-states.png'}}"
+             th:alt="${label}" width="22" height="15">
+    </button>
+</form>
+
+</body>
+</html>

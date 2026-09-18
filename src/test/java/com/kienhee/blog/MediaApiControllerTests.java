@@ -15,6 +15,7 @@ import com.kienhee.blog.storage.FilesystemStorage;
 import com.kienhee.blog.storage.StoragePath;
 import com.kienhee.blog.support.MediaFolderCleanup;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +81,8 @@ class MediaApiControllerTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findAll().stream().findFirst().orElseThrow();
         tag = "Api" + System.nanoTime();
         user = userRepository.save(User.builder()
@@ -283,7 +285,8 @@ class MediaApiControllerTests {
         @DisplayName("update with a blank name is 422 (the DTO's own validation)")
         void updateInvalid() throws Exception {
             Long id = uploadViaApi("keep.png", null);
-            mockMvc.perform(post(API + "/files/" + id).param("displayName", " ").with(owner).with(csrf()))
+            mockMvc.perform(post(API + "/files/" + id).param("displayName", " ").with(owner).with(csrf())
+                            .with(TestLocale.en()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Display name is required."));
             assertEquals("keep.png", reload(id).getOriginalFilename());

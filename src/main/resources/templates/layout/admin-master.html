@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark"
+<html th:lang="${currentLang} ?: 'vi'" data-theme="dark"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
@@ -34,6 +34,8 @@
 
 <div class="toast"><span>✓</span><span class="msg"></span></div>
 
+<div th:replace="~{fragments/i18n :: dictionary}"></div>
+<script th:src="@{/scripts/core/i18n.js}"></script>
 <script th:src="@{/scripts/lib/jquery.min.js}"></script>
 <script th:src="@{/scripts/lib/jquery.validate.min.js}"></script>
 <script th:src="@{/scripts/lib/dataTables.min.js}"></script>

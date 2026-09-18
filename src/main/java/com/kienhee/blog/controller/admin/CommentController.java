@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.entity.CommentStatus;
 import com.kienhee.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class CommentController {
     private static final String REDIRECT = "redirect:/admin/comments";
 
     private final CommentService commentService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String comments(Model model) {
@@ -58,10 +60,11 @@ public class CommentController {
         try {
             CommentStatus target = CommentService.parseStatus(status);
             int n = commentService.updateStatus(ids, target);
-            redirect.addFlashAttribute("successMessage",
-                    (n == 1 ? "1 comment" : n + " comments") + " marked as " + target.name().toLowerCase() + ".");
+            redirect.addFlashAttribute("successMessage", messages.get("msg.comment.marked",
+                    messages.get("bulk.noun.comments" + (n == 1 ? ".one" : ".other"), n),
+                    messages.get("enum.comment.status." + target.name())));
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", messages.text(e));
         }
         return REDIRECT;
     }
@@ -69,9 +72,10 @@ public class CommentController {
     private String remove(List<Long> ids, RedirectAttributes redirect) {
         try {
             int n = commentService.delete(ids);
-            redirect.addFlashAttribute("successMessage", (n == 1 ? "1 comment" : n + " comments") + " moved to trash.");
+            redirect.addFlashAttribute("successMessage", messages.get("bulk.verb.trashed",
+                    messages.get("bulk.noun.comments" + (n == 1 ? ".one" : ".other"), n)));
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", messages.text(e));
         }
         return REDIRECT;
     }
@@ -82,9 +86,9 @@ public class CommentController {
                         java.security.Principal principal, RedirectAttributes redirect) {
         try {
             commentService.replyAsStaff(id, content, principal != null ? principal.getName() : null);
-            redirect.addFlashAttribute("successMessage", "Reply posted.");
+            redirect.addFlashAttribute("successMessage", messages.get("msg.comment.reply_posted"));
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", messages.text(e));
         }
         return REDIRECT;
     }

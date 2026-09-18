@@ -11,8 +11,8 @@ import lombok.*;
 @Builder
 public class MediaFolderCreateRequest {
 
-    @NotBlank(message = "Folder name is required.")
-    @Size(min = 2, max = 150, message = "Folder name must have at least 2 characters.")
+    @NotBlank(message = "{validation.folder.name_required}")
+    @Size(min = 2, max = 150, message = "{validation.folder.name_min}")
     private String name;
 
     /** Parent folder id; {@code null} means a root-level folder. */

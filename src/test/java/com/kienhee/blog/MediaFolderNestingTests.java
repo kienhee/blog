@@ -123,7 +123,7 @@ class MediaFolderNestingTests {
 
             IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                     () -> create("Photos", a.getId()));
-            assertTrue(error.getMessage().toLowerCase().contains("already exists"));
+            assertTrue(error.getMessage().contains("folder_exists"), error.getMessage());
 
             // The very same slug in a different branch is legitimate.
             MediaFolder other = create("Photos", b.getId());
@@ -147,7 +147,7 @@ class MediaFolderNestingTests {
             Long tooDeep = parentId;
             IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                     () -> create(tag + " overflow", tooDeep));
-            assertTrue(error.getMessage().contains("nested"));
+            assertTrue(error.getMessage().startsWith("error.media.depth"), error.getMessage());
         }
     }
 

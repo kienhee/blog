@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.entity.NewsletterIssue;
 import com.kienhee.blog.entity.Subscriber;
 import com.kienhee.blog.entity.SubscriberStatus;
@@ -28,6 +29,7 @@ public class SubscriberController {
     private static final String REDIRECT = "redirect:/admin/subscribers";
 
     private final NewsletterService newsletterService;
+    private final BusinessMessages messages;
 
     @GetMapping
     public String subscribers(Model model) {
@@ -50,7 +52,7 @@ public class SubscriberController {
             redirect.addFlashAttribute("successMessage", "Sending \"" + issue.getSubject() + "\" to "
                     + issue.getRecipients() + (issue.getRecipients() == 1 ? " subscriber." : " subscribers."));
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", messages.text(e));
             redirect.addFlashAttribute("draftSubject", subject);
             redirect.addFlashAttribute("draftBody", body);
         }
@@ -62,9 +64,9 @@ public class SubscriberController {
     public String delete(@PathVariable Long id, RedirectAttributes redirect) {
         try {
             newsletterService.deleteSubscriber(id);
-            redirect.addFlashAttribute("successMessage", "Subscriber removed.");
+            redirect.addFlashAttribute("successMessage", messages.get("msg.subscriber.removed"));
         } catch (IllegalArgumentException e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", messages.text(e));
         }
         return REDIRECT;
     }

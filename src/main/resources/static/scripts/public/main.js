@@ -68,7 +68,7 @@ $(function () {
           $latest.prop('hidden', true);
           $results.empty().prop('hidden', false);
           $('<p class="kicker" style="padding:20px 0">')
-            .text(items.length ? 'Results' : 'No articles match \u201c' + q + '\u201d').appendTo($results);
+            .text(items.length ? khT('js.search.results') : khT('js.search.no_match', q)).appendTo($results);
           $.each(items, function (_, it) {
             $('<a class="res">').attr('href', it.url)
               .append($('<span class="kicker">').text(it.category))
@@ -78,7 +78,7 @@ $(function () {
           if (items.length) {
             $('<a class="kicker" style="display:block;padding:16px 0;color:var(--accent)">')
               .attr('href', $live.attr('action') + '?q=' + encodeURIComponent(q))
-              .text('See all results \u2192').appendTo($results);
+              .text(khT('js.search.see_all')).appendTo($results);
           }
         });
       }, 250);
@@ -139,18 +139,18 @@ $(function () {
       $email.val(value);
       if (!value) {
         e.preventDefault();
-        fail('Enter your email address.');
+        fail(khT('js.newsletter.email_required'));
         return;
       }
       // Deliberately loose: the address is confirmed by the email we send, not by this regex.
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
         e.preventDefault();
-        fail('That does not look like an email address.');
+        fail(khT('js.newsletter.email_invalid'));
         return;
       }
       clear();
       // The POST reloads the page, so this only guards against a double click.
-      $button.prop('disabled', true).text('Subscribing…');
+      $button.prop('disabled', true).text(khT('js.newsletter.subscribing'));
     });
   });
 
@@ -163,14 +163,14 @@ $(function () {
     var $text = $cForm.find('[data-reply-target]');
     var resetReply = function () {
       $parent.val('');
-      $label.text('Join the discussion');
+      $label.text(khT('js.comment.join'));
       $cancel.prop('hidden', true);
     };
 
     $(document).on('click', '[data-reply-to]', function () {
       var $btn = $(this);
       $parent.val($btn.attr('data-reply-to'));
-      $label.text('Replying to ' + $btn.attr('data-reply-name'));
+      $label.text(khT('js.comment.replying_to', $btn.attr('data-reply-name')));
       $cancel.prop('hidden', false);
       $('html, body').animate({ scrollTop: $cForm.offset().top - 120 }, 200);
       $text.trigger('focus');
@@ -179,7 +179,7 @@ $(function () {
     if (!$parent.val()) resetReply();
 
     $cForm.on('submit', function () {
-      $cForm.find('button[type="submit"]').prop('disabled', true).text('Posting…');
+      $cForm.find('button[type="submit"]').prop('disabled', true).text(khT('js.comment.posting'));
     });
   }
 
@@ -203,7 +203,7 @@ $(function () {
     if (type === 'link') {
       if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).catch(function () {});
       if ($note.length) {
-        $note.text('Link copied');
+        $note.text(khT('js.article.link_copied'));
         setTimeout(function () { $note.text(''); }, 1600);
       }
       return;

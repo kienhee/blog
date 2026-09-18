@@ -5,6 +5,7 @@ import com.kienhee.blog.entity.Role;
 import com.kienhee.blog.repository.PermissionRepository;
 import com.kienhee.blog.repository.RoleRepository;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,8 @@ class PermissionCatalogTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
     }
 
     private Set<String> dbCodes() {
@@ -148,7 +150,7 @@ class PermissionCatalogTests {
     @DisplayName("the Roles page lists every permission for a role")
     void rolesPageShowsCatalog() throws Exception {
         Long adminId = roleRepository.findBySlug("admin").orElseThrow().getId();
-        String html = mockMvc.perform(get("/admin/roles").param("roleId", adminId.toString()).with(TestAuth.owner()))
+        String html = mockMvc.perform(get("/admin/roles").param("roleId", adminId.toString()).with(TestAuth.owner()).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertEquals(CATALOG.size(), html.split("name=\"permissionIds\"", -1).length - 1);

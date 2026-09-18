@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/public-master}">
 <head>
-    <title>Home</title>
+    <title th:text="#{public.home.title}">Home</title>
 </head>
 <body>
 <main layout:fragment="content">
@@ -12,16 +12,16 @@
             <div class="hero">
                 <div class="hero-text">
                     <div style="display:flex;align-items:center;gap:12px">
-                        <span class="badge-accent">Latest</span>
+                        <span class="badge-accent" th:text="#{public.home.badge_latest}">Latest</span>
                         <a class="kicker" th:if="${featured.category.visible}" th:href="@{/category/{slug}(slug=${featured.category.slug})}" th:text="${featured.category.name}">Category</a>
                         <span class="kicker" th:unless="${featured.category.visible}" th:text="${featured.category.name}">Category</span>
                     </div>
                     <h1 th:text="${featured.title}">Title</h1>
                     <p class="dim" style="font-size:18px;line-height:1.5;max-width:46ch" th:text="${@publicView.dek(featured)}">Summary</p>
-                    <p class="dim" style="font-size:13px" th:text="|${@publicView.date(featured.publishedAt)} · ${@publicView.readMinutes(featured)} min read|">Sep 11, 2026 · 9 min read</p>
+                    <p class="dim" style="font-size:13px" th:text="|${@publicView.date(featured.publishedAt)} · #{common.read_minutes(${@publicView.readMinutes(featured)})}|">Sep 11, 2026 · 9 min read</p>
                     <div style="display:flex;gap:12px;margin-top:8px">
-                        <a class="btn" th:href="@{/article/{slug}(slug=${featured.slug})}">Read the article</a>
-                        <a class="btn btn-ghost" th:href="@{/news}">All news</a>
+                        <a class="btn" th:href="@{/article/{slug}(slug=${featured.slug})}" th:text="#{public.home.read_article}">Read the article</a>
+                        <a class="btn btn-ghost" th:href="@{/news}" th:text="#{public.home.all_news}">All news</a>
                     </div>
                 </div>
                 <div class="hero-media" th:with="cover=${@publicView.hasCover(featured)}"><img class="ph" th:src="${cover} ? ${featured.coverImage} : @{/images/placeholder.svg}" th:alt="${featured.title}" style="height:100%;object-fit:cover"></div>
@@ -30,32 +30,32 @@
     </section>
 
     <section class="wrap" style="padding-top:56px">
-        <div class="section-head"><h2>Latest</h2><a class="dim" th:href="@{/news}" style="font-size:13px">View all →</a></div>
-        <div th:if="${featured == null}" th:replace="~{fragments/public/pagination :: empty('No articles have been published yet.')}"></div>
+        <div class="section-head"><h2 th:text="#{public.home.latest}">Latest</h2><a class="dim" th:href="@{/news}" style="font-size:13px" th:text="#{public.home.view_all}">View all →</a></div>
+        <div th:if="${featured == null}" th:replace="~{fragments/public/pagination :: empty(#{public.home.empty})}"></div>
         <a class="post-row" th:each="p, st : ${latest}" th:href="@{/article/{slug}(slug=${p.slug})}">
             <span class="num" th:text="${#numbers.formatInteger(st.count, 2)}">01</span>
             <span class="cat" th:text="${p.category.name}">Category</span>
             <span><span class="ttl" th:text="${p.title}">Title</span><span class="dek" th:text="${@publicView.dek(p)}">Summary</span></span>
-            <span class="meta"><span th:text="${@publicView.date(p.publishedAt)}">Sep 9, 2026</span><br><span th:text="|${@publicView.readMinutes(p)} min read|">4 min read</span></span>
+            <span class="meta"><span th:text="${@publicView.date(p.publishedAt)}">Sep 9, 2026</span><br><span th:text="#{common.read_minutes(${@publicView.readMinutes(p)})}">4 min read</span></span>
         </a>
     </section>
 
     <section class="wrap" style="margin-top:64px">
         <div class="cta-box">
             <div>
-                <h2 style="font-size:38px;line-height:1.05;margin-bottom:16px">One email a week. AI that actually works.</h2>
-                <p class="dim" style="line-height:1.55;max-width:48ch">Hands-on guides, tool releases and the news worth your time — written for people who use AI at work.</p>
+                <h2 style="font-size:38px;line-height:1.05;margin-bottom:16px" th:text="#{public.newsletter.heading}">One email a week. AI that actually works.</h2>
+                <p class="dim" style="line-height:1.55;max-width:48ch" th:text="#{public.newsletter.pitch}">Hands-on guides, tool releases and the news worth your time.</p>
             </div>
             <form id="newsletter" data-newsletter novalidate method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:14px;justify-content:center;padding:1rem">
                 <input type="hidden" name="from" value="home">
                 <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
-                <input class="input" type="email" name="email" th:value="${newsletterEmail}" placeholder="Enter your email" maxlength="150" aria-label="Email address">
-                <button class="btn" type="submit">Subscribe free</button>
+                <input class="input" type="email" name="email" th:value="${newsletterEmail}" th:placeholder="#{public.newsletter.email_placeholder}" maxlength="150" th:aria-label="#{public.newsletter.email_label}">
+                <button class="btn" type="submit" th:text="#{public.newsletter.submit}">Subscribe free</button>
                 <span th:if="${newsletterSuccess}" class="cmt-flash ok" role="status" style="margin-top:0" th:text="${newsletterSuccess}">Check your inbox</span>
                 <span th:if="${newsletterError}" class="cmt-flash err" role="alert" style="margin-top:0" th:text="${newsletterError}">Enter a valid email</span>
                 <!-- Client-side message (public/main.js); the server-side one above is a separate span. -->
                 <span class="cmt-flash err" role="alert" style="margin-top:0" data-newsletter-error hidden></span>
-                <span class="dim" style="font-size:12px">No spam. Unsubscribe anytime.</span>
+                <span class="dim" style="font-size:12px" th:text="#{public.newsletter.no_spam}">No spam. Unsubscribe anytime.</span>
             </form>
         </div>
     </section>

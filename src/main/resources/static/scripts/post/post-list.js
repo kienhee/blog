@@ -8,7 +8,7 @@ $(function () {
     $('#delete-post-form').attr('action', '/admin/post/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'post "' + name + '"' : 'this post', '#delete-post-form',
-        'It moves to the trash; its public URL returns 404 until you restore it.');
+        khT('js.post.delete_note'));
     }
   });
 });

@@ -12,14 +12,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResetPasswordRequest {
 
-    @NotBlank(message = "This reset link is invalid or has expired. Request a new one.")
+    @NotBlank(message = "{validation.reset.token}")
     private String token;
 
     /** BCrypt only uses the first 72 bytes, so longer passwords are refused rather than silently cut. */
-    @NotBlank(message = "Password is required.")
-    @Size(min = 8, max = 72, message = "Password must be 8 to 72 characters.")
+    @NotBlank(message = "{validation.password.required}")
+    @Size(min = 8, max = 72, message = "{validation.password.size8_72}")
     private String password;
 
-    @NotBlank(message = "Please confirm the new password.")
+    @NotBlank(message = "{validation.password.confirm_new}")
     private String confirmPassword;
 }

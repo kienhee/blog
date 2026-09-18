@@ -8,7 +8,7 @@ $(function () {
     $('#delete-role-form').attr('action', '/admin/roles/' + id + '/delete');
     if (window.khDialog) {
       window.khDialog(name ? 'role "' + name + '"' : 'this role', '#delete-role-form',
-        'This cannot be undone. Only a role that no user is assigned to can be deleted.');
+        khT('js.role.delete_note'));
     }
   });
 });

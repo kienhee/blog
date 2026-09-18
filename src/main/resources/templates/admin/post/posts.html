@@ -2,22 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Posts</title>
+    <title th:text="#{nav.admin.posts}">Posts</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Posts</strong>
+    <a th:href="@{/admin/dashboard}" class="dim" th:text="#{nav.admin.dashboard}">Dashboard</a><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.posts}">Posts</strong>
 </div>
 
 <div layout:fragment="content">
       <div class="dt-root">
         <div class="page-head">
           <div>
-            <h1>Posts</h1>
-            <p class="dim" style="margin-top:6px" th:text="${posts != null ? posts.size() + ' articles' : '0 articles'}">0 articles</p>
+            <h1 th:text="#{nav.admin.posts}">Posts</h1>
+            <p class="dim" style="margin-top:6px" th:text="#{admin.post.count(${posts != null ? posts.size() : 0})}">0 articles</p>
           </div>
-          <a class="btn" th:href="@{/admin/post/new}">New post</a>
+          <a class="btn" th:href="@{/admin/post/new}" th:text="#{admin.post.new}">New post</a>
         </div>
 
         <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
@@ -28,45 +28,45 @@
         </div>
 
         <div class="bulk">
-          <span class="n">0 selected</span>
-          <button th:if="${perms.contains('posts:delete')}" class="btn btn-ghost btn-xs btn-danger" data-bulk="Delete">Delete</button>
-                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">Clear</button>
+          <span class="n" th:text="#{admin.common.selected(0)}">0 selected</span>
+          <button th:if="${perms.contains('posts:delete')}" class="btn btn-ghost btn-xs btn-danger" th:data-bulk="#{admin.dialog.delete}" th:text="#{admin.dialog.delete}">Delete</button>
+                    <button data-bulk-clear style="margin-left:auto;background:transparent;border:none;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer" th:text="#{admin.common.clear}">Clear</button>
         </div>
 
         <div class="table-wrap">
-          <table class="dt" th:data-bulk-delete-url="@{/admin/posts/bulk-delete}" data-bulk-noun="posts" data-bulk-delete-note="They move to the trash; their public URLs return 404 until you restore them.">
+          <table class="dt" th:data-bulk-delete-url="@{/admin/posts/bulk-delete}" th:data-bulk-noun="#{nav.admin.posts}" th:data-bulk-delete-note="#{admin.post.bulk_note}">
             <thead>
               <tr>
                 <th style="width:44px"><input class="checkbox allcheck" type="checkbox"></th>
-                <th style="width:72px">Cover</th>
-                <th style="width:28%">Title</th>
-                <th style="width:14%">Slug</th>
-                <th style="width:130px">Category</th>
-                <th style="width:110px">Status</th>
-                <th style="width:130px">Updated</th>
-                <th style="width:96px;text-align:right"><span class="kicker">Actions</span></th>
+                <th style="width:72px" th:text="#{admin.post.cover}">Cover</th>
+                <th style="width:28%" th:text="#{admin.post.title}">Title</th>
+                <th style="width:14%" th:text="#{admin.common.slug}">Slug</th>
+                <th style="width:130px" th:text="#{admin.post.category}">Category</th>
+                <th style="width:110px" th:text="#{admin.common.status}">Status</th>
+                <th style="width:130px" th:text="#{admin.common.updated}">Updated</th>
+                <th style="width:96px;text-align:right"><span class="kicker" th:text="#{admin.common.actions}">Actions</span></th>
               </tr>
               <tr class="filters">
                 <th></th>
                 <th></th>
-                <th><input class="input" data-col="2" placeholder="Filter…"></th>
-                <th><input class="input" data-col="3" placeholder="Filter…"></th>
+                <th><input class="input" data-col="2" th:placeholder="#{admin.common.filter}"></th>
+                <th><input class="input" data-col="3" th:placeholder="#{admin.common.filter}"></th>
                 <th>
                   <select class="select" data-col="4">
-                    <option value="">All</option>
+                    <option value="" th:text="#{common.all}">All</option>
                     <option th:each="c : ${categories}" th:value="${c.name}" th:text="${c.name}"></option>
                   </select>
                 </th>
                 <th>
                   <select class="select" data-col="5">
-                    <option value="">All</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Published">Published</option>
-                    <option value="Archived">Archived</option>
+                    <option value="" th:text="#{common.all}">All</option>
+                    <option value="Draft" th:value="#{enum.post.status.DRAFT}" th:text="#{enum.post.status.DRAFT}">Draft</option>
+                    <option value="Scheduled" th:value="#{enum.post.status.SCHEDULED}" th:text="#{enum.post.status.SCHEDULED}">Scheduled</option>
+                    <option value="Published" th:value="#{enum.post.status.PUBLISHED}" th:text="#{enum.post.status.PUBLISHED}">Published</option>
+                    <option value="Archived" th:value="#{enum.post.status.ARCHIVED}" th:text="#{enum.post.status.ARCHIVED}">Archived</option>
                   </select>
                 </th>
-                <th><input class="input" data-col="6" placeholder="Filter…"></th>
+                <th><input class="input" data-col="6" th:placeholder="#{admin.common.filter}"></th>
                 <th></th>
               </tr>
             </thead>
@@ -86,17 +86,17 @@
                 <td>
                   <span class="badge"
                         th:style="${p.status.name() == 'PUBLISHED' ? 'color:#5ee38a' : (p.status.name() == 'DRAFT' ? 'color:#a0a0a0' : (p.status.name() == 'SCHEDULED' ? 'color:#ffc94d' : 'color:#7d7979'))}"
-                        th:text="${#strings.capitalize(#strings.toLowerCase(p.status.name()))}">Published</span>
+                        th:text="#{'enum.post.status.' + ${p.status.name()}}">Published</span>
                   <span th:if="${p.status.name() == 'SCHEDULED'}" class="dim" style="display:block;margin-top:4px;font-size:11px"
-                        th:text="${p.scheduledAt != null} ? ${#temporals.format(p.scheduledAt, 'yyyy-MM-dd HH:mm')} : 'No time set'">2026-09-20 09:00</span>
+                        th:text="${p.scheduledAt != null} ? ${#temporals.format(p.scheduledAt, 'yyyy-MM-dd HH:mm')} : #{admin.post.no_time_set}">2026-09-20 09:00</span>
                 </td>
                 <td class="dim" th:text="${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'}">—</td>
                 <td class="right">
                   <span style="display:inline-flex;gap:6px">
-                    <a class="btn btn-ghost btn-xs" th:href="@{'/admin/post/' + ${p.id} + '/edit'}">Edit</a>
+                    <a class="btn btn-ghost btn-xs" th:href="@{'/admin/post/' + ${p.id} + '/edit'}" th:text="#{admin.common.edit}">Edit</a>
                     <button th:if="${perms.contains('posts:delete')}" type="button" class="btn btn-ghost btn-xs btn-danger btn-del-post"
                             th:data-id="${p.id}"
-                            th:data-name="${p.title}">Del</button>
+                            th:data-name="${p.title}" th:text="#{admin.common.del}">Del</button>
                   </span>
                 </td>
               </tr>

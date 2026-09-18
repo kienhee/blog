@@ -10,6 +10,7 @@ import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.repository.UserStorageQuotaRepository;
 import com.kienhee.blog.service.MediaService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +54,8 @@ class WebpThumbnailTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         Role role = roleRepository.findBySlug("admin").orElseThrow();
         user = userRepository.save(User.builder().fullName("Webp Tester").email("webp" + System.nanoTime() + "@test.com")
                 .password("{noop}irrelevant").role(role).build());

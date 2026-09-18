@@ -14,6 +14,7 @@ import com.kienhee.blog.repository.HashtagRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +61,8 @@ class TrashTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Trash " + tag).slug(tag + "-cat").visible(true).build());
     }

@@ -1,5 +1,8 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.config.I18n;
+
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.config.AppMailProperties;
 import com.kienhee.blog.service.MailService;
 import com.kienhee.blog.entity.UserStatus;
@@ -53,12 +56,12 @@ public class UserServiceImpl implements UserService {
     public User createUser(UserCreateRequest request, boolean actorIsAdmin) {
         String email = request.getEmail().trim().toLowerCase();
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already in use: " + request.getEmail());
+            throw new BusinessException("error.user.email_taken", request.getEmail());
         }
 
         Role role = resolveRole(request.getRoleId());
         if (!actorIsAdmin && isAdminRole(role)) {
-            throw new IllegalArgumentException(ADMIN_ONLY);
+            throw new BusinessException(ADMIN_ONLY);
         }
 
         User user = User.builder()
@@ -80,7 +83,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return roleRepository.findById(roleId)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found."));
+                .orElseThrow(() -> new BusinessException("error.user.role_not_found"));
     }
 
     @Override
@@ -93,16 +96,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUser(Long id, UserUpdateRequest request, boolean actorIsAdmin) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.user.not_found", id));
         Role newRole = resolveRole(request.getRoleId());
 
         boolean targetIsAdmin = isAdminRole(user.getRole());
         if (!actorIsAdmin && (targetIsAdmin || isAdminRole(newRole))) {
-            throw new IllegalArgumentException(ADMIN_ONLY);
+            throw new BusinessException(ADMIN_ONLY);
         }
         if (targetIsAdmin && user.getStatus() == UserStatus.ACTIVE && !isAdminRole(newRole)
                 && userRepository.countByRole_SystemRoleTrueAndStatus(UserStatus.ACTIVE) <= 1) {
-            throw new IllegalArgumentException(LAST_ADMIN);
+            throw new BusinessException(LAST_ADMIN);
         }
 
         user.setFullName(request.getFullName().trim());
@@ -128,21 +131,21 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id, String currentAdminEmail, boolean actorIsAdmin) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.user.not_found", id));
 
         if (currentAdminEmail != null && user.getEmail().equalsIgnoreCase(currentAdminEmail.trim())) {
-            throw new IllegalArgumentException("You cannot delete your own account.");
+            throw new BusinessException("error.user.self_delete");
         }
         boolean targetIsAdmin = isAdminRole(user.getRole());
         if (targetIsAdmin && !actorIsAdmin) {
-            throw new IllegalArgumentException(ADMIN_ONLY);
+            throw new BusinessException(ADMIN_ONLY);
         }
         if (targetIsAdmin && user.getStatus() == UserStatus.ACTIVE
                 && userRepository.countByRole_SystemRoleTrueAndStatus(UserStatus.ACTIVE) <= 1) {
-            throw new IllegalArgumentException(LAST_ADMIN);
+            throw new BusinessException(LAST_ADMIN);
         }
         if (postRepository.existsByAuthor_Id(id)) {
-            throw new IllegalArgumentException("This user still has posts. Delete or reassign their posts first.");
+            throw new BusinessException("error.user.has_posts");
         }
 
         userRepository.delete(user);
@@ -163,17 +166,17 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void changeStatus(Long id, UserStatus status, String actorEmail, boolean actorIsAdmin) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.user.not_found", id));
         if (actorEmail != null && user.getEmail().equalsIgnoreCase(actorEmail.trim())) {
-            throw new IllegalArgumentException("You can't change the status of your own account.");
+            throw new BusinessException("error.user.self_status");
         }
         boolean targetIsAdmin = isAdminRole(user.getRole());
         if (targetIsAdmin && !actorIsAdmin) {
-            throw new IllegalArgumentException(ADMIN_ONLY);
+            throw new BusinessException(ADMIN_ONLY);
         }
         if (targetIsAdmin && user.getStatus() == UserStatus.ACTIVE && status != UserStatus.ACTIVE
                 && userRepository.countByRole_SystemRoleTrueAndStatus(UserStatus.ACTIVE) <= 1) {
-            throw new IllegalArgumentException(LAST_ADMIN);
+            throw new BusinessException(LAST_ADMIN);
         }
 
         boolean approving = user.getStatus() == UserStatus.PENDING && status == UserStatus.ACTIVE;
@@ -193,7 +196,7 @@ public class UserServiceImpl implements UserService {
                     new org.springframework.transaction.support.TransactionSynchronization() {
                         @Override
                         public void afterCommit() {
-                            mailService.send(to, "Your account is approved", "account-approved", variables);
+                            mailService.send(to, I18n.DEFAULT, "account-approved", "mail.approved.subject", variables);
                         }
                     });
         }

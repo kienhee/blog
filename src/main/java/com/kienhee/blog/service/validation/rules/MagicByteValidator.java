@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.validation.rules;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.service.validation.FileValidator;
 import com.kienhee.blog.service.validation.MediaTypeCatalog;
 import com.kienhee.blog.service.validation.UploadValidationContext;
@@ -33,7 +34,7 @@ public class MagicByteValidator implements FileValidator {
     @Override
     public void validate(UploadValidationContext context) {
         if (!looksLikeDeclaredType(context)) {
-            throw new IllegalArgumentException("File content does not match its declared type.");
+            throw new BusinessException("error.media.magic_mismatch");
         }
     }
 

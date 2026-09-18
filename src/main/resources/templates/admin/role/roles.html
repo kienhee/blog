@@ -2,17 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Roles</title>
+    <title th:text="#{nav.admin.roles}">Roles</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <a th:href="@{/admin/dashboard}" class="dim">Dashboard</a><span style="color:var(--line)">/</span><strong>Roles</strong>
+    <a th:href="@{/admin/dashboard}" class="dim" th:text="#{nav.admin.dashboard}">Dashboard</a><span style="color:var(--line)">/</span><strong th:text="#{nav.admin.roles}">Roles</strong>
 </div>
 
 <div layout:fragment="content">
-      <h1 style="font-size:34px">Roles &amp; permissions</h1>
-      <p class="dim" style="margin:6px 0 24px">Pick a role on the left, set what it can do, then save.</p>
+      <h1 style="font-size:34px" th:text="#{admin.role.title}">Roles &amp; permissions</h1>
+      <p class="dim" style="margin:6px 0 24px" th:text="#{admin.role.intro}">Pick a role on the left, set what it can do, then save.</p>
 
       <div th:if="${successMessage}" style="margin-bottom:18px;padding:12px 14px;background:rgba(46,213,115,0.12);border:1px solid #2ed573;color:#2ed573;border-radius:6px;font-size:13px;font-weight:600">
           <span th:text="${successMessage}">Success message</span>
@@ -30,44 +30,43 @@
             <span style="font-size:16px;font-weight:700" th:text="${r.name}">Owner</span>
             <span class="dim" style="font-size:12px">
               <span th:text="${userCounts != null and userCounts.containsKey(r.id) ? userCounts.get(r.id) : 0}">0</span>
-              <span th:text="${userCounts != null and userCounts.get(r.id) == 1 ? ' user' : ' users'}"> users</span>
-              <span th:if="${r.systemRole}"> · system role</span>
-              <span th:unless="${r.systemRole}" th:text="' · ' + ${r.permissions.size()} + ' permissions'"></span>
+              <span th:text="#{admin.role.users_suffix}"> users</span>
+              <span th:if="${r.systemRole}" th:text="#{admin.role.system_suffix}"> · system role</span>
+              <span th:unless="${r.systemRole}" th:text="#{admin.role.permissions_suffix(${r.permissions.size()})}"></span>
             </span>
           </a>
 
           <form class="role-create" th:if="${perms.contains('roles:create')}" method="post" th:action="@{/admin/roles}">
-            <input class="input" name="name" placeholder="New role name" required minlength="2">
-            <input class="input" name="description" placeholder="Short description (optional)">
-            <button class="btn btn-ghost btn-xs" type="submit">Add role</button>
+            <input class="input" name="name" th:placeholder="#{admin.role.new_name}" required minlength="2">
+            <input class="input" name="description" th:placeholder="#{admin.role.new_description}">
+            <button class="btn btn-ghost btn-xs" type="submit" th:text="#{admin.role.add}">Add role</button>
           </form>
         </div>
 
-        <div th:if="${selectedRole == null}" style="padding:40px 20px" class="dim">No roles yet. Create one to get started.</div>
+        <div th:if="${selectedRole == null}" style="padding:40px 20px" class="dim" th:text="#{admin.role.empty}">No roles yet.</div>
 
         <div th:if="${selectedRole != null}">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:2px solid var(--rule)">
             <span style="font-size:18px;font-weight:700" data-role-title
-                  th:text="${selectedRole.name} + ' permissions'">Editor permissions</span>
+                  th:text="#{admin.role.of(${selectedRole.name})}">Editor permissions</span>
             <span style="display:flex;gap:8px">
               <button th:if="${perms.contains('roles:edit') and !selectedRole.systemRole}"
-                      class="btn btn-sm" type="submit" form="permissions-form">Save changes</button>
+                      class="btn btn-sm" type="submit" form="permissions-form" th:text="#{admin.role.save}">Save changes</button>
               <button th:if="${perms.contains('roles:delete') and !selectedRole.systemRole}"
                       type="button" class="btn btn-ghost btn-sm btn-danger" id="btn-delete-role"
-                      th:data-id="${selectedRole.id}" th:data-name="${selectedRole.name}">Delete role</button>
+                      th:data-id="${selectedRole.id}" th:data-name="${selectedRole.name}" th:text="#{admin.role.delete}">Delete role</button>
             </span>
           </div>
 
-          <p th:if="${selectedRole.systemRole}" class="dim" style="padding:14px 20px;font-size:13px;border-bottom:1px solid var(--line)">
-            This is a system role with full access. It can't be edited or deleted, so you can never lock yourself out.
-          </p>
+          <p th:if="${selectedRole.systemRole}" class="dim" style="padding:14px 20px;font-size:13px;border-bottom:1px solid var(--line)"
+             th:text="#{admin.role.system_note}">This is a system role with full access.</p>
           <p th:if="${selectedRole.description != null}" class="dim" style="padding:14px 20px;font-size:13px;border-bottom:1px solid var(--line)"
              th:text="${selectedRole.description}">Description</p>
 
           <form id="permissions-form" method="post" th:action="@{'/admin/roles/' + ${selectedRole.id} + '/permissions'}">
             <div class="perm-matrix">
               <div class="perm-row" th:each="row : ${permissionMatrix}">
-                <div class="perm-label" th:text="${row.label}">Posts</div>
+                <div class="perm-label" th:text="#{'perm.module.' + ${row.resource}}">Posts</div>
                 <div class="perm-cells">
                   <label th:each="cell : ${row.cells}" th:title="${cell.code}">
                     <input class="checkbox" type="checkbox" name="permissionIds"
@@ -75,8 +74,8 @@
                            th:checked="${cell.granted}"
                            th:disabled="${selectedRole.systemRole or !perms.contains('roles:edit')}">
                     <span class="perm-text">
-                      <span class="kicker" th:text="${cell.action}">view</span>
-                      <span class="dim perm-desc" th:text="${cell.label}">View posts</span>
+                      <span class="kicker" th:text="#{'perm.action.' + ${cell.action}}">view</span>
+                      <span class="dim perm-desc" th:text="#{'perm.' + ${row.resource} + '.' + ${cell.action}}">View posts</span>
                     </span>
                   </label>
                 </div>

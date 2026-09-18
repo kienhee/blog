@@ -35,6 +35,7 @@ public class PublicCommentController {
     private final CommentRateLimiter rateLimiter;
     private final UserRepository userRepository;
     private final Validator validator;
+    private final BusinessMessages messages;
 
     @PostMapping("/article/{slug}/comments")
     public String submit(@PathVariable String slug, @ModelAttribute CommentForm form, Principal principal,
@@ -44,7 +45,7 @@ public class PublicCommentController {
 
         // Bots fill every field; pretend it worked so they learn nothing.
         if (form.getWebsite() != null && !form.getWebsite().isBlank()) {
-            redirect.addFlashAttribute("commentSuccess", "Thanks! Your comment is awaiting moderation.");
+            redirect.addFlashAttribute("commentSuccess", messages.get("msg.comment.thanks_pending"));
             return back;
         }
 
@@ -58,24 +59,24 @@ public class PublicCommentController {
         if (!violations.isEmpty()) {
             String message = violations.stream()
                     .sorted(Comparator.comparing(v -> v.getPropertyPath().toString()))
-                    .map(ConstraintViolation::getMessage).findFirst().orElse("Please check your comment.");
+                    .map(ConstraintViolation::getMessage).findFirst().orElse(messages.get("error.comment.check"));
             return fail(redirect, form, message, back);
         }
 
         if (!rateLimiter.tryAcquire(request.getRemoteAddr())) {
-            return fail(redirect, form, "Too many comments from your connection. Please try again in a few minutes.", back);
+            return fail(redirect, form, messages.get("error.comment.rate_limited"), back);
         }
 
         try {
             Comment saved = commentService.submit(post, form, user, request.getRemoteAddr(), request.getHeader("User-Agent"));
             redirect.addFlashAttribute("commentSuccess", saved.getStatus() == CommentStatus.APPROVED
-                    ? "Thanks! Your comment is live."
-                    : "Thanks! Your comment is awaiting moderation.");
+                    ? messages.get("msg.comment.thanks_live")
+                    : messages.get("msg.comment.thanks_pending"));
             return saved.getStatus() == CommentStatus.APPROVED
                     ? "redirect:/article/" + post.getSlug() + "#comment-" + saved.getId()
                     : back;
         } catch (IllegalArgumentException e) {
-            return fail(redirect, form, e.getMessage(), back);
+            return fail(redirect, form, messages.text(e), back);
         }
     }
 

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -24,6 +26,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -41,6 +44,15 @@ class MailServiceImplTests {
 
     private static final String RESET_URL = "http://localhost:8080/auth/reset?token=abcDEF123_-xyz";
 
+    /** The real message catalogue (messages.properties / _en), as Spring wires it in the app. */
+    private static MessageSource messages() {
+        ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
+        source.setBasename("classpath:messages");
+        source.setDefaultEncoding("UTF-8");
+        source.setFallbackToSystemLocale(false);
+        return source;
+    }
+
     /** The real mail templates from src/main/resources/templates, rendered like in the app. */
     private static ITemplateEngine templateEngine() {
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
@@ -51,6 +63,7 @@ class MailServiceImplTests {
         resolver.setCacheable(false);
         SpringTemplateEngine engine = new SpringTemplateEngine();
         engine.setTemplateResolver(resolver);
+        engine.setTemplateEngineMessageSource(messages());
         return engine;
     }
 
@@ -90,9 +103,9 @@ class MailServiceImplTests {
         void disabledSendsNothing() {
             ITemplateEngine engine = spy(templateEngine());
             ObjectProvider<JavaMailSender> provider = provider(sender);
-            MailServiceImpl service = new MailServiceImpl(provider, engine, properties(false));
+            MailServiceImpl service = new MailServiceImpl(provider, engine, properties(false), messages());
 
-            service.send("reader@example.com", "Reset your Kienhee password", "password-reset", resetVariables("Reader"));
+            service.sendWritten("reader@example.com", Locale.ENGLISH, "password-reset", "Reset your Kienhee password", resetVariables("Reader"));
 
             verifyNoInteractions(sender);
             verify(provider, never()).getIfAvailable();
@@ -102,17 +115,17 @@ class MailServiceImplTests {
         @Test
         @DisplayName("mail enabled but no SMTP sender configured: logs and returns, never throws")
         void noSenderDoesNotThrow() {
-            MailServiceImpl service = new MailServiceImpl(provider(null), templateEngine(), properties(true));
+            MailServiceImpl service = new MailServiceImpl(provider(null), templateEngine(), properties(true), messages());
             assertDoesNotThrow(() ->
-                    service.send("reader@example.com", "Subject", "password-reset", resetVariables("Reader")));
+                    service.sendWritten("reader@example.com", Locale.ENGLISH, "password-reset", "Subject", resetVariables("Reader")));
         }
 
         @Test
         @DisplayName("builds the message: from name and address, recipient, subject and HTML body with the link")
         void buildsMessage() throws Exception {
-            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true));
+            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true), messages());
 
-            service.send("reader@example.com", "Reset your Kienhee password", "password-reset", resetVariables("Minh Tran"));
+            service.sendWritten("reader@example.com", Locale.ENGLISH, "password-reset", "Reset your Kienhee password", resetVariables("Minh Tran"));
 
             ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
             verify(sender).send(captor.capture());
@@ -139,9 +152,9 @@ class MailServiceImplTests {
         @Test
         @DisplayName("user-controlled values are HTML-escaped in the email")
         void escapesName() throws Exception {
-            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true));
+            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true), messages());
 
-            service.send("reader@example.com", "Subject", "password-reset", resetVariables("<script>alert(1)</script>"));
+            service.sendWritten("reader@example.com", Locale.ENGLISH, "password-reset", "Subject", resetVariables("<script>alert(1)</script>"));
 
             ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
             verify(sender).send(captor.capture());
@@ -154,19 +167,19 @@ class MailServiceImplTests {
         @DisplayName("an SMTP failure is swallowed (logged), so a request never fails because of mail")
         void smtpFailureIsSwallowed() {
             doThrow(new MailSendException("535 Authentication failed")).when(sender).send(any(MimeMessage.class));
-            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true));
+            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true), messages());
 
             assertDoesNotThrow(() ->
-                    service.send("reader@example.com", "Subject", "password-reset", resetVariables("Reader")));
+                    service.sendWritten("reader@example.com", Locale.ENGLISH, "password-reset", "Subject", resetVariables("Reader")));
             verify(sender).send(any(MimeMessage.class));
         }
 
         @Test
         @DisplayName("a missing template is swallowed and nothing is sent")
         void missingTemplate() {
-            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true));
+            MailServiceImpl service = new MailServiceImpl(provider(sender), templateEngine(), properties(true), messages());
 
-            assertDoesNotThrow(() -> service.send("reader@example.com", "Subject", "does-not-exist", Map.of()));
+            assertDoesNotThrow(() -> service.sendWritten("reader@example.com", Locale.ENGLISH, "does-not-exist", "Subject", Map.of()));
             verify(sender, never()).send(any(MimeMessage.class));
         }
 
@@ -174,7 +187,7 @@ class MailServiceImplTests {
         @DisplayName("send runs asynchronously (@Async), so callers never wait on the SMTP server")
         void sendIsAsync() throws Exception {
             assertNotNull(MailServiceImpl.class
-                    .getMethod("send", String.class, String.class, String.class, Map.class)
+                    .getMethod("sendWritten", String.class, Locale.class, String.class, String.class, Map.class)
                     .getAnnotation(Async.class));
         }
     }
@@ -209,7 +222,7 @@ class MailServiceImplTests {
             props.put("mail.smtp.connectiontimeout", "5000");
             props.put("mail.smtp.timeout", "5000");
             sender.setJavaMailProperties(props);
-            return new MailServiceImpl(provider(sender), templateEngine(), properties);
+            return new MailServiceImpl(provider(sender), templateEngine(), properties, messages());
         }
 
         @Test
@@ -218,8 +231,8 @@ class MailServiceImplTests {
             AppMailProperties properties = properties(true);
             properties.setFromName("Kiến Hee");
 
-            service(properties).send("reader@example.com", "Đặt lại mật khẩu Kienhee", "password-reset",
-                    resetVariables("Trần Minh"));
+            service(properties).sendWritten("reader@example.com", Locale.ENGLISH, "password-reset",
+                    "Đặt lại mật khẩu Kienhee", resetVariables("Trần Minh"));
 
             assertTrue(greenMail.waitForIncomingEmail(5000, 1), "one message reaches the SMTP server");
             MimeMessage received = greenMail.getReceivedMessages()[0];
@@ -239,8 +252,67 @@ class MailServiceImplTests {
         @Test
         @DisplayName("with mail disabled the SMTP server receives nothing")
         void disabledReachesNoServer() {
-            service(properties(false)).send("reader@example.com", "Subject", "password-reset", resetVariables("Reader"));
+            service(properties(false)).sendWritten("reader@example.com", Locale.ENGLISH, "password-reset",
+                    "Subject", resetVariables("Reader"));
             assertEquals(0, greenMail.getReceivedMessages().length);
+        }
+    }
+
+    @Nested
+    @DisplayName("language of the email")
+    class Languages {
+
+        private MailServiceImpl service(JavaMailSender sender) {
+            return new MailServiceImpl(provider(sender), templateEngine(), properties(true), messages());
+        }
+
+        private MimeMessage sent(Locale locale) throws Exception {
+            JavaMailSender sender = mock(JavaMailSender.class);
+            when(sender.createMimeMessage()).thenAnswer(invocation -> new MimeMessage((Session) null));
+
+            service(sender).send("reader@example.com", locale, "password-reset",
+                    "mail.reset.subject", resetVariables("Reader"), "Kienhee");
+
+            ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+            verify(sender).send(captor.capture());
+            MimeMessage message = captor.getValue();
+            message.saveChanges();
+            return message;
+        }
+
+        @Test
+        @DisplayName("the subject comes from the catalogue for the language asked for")
+        void subjectFollowsLocale() throws Exception {
+            assertEquals("Reset your Kienhee password", sent(Locale.ENGLISH).getSubject());
+            assertEquals("Đặt lại mật khẩu Kienhee của bạn", sent(Locale.forLanguageTag("vi")).getSubject());
+        }
+
+        @Test
+        @DisplayName("the body is rendered in that language too, links unchanged")
+        void bodyFollowsLocale() throws Exception {
+            String english = (String) sent(Locale.ENGLISH).getContent();
+            assertTrue(english.contains("Choose a new password"), english);
+            assertTrue(english.contains("lang=\"en\""), "html lang follows the locale");
+
+            String vietnamese = (String) sent(Locale.forLanguageTag("vi")).getContent();
+            assertTrue(vietnamese.contains("Chọn mật khẩu mới"), vietnamese);
+            assertTrue(vietnamese.contains("lang=\"vi\""), "html lang follows the locale");
+            // Whatever the language, the single-use link is the same one.
+            assertTrue(vietnamese.contains(RESET_URL));
+        }
+
+        @Test
+        @DisplayName("an unknown subject key shows the key, never an empty subject line")
+        void unknownSubjectKey() throws Exception {
+            JavaMailSender sender = mock(JavaMailSender.class);
+            when(sender.createMimeMessage()).thenAnswer(invocation -> new MimeMessage((Session) null));
+
+            service(sender).send("reader@example.com", Locale.ENGLISH, "password-reset",
+                    "mail.does.not.exist", resetVariables("Reader"));
+
+            ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+            verify(sender).send(captor.capture());
+            assertEquals("mail.does.not.exist", captor.getValue().getSubject());
         }
     }
 }

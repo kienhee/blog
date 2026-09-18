@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.validation.rules;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.service.validation.FileValidator;
 import com.kienhee.blog.service.validation.MediaTypeCatalog;
 import com.kienhee.blog.service.validation.UploadValidationContext;
@@ -23,8 +24,7 @@ public class ContentTypeWhitelistValidator implements FileValidator {
     @Override
     public void validate(UploadValidationContext context) {
         if (!MediaTypeCatalog.isAllowed(context.getDeclaredContentType())) {
-            throw new IllegalArgumentException(
-                    "Unsupported file type. Allowed: JPG, PNG, WEBP, GIF, SVG, PDF, DOC(X), XLS(X), ZIP, TXT.");
+            throw new BusinessException("error.media.unsupported_type");
         }
     }
 }

@@ -10,6 +10,7 @@ import com.kienhee.blog.repository.HashtagRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.SettingService;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +58,8 @@ class PublicSiteTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         author = userRepository.findAll().get(0);
         category = categoryRepository.save(Category.builder().name("Public " + tag).slug("cat-" + tag).visible(true).build());
         hiddenCategory = categoryRepository.save(Category.builder().name("Hidden " + tag).slug("hidden-" + tag).visible(false).build());
@@ -144,7 +146,7 @@ class PublicSiteTests {
         Post published = post("findme", PostStatus.PUBLISHED, "<p>x</p>", LocalDateTime.now());
         post("findme-draft", PostStatus.DRAFT, "<p>x</p>", null);
 
-        mockMvc.perform(get("/search").param("q", tag))
+        mockMvc.perform(get("/search").param("q", tag).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(published.getTitle())))
                 .andExpect(content().string(containsString("1 result for")));
@@ -163,7 +165,7 @@ class PublicSiteTests {
         postRepository.save(tagged);
         Post untagged = post("untagged", PostStatus.PUBLISHED, "<p>x</p>", LocalDateTime.now());
 
-        MvcResult result = mockMvc.perform(get("/search").param("tag", hashtag.getSlug()))
+        MvcResult result = mockMvc.perform(get("/search").param("tag", hashtag.getSlug()).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("1 article tagged")))
                 .andReturn();
@@ -192,7 +194,7 @@ class PublicSiteTests {
         Post newest = post("p3", PostStatus.PUBLISHED, "<p>x</p>", base.minusDays(1));
 
         // Assert on the model, not the HTML: the header's search overlay lists the newest posts on every page.
-        MvcResult first = mockMvc.perform(get("/category/" + category.getSlug()))
+        MvcResult first = mockMvc.perform(get("/category/" + category.getSlug()).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Page 1 of 2")))
                 .andReturn();

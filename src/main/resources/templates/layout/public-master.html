@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark"
+<html th:lang="${currentLang} ?: 'vi'" data-theme="dark"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
@@ -9,6 +9,7 @@
     <script>try{var t=localStorage.getItem('kienhee-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
     <title layout:title-pattern="$CONTENT_TITLE — $LAYOUT_TITLE" th:text="${siteTitle} ?: 'Kienhee'">Kienhee</title>
     <meta name="description" th:content="${pageDescription} ?: (${siteDescription} ?: 'AI guides and news')">
+    <meta property="og:locale" th:content="${currentLang == 'en'} ? 'en_US' : 'vi_VN'">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
@@ -24,6 +25,8 @@
 
 <div th:replace="~{fragments/public/footer :: footer}"></div>
 
+<div th:replace="~{fragments/i18n :: dictionary}"></div>
+<script th:src="@{/scripts/core/i18n.js}"></script>
 <script th:src="@{/scripts/lib/jquery.min.js}"></script>
 <script th:src="@{/scripts/public/main.js}"></script>
 <th:block layout:fragment="scripts"></th:block>

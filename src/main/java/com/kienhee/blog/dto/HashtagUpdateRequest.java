@@ -13,19 +13,19 @@ import lombok.*;
 @Builder
 public class HashtagUpdateRequest {
 
-    @NotNull(message = "Hashtag ID is required.")
+    @NotNull(message = "{validation.hashtag.id_required}")
     private Long id;
 
-    @NotBlank(message = "Name is required.")
-    @Size(min = 2, max = 100, message = "Name must have at least 2 characters.")
+    @NotBlank(message = "{validation.name.required}")
+    @Size(min = 2, max = 100, message = "{validation.name.min}")
     private String name;
 
-    @NotBlank(message = "Slug is required.")
-    @Size(min = 2, max = 120, message = "Slug must have at least 2 characters.")
-    @Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "Slug may only contain lowercase letters, numbers and hyphens.")
+    @NotBlank(message = "{validation.slug.required}")
+    @Size(min = 2, max = 120, message = "{validation.slug.min2}")
+    @Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "{validation.slug.pattern}")
     private String slug;
 
-    @Size(max = 2000, message = "Description must not exceed 2000 characters.")
+    @Size(max = 2000, message = "{validation.description.max2000}")
     private String description;
 
     @Builder.Default

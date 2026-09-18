@@ -13,7 +13,7 @@ $(function () {
 
     if (status === 'DISABLED' && window.khDialog) {
       window.khDialog('sign-in for "' + ($btn.attr('data-name') || 'this account') + '"', function () { $form[0].submit(); },
-        'They can no longer sign in. Their content stays, and you can enable the account again at any time.');
+        khT('js.user.disable_note'));
       return;
     }
     $form[0].submit();

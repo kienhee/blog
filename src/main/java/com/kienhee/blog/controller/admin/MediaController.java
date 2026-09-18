@@ -1,5 +1,6 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
 import com.kienhee.blog.dto.MediaFolderCreateRequest;
 import com.kienhee.blog.dto.MediaUpdateRequest;
 import com.kienhee.blog.entity.Media;
@@ -47,6 +48,7 @@ public class MediaController {
     private final MediaService mediaService;
     private final MediaFolderService mediaFolderService;
     private final MediaTrashProperties trashProperties;
+    private final BusinessMessages messages;
 
     /**
      * The explorer on this page is the MediaExplorer component, which loads everything it shows
@@ -80,7 +82,7 @@ public class MediaController {
                 mediaService.uploadMedia(file, uploaderEmail, folderId);
                 successCount++;
             } catch (IllegalArgumentException e) {
-                errors.add((file.getOriginalFilename() != null ? file.getOriginalFilename() : "file") + ": " + e.getMessage());
+                errors.add((file.getOriginalFilename() != null ? file.getOriginalFilename() : messages.get("bulk.noun.media-files.bare")) + ": " + messages.text(e));
             }
         }
 
@@ -111,9 +113,9 @@ public class MediaController {
 
         try {
             mediaService.updateMedia(id, request);
-            redirectAttributes.addFlashAttribute("successMessage", "File updated successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.file_updated"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(returnFolder);
     }
@@ -125,9 +127,9 @@ public class MediaController {
                           RedirectAttributes redirectAttributes) {
         try {
             mediaService.deleteMedia(id);
-            redirectAttributes.addFlashAttribute("successMessage", "File moved to the trash.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.file_trashed"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(returnFolder);
     }
@@ -138,7 +140,7 @@ public class MediaController {
                               @RequestParam(value = "returnFolder", required = false) Long returnFolder,
                               RedirectAttributes redirectAttributes) {
         if (ids == null || ids.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "No files selected.");
+            redirectAttributes.addFlashAttribute("errorMessage", messages.get("error.media.none_selected"));
             return redirectToFolder(returnFolder);
         }
 
@@ -160,14 +162,14 @@ public class MediaController {
                             @RequestParam(value = "returnFolder", required = false) Long returnFolder,
                             RedirectAttributes redirectAttributes) {
         if (ids == null || ids.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "No files selected.");
+            redirectAttributes.addFlashAttribute("errorMessage", messages.get("error.media.none_selected"));
             return redirectToFolder(returnFolder);
         }
         try {
             mediaService.bulkMoveToFolder(ids, folderId);
             redirectAttributes.addFlashAttribute("successMessage", ids.size() + " file(s) moved.");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(returnFolder);
     }
@@ -186,9 +188,9 @@ public class MediaController {
         }
         try {
             mediaFolderService.createFolder(request);
-            redirectAttributes.addFlashAttribute("successMessage", "Folder created.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.folder_created"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(request.getParentId());
     }
@@ -205,9 +207,9 @@ public class MediaController {
                              RedirectAttributes redirectAttributes) {
         try {
             mediaFolderService.moveFolder(id, parentId);
-            redirectAttributes.addFlashAttribute("successMessage", "Folder moved.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.folder_moved"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
             return redirectToFolder(returnFolder);
         }
         return redirectToFolder(parentId);
@@ -226,9 +228,9 @@ public class MediaController {
                                 RedirectAttributes redirectAttributes) {
         try {
             mediaFolderService.renameFolder(id, name);
-            redirectAttributes.addFlashAttribute("successMessage", "Folder renamed.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.folder_renamed"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(returnFolder);
     }
@@ -240,9 +242,9 @@ public class MediaController {
                                 RedirectAttributes redirectAttributes) {
         try {
             mediaFolderService.deleteFolder(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Folder moved to the trash, together with its subfolders and files.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.folder_trashed"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return redirectToFolder(returnFolder);
     }
@@ -263,11 +265,10 @@ public class MediaController {
     public String restore(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             MediaService.RestoreResult result = mediaService.restoreMedia(id);
-            redirectAttributes.addFlashAttribute("successMessage", result.movedToRoot()
-                    ? "File restored to Home — the folder it used to live in no longer exists."
-                    : "File restored.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get(result.movedToRoot()
+                    ? "msg.media.file_restored_home" : "msg.media.file_restored"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/trash?type=media-files";
     }
@@ -281,9 +282,9 @@ public class MediaController {
     public String purge(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             mediaService.purgeMedia(id);
-            redirectAttributes.addFlashAttribute("successMessage", "File permanently deleted.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.file_purged"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/trash?type=media-files";
     }
@@ -293,11 +294,10 @@ public class MediaController {
     public String restoreFolder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             MediaFolderService.FolderRestoreResult result = mediaFolderService.restoreFolder(id);
-            redirectAttributes.addFlashAttribute("successMessage", result.movedToRoot()
-                    ? "Folder restored to Home — its parent folder no longer exists."
-                    : "Folder restored with its subfolders and files.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get(result.movedToRoot()
+                    ? "msg.media.folder_restored_home" : "msg.media.folder_restored"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/trash?type=media-files";
     }
@@ -308,9 +308,9 @@ public class MediaController {
         try {
             mediaFolderService.purgeFolder(id);
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Folder permanently deleted. Any files still inside it stay in the trash at Home.");
+                    messages.get("msg.media.folder_purged"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/trash?type=media-files";
     }
@@ -342,7 +342,7 @@ public class MediaController {
         List<Long> media = mediaIds == null ? List.of() : mediaIds;
         List<Long> folders = folderIds == null ? new ArrayList<>() : new ArrayList<>(folderIds);
         if (media.isEmpty() && folders.isEmpty()) {
-            return ResponseEntity.status(422).body(Map.of("message", "Nothing selected."));
+            return ResponseEntity.status(422).body(Map.of("message", messages.get("error.media.nothing_selected")));
         }
 
         Set<Long> mediaBefore = trashedMediaIds();
@@ -375,11 +375,12 @@ public class MediaController {
         List<Long> removedFolders = folderDepthsBefore.keySet().stream().filter(id -> !foldersAfter.contains(id)).toList();
 
         int done = removedMedia.size() + removedFolders.size();
-        String verb = purge ? "permanently deleted" : "restored";
+        String counted = messages.get("bulk.noun.items" + (done == 1 ? ".one" : ".other"), done);
+        String verbKey = purge ? "bulk.verb.purged" : "bulk.verb.restored";
         String message = done == 0
-                ? (errors.isEmpty() ? "Nothing was " + verb + "." : String.join(" ", errors))
-                : done + (done == 1 ? " item " : " items ") + verb + "."
-                        + (errors.isEmpty() ? "" : " " + errors.size() + " could not be " + verb + ": " + String.join(" ", errors));
+                ? (errors.isEmpty() ? messages.get("msg.media.nothing_done") : String.join(" ", errors))
+                : messages.get(verbKey, counted)
+                        + (errors.isEmpty() ? "" : " " + messages.get("msg.media.some_failed", errors.size(), String.join(" ", errors)));
 
         MediaService.TrashSummary summary = mediaService.getTrashSummary();
         Map<String, Object> body = new LinkedHashMap<>();
@@ -408,13 +409,13 @@ public class MediaController {
                 mediaService.restoreMedia(id);
             }
         } catch (IllegalArgumentException e) {
-            errors.add(e.getMessage());
+            errors.add(messages.text(e));
         }
     }
 
     private void purgeOrRestoreFolder(Long id, boolean purge, Map<Long, Integer> trashedAtStart, List<String> errors) {
         if (!trashedAtStart.containsKey(id)) {
-            errors.add("Folder #" + id + " is not in the trash.");
+            errors.add(messages.get("error.media.folder_not_trashed_id", id));
             return;
         }
         if (!trashedFolderDepths().containsKey(id)) {
@@ -427,7 +428,7 @@ public class MediaController {
                 mediaFolderService.restoreFolder(id);
             }
         } catch (IllegalArgumentException e) {
-            errors.add(e.getMessage());
+            errors.add(messages.text(e));
         }
     }
 
@@ -449,9 +450,9 @@ public class MediaController {
         MediaService.BulkDeleteResult result = mediaService.emptyTrash();
         if (result.deletedCount() > 0) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    result.deletedCount() + " item(s) permanently deleted. Storage has been freed.");
+                    messages.get("msg.media.trash_emptied", result.deletedCount()));
         } else if (result.errors().isEmpty()) {
-            redirectAttributes.addFlashAttribute("successMessage", "The trash is already empty.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.media.trash_already_empty"));
         }
         if (!result.errors().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", String.join(" · ", result.errors()));

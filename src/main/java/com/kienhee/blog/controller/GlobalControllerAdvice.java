@@ -1,10 +1,12 @@
 package com.kienhee.blog.controller;
 
+import com.kienhee.blog.config.I18n;
 import com.kienhee.blog.entity.User;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.service.SettingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.security.Principal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +25,7 @@ public class GlobalControllerAdvice {
 
     private final UserRepository userRepository;
     private final SettingService settingService;
+    private final JsMessages jsMessages;
 
     /** Rows per page for admin DataTables ({@code blog.posts_per_page} setting), exposed as a meta tag. */
     @ModelAttribute("postsPerPage")
@@ -54,6 +58,38 @@ public class GlobalControllerAdvice {
             uri = uri.substring(contextPath.length());
         }
         return (uri.isEmpty()) ? "/" : uri;
+    }
+
+    /**
+     * Language of the current request ("vi" / "en"), for the flag switcher and {@code <html lang>}.
+     */
+    @ModelAttribute("currentLang")
+    public String currentLang() {
+        return I18n.codeOf(LocaleContextHolder.getLocale());
+    }
+
+    /** The js.* messages as JSON, inlined by the layouts for core/i18n.js (window.khT). */
+    @ModelAttribute("jsMessages")
+    public String jsMessages() {
+        return jsMessages.asJson(LocaleContextHolder.getLocale());
+    }
+
+    /** The language codes to offer, in display order. */
+    @ModelAttribute("langCodes")
+    public List<String> langCodes() {
+        return I18n.CODES;
+    }
+
+    /**
+     * Request path <i>with</i> its query string, so switching language comes back to the same page
+     * (page 2 of a list, a search with its {@code ?q=}). {@code currentUri} has no query string
+     * because nav highlighting must not depend on one.
+     */
+    @ModelAttribute("currentUriFull")
+    public String currentUriFull(HttpServletRequest request) {
+        String uri = currentUri(request);
+        String query = request.getQueryString();
+        return (query == null || query.isBlank()) ? uri : uri + "?" + query;
     }
 
     @ModelAttribute("currentUser")

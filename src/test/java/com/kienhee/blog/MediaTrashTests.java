@@ -236,7 +236,7 @@ class MediaTrashTests {
 
             IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                     () -> mediaService.deleteMedia(media.getId()));
-            assertEquals("Cannot delete: this file is used as a user's profile photo.", error.getMessage());
+            assertEquals("error.media.used_as_avatar", error.getMessage());
             assertEquals(Media.Status.ACTIVE, reload(media.getId()).getStatus());
         }
 
@@ -260,8 +260,7 @@ class MediaTrashTests {
 
             IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                     () -> mediaService.deleteMedia(media.getId()));
-            assertEquals("Cannot delete: this file is used as a cover image on one or more posts.",
-                    error.getMessage());
+            assertEquals("error.media.used_as_cover", error.getMessage());
         }
     }
 

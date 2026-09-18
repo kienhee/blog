@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.entity.Media;
 import com.kienhee.blog.entity.MediaFolder;
 import com.kienhee.blog.service.MediaFolderService;
@@ -79,23 +80,23 @@ public class TrashServiceImpl implements TrashService {
         switch (type) {
             case POSTS -> {
                 if (isTrue("select c.deleted_at is not null from posts p join categories c on c.id = p.category_id where p.id = ?", id)) {
-                    throw new IllegalArgumentException("Its category is in the trash. Restore the category first.");
+                    throw new BusinessException("error.trash.category_trashed");
                 }
                 jdbc.update("update posts set deleted_at = null where id = ?", id);
             }
             case CATEGORIES -> {
                 if (isTrue("select p.deleted_at is not null from categories c join categories p on p.id = c.parent_id where c.id = ?", id)) {
-                    throw new IllegalArgumentException("Its parent category is in the trash. Restore the parent first.");
+                    throw new BusinessException("error.trash.parent_trashed");
                 }
                 jdbc.update("update categories set deleted_at = null where id = ?", id);
             }
             case HASHTAGS -> jdbc.update("update hashtags set deleted_at = null where id = ?", id);
             case COMMENTS -> {
                 if (isTrue("select p.deleted_at is not null from comments c join posts p on p.id = c.post_id where c.id = ?", id)) {
-                    throw new IllegalArgumentException("Its post is in the trash. Restore the post first.");
+                    throw new BusinessException("error.trash.post_trashed");
                 }
                 if (isTrue("select p.deleted_at is not null from comments c join comments p on p.id = c.parent_id where c.id = ?", id)) {
-                    throw new IllegalArgumentException("It replies to a comment that is in the trash. Restore that comment first.");
+                    throw new BusinessException("error.trash.parent_comment_trashed");
                 }
                 LocalDateTime trashedAt = jdbc.queryForObject("select deleted_at from comments where id = ?", LocalDateTime.class, id);
                 // Replies trashed together with this comment (same timestamp) come back with it.
@@ -119,11 +120,11 @@ public class TrashServiceImpl implements TrashService {
         if (type == TrashType.CATEGORIES) {
             Long posts = jdbc.queryForObject("select count(*) from posts where category_id = ?", Long.class, id);
             if (posts != null && posts > 0) {
-                throw new IllegalArgumentException("Posts still use it (some may be in the trash). Delete those posts permanently first.");
+                throw new BusinessException("error.trash.posts_use_it");
             }
             Long children = jdbc.queryForObject("select count(*) from categories where parent_id = ?", Long.class, id);
             if (children != null && children > 0) {
-                throw new IllegalArgumentException("It still has subcategories. Delete those permanently first.");
+                throw new BusinessException("error.trash.has_children");
             }
         }
         // posts -> comments and post_hashtags, hashtags -> post_hashtags, comments -> replies: ON DELETE CASCADE.
@@ -133,7 +134,7 @@ public class TrashServiceImpl implements TrashService {
     private void requireInTrash(TrashType type, Long id) {
         Long n = jdbc.queryForObject("select count(*) from " + table(type) + " where id = ? and deleted_at is not null", Long.class, id);
         if (n == null || n == 0) {
-            throw new IllegalArgumentException("It is not in the trash (already restored or deleted).");
+            throw new BusinessException("error.trash.not_trashed");
         }
     }
 

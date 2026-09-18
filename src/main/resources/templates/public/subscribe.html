@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/public-master}">
 <head>
-    <title>Subscribe</title>
+    <title th:text="#{nav.subscribe}">Subscribe</title>
 </head>
 <body>
 <main layout:fragment="content">
@@ -14,38 +14,38 @@
     <!-- Social links come from Settings (social.x, social.youtube); only http(s) URLs are rendered. -->
     <div class="cell-grid" style="margin-bottom:48px">
       <a class="cell" th:if="${xOk}" th:href="${xUrl}" target="_blank" rel="me noopener noreferrer">
-        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">FOLLOW</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)" th:text="#{public.subscribe.follow}">FOLLOW</span>
         <span class="n">X / Twitter</span>
-        <span class="dim" style="font-size:15px;line-height:1.5">Short notes and links as they happen.</span>
+        <span class="dim" style="font-size:15px;line-height:1.5" th:text="#{public.subscribe.follow_note}">Short notes and links as they happen.</span>
       </a>
       <a class="cell" th:if="${ytOk}" th:href="${ytUrl}" target="_blank" rel="me noopener noreferrer">
-        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">WATCH</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)" th:text="#{public.subscribe.watch}">WATCH</span>
         <span class="n">YouTube</span>
-        <span class="dim" style="font-size:15px;line-height:1.5">Walkthroughs of the guides on video.</span>
+        <span class="dim" style="font-size:15px;line-height:1.5" th:text="#{public.subscribe.watch_note}">Walkthroughs of the guides on video.</span>
       </a>
       <a class="cell" th:href="@{/rss.xml}">
-        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)">READ</span>
-        <span class="n">RSS feed</span>
-        <span class="dim" style="font-size:15px;line-height:1.5">Every new article in your feed reader.</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent)" th:text="#{public.subscribe.read}">READ</span>
+        <span class="n" th:text="#{public.subscribe.rss}">RSS feed</span>
+        <span class="dim" style="font-size:15px;line-height:1.5" th:text="#{public.subscribe.read_note}">Every new article in your feed reader.</span>
       </a>
     </div>
     </th:block>
     <div class="poster poster-light">
       <div>
-        <h1>The Kienhee Brief</h1>
-        <p style="margin-top:20px;font-size:20px;line-height:1.5;max-width:44ch;font-weight:500">One email every Thursday: the week's releases, one guide, and what is safe to ignore.</p>
+        <h1 th:text="#{public.subscribe.poster_title}">The Kienhee Brief</h1>
+        <p style="margin-top:20px;font-size:20px;line-height:1.5;max-width:44ch;font-weight:500" th:text="#{public.subscribe.poster_pitch}">One email every Thursday.</p>
       </div>
       <form data-newsletter novalidate method="post" th:action="@{/subscribe}" style="display:flex;flex-direction:column;gap:12px">
         <input type="hidden" name="from" value="subscribe">
         <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
-        <input class="input" type="email" name="email" th:value="${newsletterEmail}" placeholder="Enter your email" maxlength="150" aria-label="Email address">
+        <input class="input" type="email" name="email" th:value="${newsletterEmail}" th:placeholder="#{public.newsletter.email_placeholder}" maxlength="150" th:aria-label="#{public.newsletter.email_label}">
         <button class="btn" type="submit" style="height:56px"
-                th:text="${subscriberCount != null and subscriberCount >= 10} ? |Join ${#numbers.formatInteger(subscriberCount, 1, 'COMMA')} readers| : 'Subscribe free'">Subscribe free</button>
+                th:text="${subscriberCount != null and subscriberCount >= 10} ? #{public.subscribe.join_readers(${#numbers.formatInteger(subscriberCount, 1, 'COMMA')})} : #{public.newsletter.submit}">Subscribe free</button>
         <span th:if="${newsletterSuccess}" class="cmt-flash ok" role="status" style="margin-top:0" th:text="${newsletterSuccess}">Check your inbox</span>
         <span th:if="${newsletterError}" class="cmt-flash err" role="alert" style="margin-top:0" th:text="${newsletterError}">Enter a valid email</span>
         <!-- Client-side message (public/main.js); the server-side one above is a separate span. -->
         <span class="cmt-flash err" role="alert" style="margin-top:0" data-newsletter-error hidden></span>
-        <span style="font-size:13px;font-weight:600">Free. No spam. One click to leave.</span>
+        <span style="font-size:13px;font-weight:600" th:text="#{public.subscribe.terms}">Free. No spam. One click to leave.</span>
       </form>
     </div>
   </section>

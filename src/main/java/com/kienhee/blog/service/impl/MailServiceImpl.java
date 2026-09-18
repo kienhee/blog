@@ -6,6 +6,8 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -24,10 +26,26 @@ public class MailServiceImpl implements MailService {
     private final ObjectProvider<JavaMailSender> mailSender;
     private final ITemplateEngine templateEngine;
     private final AppMailProperties properties;
+    private final MessageSource messageSource;
+
+    @Override
+    public void send(String to, Locale locale, String template, String subjectCode,
+                     Map<String, Object> variables, Object... subjectArgs) {
+        sendWritten(to, locale, template, subject(subjectCode, subjectArgs, locale), variables);
+    }
+
+    /** A missing subject key shows as the key rather than as an empty subject line. */
+    private String subject(String code, Object[] args, Locale locale) {
+        try {
+            return messageSource.getMessage(code, args, locale);
+        } catch (NoSuchMessageException e) {
+            return code;
+        }
+    }
 
     @Async
     @Override
-    public void send(String to, String subject, String template, Map<String, Object> variables) {
+    public void sendWritten(String to, Locale locale, String template, String subject, Map<String, Object> variables) {
         // Never log the body: it can carry single-use links.
         if (!properties.isEnabled()) {
             log.info("Mail disabled (app.mail.enabled=false): not sending \"{}\" to {}", subject, mask(to));
@@ -39,7 +57,7 @@ public class MailServiceImpl implements MailService {
             return;
         }
         try {
-            String html = templateEngine.process("mail/" + template, new Context(Locale.ENGLISH, variables));
+            String html = templateEngine.process("mail/" + template, new Context(locale, variables));
             MimeMessage message = sender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
             helper.setFrom(properties.getFrom(), properties.getFromName());

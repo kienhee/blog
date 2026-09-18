@@ -11,6 +11,7 @@ import com.kienhee.blog.repository.CommentRepository;
 import com.kienhee.blog.repository.PostRepository;
 import com.kienhee.blog.repository.UserRepository;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +53,8 @@ class CommentReplyTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
         staff = userRepository.findAll().get(0);
         Category category = categoryRepository.save(Category.builder().name("Reply " + tag).slug(tag + "-cat").visible(true).build());
         post = postRepository.save(Post.builder().title("Reply post " + tag).slug(tag + "-post").content("<p>x</p>")
@@ -90,7 +92,7 @@ class CommentReplyTests {
         assertEquals(staff.getEmail(), reply.getAuthorEmail());
         assertEquals(staff.getFullName(), reply.getAuthorName());
 
-        mockMvc.perform(get("/article/" + post.getSlug()))
+        mockMvc.perform(get("/article/" + post.getSlug()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Thanks for asking! " + tag)))
                 .andExpect(content().string(containsString("class=\"tag\">Author</span>")));
     }

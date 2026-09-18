@@ -1,5 +1,8 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.config.I18n;
+
+import com.kienhee.blog.exception.BusinessException;
 import java.util.List;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -41,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new IllegalStateException("The Admin role is missing (see V1__Auth.sql)."));
         boolean first = registrationPolicy.isFirstAccount();
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already in use: " + request.getEmail());
+            throw new BusinessException("error.user.email_taken", request.getEmail());
         }
 
         User user = User.builder()
@@ -66,7 +69,8 @@ public class AuthServiceImpl implements AuthService {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    admins.forEach(to -> mailService.send(to, "New account waiting for approval", "account-pending-admin", variables));
+                    admins.forEach(to -> mailService.send(to, I18n.DEFAULT, "account-pending-admin",
+                            "mail.pending_admin.subject", variables));
                 }
             });
         }
@@ -94,14 +98,14 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public boolean changePassword(String email, String currentPassword, String newPassword) {
         User user = userRepository.findByEmail(email.trim().toLowerCase())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException("error.auth.user_not_found", email));
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect.");
+            throw new BusinessException("error.auth.wrong_password");
         }
 
         if (currentPassword.equals(newPassword)) {
-            throw new IllegalArgumentException("New password must be different from current password.");
+            throw new BusinessException("error.auth.same_password");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -113,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public User updateProfile(String email, com.kienhee.blog.dto.ProfileUpdateRequest request) {
         User user = userRepository.findByEmail(email.trim().toLowerCase())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException("error.auth.user_not_found", email));
 
         user.setFullName(request.getFullName().trim());
         user.setPhone(request.getPhone());

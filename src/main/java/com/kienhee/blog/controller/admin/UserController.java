@@ -1,5 +1,7 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.UserCreateRequest;
 import com.kienhee.blog.dto.UserUpdateRequest;
 import com.kienhee.blog.entity.Role;
@@ -28,6 +30,7 @@ public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final BusinessMessages messages;
 
     /** Available on every view this controller renders, including validation-error re-renders. */
     @ModelAttribute("roles")
@@ -56,7 +59,7 @@ public class UserController {
                              Model model,
                              RedirectAttributes redirectAttributes) {
         if (!bindingResult.hasFieldErrors("email") && userService.existsByEmail(request.getEmail())) {
-            bindingResult.rejectValue("email", "error.email", "Email already in use.");
+            bindingResult.rejectValue("email", "error.email", messages.get("msg.user.email_taken"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -70,13 +73,13 @@ public class UserController {
 
         try {
             userService.createUser(request, actorIsAdmin(authentication));
-            redirectAttributes.addFlashAttribute("successMessage", "User created successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.user.created"));
             return "redirect:/admin/users";
         } catch (IllegalArgumentException e) {
-            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("email")) {
-                bindingResult.rejectValue("email", "error.email", e.getMessage());
+            if (e instanceof BusinessException business && business.getCode().contains("email")) {
+                bindingResult.rejectValue("email", "error.email", messages.text(e));
             }
-            bindingResult.reject("createError", e.getMessage());
+            bindingResult.reject("createError", messages.text(e));
             model.addAttribute("users", userService.getAllUsers());
             if (!model.containsAttribute("userUpdateRequest")) {
                 model.addAttribute("userUpdateRequest", new UserUpdateRequest());
@@ -105,12 +108,12 @@ public class UserController {
 
         try {
             userService.updateUser(id, request, actorIsAdmin(authentication));
-            redirectAttributes.addFlashAttribute("successMessage", "User updated successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.user.updated"));
             return "redirect:/admin/users";
         } catch (IllegalArgumentException e) {
-            bindingResult.reject("updateError", e.getMessage());
+            bindingResult.reject("updateError", messages.text(e));
             // The page's form only renders the create form's global errors; show service refusals in the banner.
-            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("errorMessage", messages.text(e));
             model.addAttribute("users", userService.getAllUsers());
             if (!model.containsAttribute("userCreateRequest")) {
                 model.addAttribute("userCreateRequest", new UserCreateRequest());
@@ -129,9 +132,9 @@ public class UserController {
         String currentEmail = (principal != null) ? principal.getName() : null;
         try {
             userService.deleteUser(id, currentEmail, actorIsAdmin(authentication));
-            redirectAttributes.addFlashAttribute("successMessage", "User deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.user.deleted"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/users";
     }
@@ -145,7 +148,7 @@ public class UserController {
         String currentEmail = principal != null ? principal.getName() : null;
         java.util.Map<Long, String> names = userService.getAllUsers().stream()
                 .collect(java.util.stream.Collectors.toMap(User::getId, User::getFullName, (a, b) -> a));
-        BulkDelete.run(ids, "user", "users", "deleted", names,
+        BulkDelete.run(messages, ids, "bulk.noun.users", BulkDelete.DELETED, names,
                 id -> userService.deleteUser(id, currentEmail, actorIsAdmin(authentication)), redirectAttributes);
         return "redirect:/admin/users";
     }
@@ -168,18 +171,19 @@ public class UserController {
             try {
                 target = com.kienhee.blog.entity.UserStatus.valueOf(status == null ? "" : status.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Unknown account status.");
+                throw new BusinessException("error.user.unknown_status");
             }
             com.kienhee.blog.entity.UserStatus before = userService.getUserById(id).map(User::getStatus).orElse(null);
             userService.changeStatus(id, target, principal != null ? principal.getName() : null, actorIsAdmin(authentication));
             String message = switch (target) {
-                case ACTIVE -> before == com.kienhee.blog.entity.UserStatus.PENDING ? "Account approved." : "Account enabled.";
-                case DISABLED -> "Account disabled.";
-                case PENDING -> "Account set back to pending.";
+                case ACTIVE -> before == com.kienhee.blog.entity.UserStatus.PENDING
+                        ? messages.get("msg.user.approved") : messages.get("msg.user.enabled");
+                case DISABLED -> messages.get("msg.user.disabled");
+                case PENDING -> messages.get("msg.user.set_pending");
             };
             redirectAttributes.addFlashAttribute("successMessage", message);
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/users";
     }

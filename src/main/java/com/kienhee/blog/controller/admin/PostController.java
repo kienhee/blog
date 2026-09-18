@@ -1,5 +1,7 @@
 package com.kienhee.blog.controller.admin;
 
+import com.kienhee.blog.controller.BusinessMessages;
+import com.kienhee.blog.exception.BusinessException;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import com.kienhee.blog.entity.PostStatus;
 
@@ -33,6 +35,7 @@ public class PostController {
     private final PostService postService;
     private final CategoryService categoryService;
     private final HashtagService hashtagService;
+    private final BusinessMessages messages;
 
     @GetMapping("/posts")
     public String posts(Model model) {
@@ -66,10 +69,10 @@ public class PostController {
             request.setScheduledAt(null);
         }
         if (canPublish(authentication)) {
-            validateSchedule(request.getStatus(), request.getScheduledAt(), null, bindingResult);
+            validateSchedule(messages, request.getStatus(), request.getScheduledAt(), null, bindingResult);
         }
         if (!bindingResult.hasFieldErrors("slug") && postService.existsBySlug(request.getSlug())) {
-            bindingResult.rejectValue("slug", "error.slug", "Slug already in use.");
+            bindingResult.rejectValue("slug", "error.slug", messages.get("msg.slug_taken"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -81,7 +84,7 @@ public class PostController {
         try {
             String authorEmail = principal != null ? principal.getName() : null;
             Post created = postService.createPost(request, authorEmail);
-            redirectAttributes.addFlashAttribute("successMessage", "Post created successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.post.created"));
             return "redirect:/admin/post/" + created.getId() + "/edit";
         } catch (IllegalArgumentException e) {
             applyServiceError(bindingResult, e);
@@ -117,7 +120,7 @@ public class PostController {
                     return "admin/post/post-new";
                 })
                 .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Post not found.");
+                    redirectAttributes.addFlashAttribute("errorMessage", messages.get("error.post.not_found_plain"));
                     return "redirect:/admin/posts";
                 });
     }
@@ -138,10 +141,10 @@ public class PostController {
             });
         } else {
             java.time.LocalDateTime stored = postService.getPostById(id).map(Post::getScheduledAt).orElse(null);
-            validateSchedule(request.getStatus(), request.getScheduledAt(), stored, bindingResult);
+            validateSchedule(messages, request.getStatus(), request.getScheduledAt(), stored, bindingResult);
         }
         if (!bindingResult.hasFieldErrors("slug") && postService.existsBySlugExcluding(request.getSlug(), id)) {
-            bindingResult.rejectValue("slug", "error.slug", "Slug already in use.");
+            bindingResult.rejectValue("slug", "error.slug", messages.get("msg.slug_taken"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -153,7 +156,7 @@ public class PostController {
 
         try {
             postService.updatePost(id, request);
-            redirectAttributes.addFlashAttribute("successMessage", "Post updated successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.post.updated"));
             return "redirect:/admin/post/" + id + "/edit";
         } catch (IllegalArgumentException e) {
             applyServiceError(bindingResult, e);
@@ -169,18 +172,20 @@ public class PostController {
     public String deletePost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             postService.deletePost(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Post moved to trash.");
+            redirectAttributes.addFlashAttribute("successMessage", messages.get("msg.post.trashed"));
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", messages.text(e));
         }
         return "redirect:/admin/posts";
     }
 
     private void applyServiceError(BindingResult bindingResult, IllegalArgumentException e) {
-        String message = e.getMessage();
-        if (message != null && message.toLowerCase().contains("slug")) {
+        String message = messages.text(e);
+        // Which field to blame comes from the message code; the text itself is translated.
+        String code = e instanceof BusinessException business ? business.getCode() : String.valueOf(message).toLowerCase();
+        if (code.contains("slug")) {
             bindingResult.rejectValue("slug", "error.slug", message);
-        } else if (message != null && message.toLowerCase().contains("category")) {
+        } else if (code.contains("category")) {
             bindingResult.rejectValue("categoryId", "error.categoryId", message);
         } else if (message != null && message.toLowerCase().contains("hashtag")) {
             bindingResult.reject("postError", message);
@@ -200,7 +205,7 @@ public class PostController {
     public String bulkDelete(@org.springframework.web.bind.annotation.RequestParam(name = "ids", required = false) java.util.List<Long> ids,
                              RedirectAttributes redirectAttributes) {
         java.util.Map<Long, String> names = postService.getAllPosts().stream().collect(java.util.stream.Collectors.toMap(p -> p.getId(), p -> p.getTitle(), (a, b) -> a));
-        BulkDelete.run(ids, "post", "posts", names, postService::deletePost, redirectAttributes);
+        BulkDelete.run(messages, ids, "bulk.noun.posts", names, postService::deletePost, redirectAttributes);
         return "redirect:/admin/posts";
     }
 
@@ -211,15 +216,15 @@ public class PostController {
     }
 
     /** SCHEDULED needs a time, and a new or changed time must be in the future. */
-    private static void validateSchedule(PostStatus status, java.time.LocalDateTime scheduledAt,
+    private static void validateSchedule(BusinessMessages messages, PostStatus status, java.time.LocalDateTime scheduledAt,
                                          java.time.LocalDateTime stored, BindingResult bindingResult) {
         if (status != PostStatus.SCHEDULED) {
             return;
         }
         if (scheduledAt == null) {
-            bindingResult.rejectValue("scheduledAt", "error.scheduledAt", "Choose when the post should go live.");
+            bindingResult.rejectValue("scheduledAt", "error.scheduledAt", messages.get("error.post.schedule_required"));
         } else if (!scheduledAt.equals(stored) && !scheduledAt.isAfter(java.time.LocalDateTime.now())) {
-            bindingResult.rejectValue("scheduledAt", "error.scheduledAt", "The publish time must be in the future.");
+            bindingResult.rejectValue("scheduledAt", "error.scheduledAt", messages.get("error.post.schedule_past"));
         }
     }
 }

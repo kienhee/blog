@@ -12,16 +12,16 @@ import lombok.*;
 @Builder
 public class RegisterRequest {
 
-    @NotBlank(message = "Full name is required")
-    @Size(min = 2, message = "Full name must have at least 2 characters")
+    @NotBlank(message = "{validation.full_name.required_short}")
+    @Size(min = 2, message = "{validation.full_name.min_short}")
     private String fullName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "{validation.email.required_short}")
+    @Email(message = "{validation.email.invalid_short}")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must have at least 6 characters")
+    @NotBlank(message = "{validation.password.required_short}")
+    @Size(min = 6, message = "{validation.password.min6_short}")
     private String password;
 
     private String phone;

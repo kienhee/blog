@@ -11,8 +11,8 @@ import lombok.*;
 @Builder
 public class ProfileUpdateRequest {
 
-    @NotBlank(message = "Display name is required.")
-    @Size(min = 2, max = 150, message = "Display name must have at least 2 characters.")
+    @NotBlank(message = "{validation.display_name.required}")
+    @Size(min = 2, max = 150, message = "{validation.display_name.min}")
     private String fullName;
 
     private String email;

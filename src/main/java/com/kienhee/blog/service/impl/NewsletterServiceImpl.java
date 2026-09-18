@@ -1,5 +1,11 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.config.I18n;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Locale;
+
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.config.AppMailProperties;
 import com.kienhee.blog.entity.NewsletterIssue;
 import com.kienhee.blog.entity.Subscriber;
@@ -76,8 +82,10 @@ public class NewsletterServiceImpl implements NewsletterService {
                 "confirmUrl", baseUrl() + "/subscribe/confirm?token=" + token,
                 "siteName", mailProperties.getFromName(),
                 "days", CONFIRM_TTL.toDays());
-        afterCommit(() -> mailService.send(normalized, "Confirm your " + mailProperties.getFromName() + " subscription",
-                "newsletter-confirm", variables));
+        // Read on the request thread; afterCommit runs before the @Async hop.
+        Locale locale = LocaleContextHolder.getLocale();
+        afterCommit(() -> mailService.send(normalized, locale, "newsletter-confirm",
+                "mail.confirm.subject", variables, mailProperties.getFromName()));
     }
 
     @Override
@@ -142,7 +150,7 @@ public class NewsletterServiceImpl implements NewsletterService {
     @Transactional
     public void deleteSubscriber(Long id) {
         Subscriber subscriber = subscriberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("That subscriber no longer exists."));
+                .orElseThrow(() -> new BusinessException("error.newsletter.subscriber_gone"));
         subscriberRepository.delete(subscriber);
     }
 
@@ -152,14 +160,14 @@ public class NewsletterServiceImpl implements NewsletterService {
         String cleanSubject = subject == null ? "" : subject.trim();
         String cleanBody = body == null ? "" : body.replace("\r\n", "\n").trim();
         if (cleanSubject.length() < 3 || cleanSubject.length() > 200) {
-            throw new IllegalArgumentException("The subject must be 3 to 200 characters.");
+            throw new BusinessException("error.newsletter.subject_size");
         }
         if (cleanBody.length() < 10 || cleanBody.length() > 20000) {
-            throw new IllegalArgumentException("Write at least a few words (up to 20,000 characters).");
+            throw new BusinessException("error.newsletter.body_size");
         }
         List<Subscriber> recipients = subscriberRepository.findByStatusOrderByIdAsc(SubscriberStatus.CONFIRMED);
         if (recipients.isEmpty()) {
-            throw new IllegalArgumentException("There are no confirmed subscribers yet.");
+            throw new BusinessException("error.newsletter.no_subscribers");
         }
 
         NewsletterIssue issue = issueRepository.save(NewsletterIssue.builder()
@@ -174,7 +182,10 @@ public class NewsletterServiceImpl implements NewsletterService {
         List<String[]> targets = recipients.stream().map(r -> new String[]{r.getEmail(), r.getUnsubscribeToken()}).toList();
         String base = baseUrl();
         String siteName = mailProperties.getFromName();
-        afterCommit(() -> targets.forEach(target -> mailService.send(target[0], cleanSubject, "newsletter-issue", Map.of(
+        // An issue goes to the whole list and subscribers have no stored language, so the site's
+        // default is used; the subject is what the admin typed.
+        afterCommit(() -> targets.forEach(target -> mailService.sendWritten(target[0], I18n.DEFAULT,
+                "newsletter-issue", cleanSubject, Map.of(
                 "subject", cleanSubject,
                 "paragraphs", paragraphs,
                 "unsubscribeUrl", base + "/subscribe/unsubscribe?token=" + target[1],

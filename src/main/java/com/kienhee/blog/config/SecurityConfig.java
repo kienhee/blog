@@ -38,6 +38,8 @@ public class SecurityConfig {
         "/sitemap.xml",
         "/robots.txt",
         "/auth/**",
+        // The language switcher: a visitor must be able to change language before signing in.
+        "/lang",
         "/styles/**",
         "/scripts/**",
         "/images/**",

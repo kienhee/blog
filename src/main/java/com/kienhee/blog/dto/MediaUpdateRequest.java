@@ -12,14 +12,14 @@ import lombok.*;
 @Builder
 public class MediaUpdateRequest {
 
-    @NotNull(message = "Media ID is required.")
+    @NotNull(message = "{validation.media.id_required}")
     private Long id;
 
-    @NotBlank(message = "Display name is required.")
-    @Size(max = 255, message = "Display name must not exceed 255 characters.")
+    @NotBlank(message = "{validation.display_name.required}")
+    @Size(max = 255, message = "{validation.display_name.max}")
     private String displayName;
 
-    @Size(max = 255, message = "Alt text must not exceed 255 characters.")
+    @Size(max = 255, message = "{validation.alt.max}")
     private String altText;
 
     private Long folderId;

@@ -1,5 +1,6 @@
 package com.kienhee.blog.service;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.CommentForm;
 import com.kienhee.blog.entity.Comment;
 import com.kienhee.blog.entity.CommentStatus;
@@ -56,7 +57,7 @@ public interface CommentService {
         try {
             return CommentStatus.valueOf(value == null ? "" : value.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unknown comment status.");
+            throw new BusinessException("error.comment.unknown_status");
         }
     }
 }

@@ -13,17 +13,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentForm {
 
-    @NotBlank(message = "Please enter your name.")
-    @Size(max = 100, message = "Name must be at most 100 characters.")
+    @NotBlank(message = "{validation.comment.name_required}")
+    @Size(max = 100, message = "{validation.comment.name_max}")
     private String authorName;
 
-    @NotBlank(message = "Please enter your email.")
-    @Email(message = "Please enter a valid email.")
-    @Size(max = 150, message = "Email must be at most 150 characters.")
+    @NotBlank(message = "{validation.comment.email_required}")
+    @Email(message = "{validation.comment.email_invalid}")
+    @Size(max = 150, message = "{validation.comment.email_max}")
     private String authorEmail;
 
-    @NotBlank(message = "Please write a comment.")
-    @Size(max = 2000, message = "Comments can be at most 2000 characters.")
+    @NotBlank(message = "{validation.comment.content_required}")
+    @Size(max = 2000, message = "{validation.comment.content_max}")
     private String content;
 
     /** Comment being replied to, if any. */

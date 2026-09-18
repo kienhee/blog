@@ -8,6 +8,7 @@ import com.kienhee.blog.repository.SubscriberRepository;
 import com.kienhee.blog.service.MailService;
 import com.kienhee.blog.service.NewsletterService;
 import com.kienhee.blog.support.TestAuth;
+import com.kienhee.blog.support.TestLocale;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +57,8 @@ class NewsletterTests {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .defaultRequest(TestLocale.englishByDefault()).build();
     }
 
     @AfterEach
@@ -84,7 +86,7 @@ class NewsletterTests {
     @SuppressWarnings("unchecked")
     private Map<String, Object> lastMail(String to, String template) {
         ArgumentCaptor<Map<String, Object>> vars = ArgumentCaptor.forClass(Map.class);
-        verify(mailService, atLeastOnce()).send(eq(to), anyString(), eq(template), vars.capture());
+        verify(mailService, atLeastOnce()).send(eq(to), any(), eq(template), anyString(), vars.capture(), any());
         return vars.getValue();
     }
 
@@ -112,13 +114,13 @@ class NewsletterTests {
         String token = tokenOf(lastMail(address, "newsletter-confirm").get("confirmUrl"));
         assertNotEquals(token, pending.getConfirmTokenHash(), "only the hash is stored");
 
-        mockMvc.perform(get("/subscribe/confirm").param("token", token))
+        mockMvc.perform(get("/subscribe/confirm").param("token", token).with(TestLocale.en()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Referrer-Policy", "no-referrer"))
                 .andExpect(content().string(containsString("You are subscribed")));
         assertEquals(SubscriberStatus.CONFIRMED, subscriberRepository.findByEmail(address).orElseThrow().getStatus());
 
-        mockMvc.perform(get("/subscribe/confirm").param("token", token))
+        mockMvc.perform(get("/subscribe/confirm").param("token", token).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Link expired")));
     }
 
@@ -130,7 +132,7 @@ class NewsletterTests {
         mockMvc.perform(signup(address).param("from", "home"))
                 .andExpect(redirectedUrl("/#newsletter"))
                 .andExpect(flash().attribute("newsletterSuccess", NewsletterService.SUBSCRIBE_MESSAGE));
-        verify(mailService, never()).send(eq(address), anyString(), anyString(), anyMap());
+        verify(mailService, never()).send(eq(address), any(), anyString(), anyString(), anyMap(), any());
     }
 
     @Test
@@ -154,7 +156,7 @@ class NewsletterTests {
         s.setConfirmSentAt(LocalDateTime.now().minusDays(8));
         subscriberRepository.save(s);
 
-        mockMvc.perform(get("/subscribe/confirm").param("token", token)).andExpect(content().string(containsString("Link expired")));
+        mockMvc.perform(get("/subscribe/confirm").param("token", token).with(TestLocale.en())).andExpect(content().string(containsString("Link expired")));
         assertEquals(SubscriberStatus.PENDING, subscriberRepository.findByEmail(address).orElseThrow().getStatus());
     }
 
@@ -164,20 +166,20 @@ class NewsletterTests {
         String address = email("leaver");
         Subscriber s = confirmedSubscriber(address);
 
-        mockMvc.perform(get("/subscribe/unsubscribe").param("token", s.getUnsubscribeToken()))
+        mockMvc.perform(get("/subscribe/unsubscribe").param("token", s.getUnsubscribeToken()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("Unsubscribe?")));
         assertEquals(SubscriberStatus.CONFIRMED, subscriberRepository.findByEmail(address).orElseThrow().getStatus(),
                 "opening the link alone changes nothing");
 
-        mockMvc.perform(post("/subscribe/unsubscribe").param("token", s.getUnsubscribeToken()).with(csrf()))
+        mockMvc.perform(post("/subscribe/unsubscribe").param("token", s.getUnsubscribeToken()).with(csrf()).with(TestLocale.en()))
                 .andExpect(content().string(containsString("You are unsubscribed")));
         assertEquals(SubscriberStatus.UNSUBSCRIBED, subscriberRepository.findByEmail(address).orElseThrow().getStatus());
 
-        mockMvc.perform(get("/subscribe/unsubscribe").param("token", "nope")).andExpect(content().string(containsString("Link expired")));
+        mockMvc.perform(get("/subscribe/unsubscribe").param("token", "nope").with(TestLocale.en())).andExpect(content().string(containsString("Link expired")));
 
         mockMvc.perform(signup(address));
         assertEquals(SubscriberStatus.PENDING, subscriberRepository.findByEmail(address).orElseThrow().getStatus());
-        verify(mailService).send(eq(address), anyString(), eq("newsletter-confirm"), anyMap());
+        verify(mailService).send(eq(address), any(), eq("newsletter-confirm"), anyString(), anyMap(), any());
     }
 
     @Test
@@ -187,7 +189,7 @@ class NewsletterTests {
         for (int i = 0; i < 5; i++) {
             mockMvc.perform(signup(address));
         }
-        verify(mailService, times(3)).send(eq(address), anyString(), eq("newsletter-confirm"), anyMap());
+        verify(mailService, times(3)).send(eq(address), any(), eq("newsletter-confirm"), anyString(), anyMap(), any());
     }
 
     @Test
@@ -211,10 +213,10 @@ class NewsletterTests {
                 .andExpect(flash().attribute("successMessage", containsString("Sending \"Issue " + tag + "\" to")));
 
         ArgumentCaptor<Map<String, Object>> vars = ArgumentCaptor.forClass(Map.class);
-        verify(mailService).send(eq(reader.getEmail()), eq("Issue " + tag), eq("newsletter-issue"), vars.capture());
+        verify(mailService).sendWritten(eq(reader.getEmail()), any(), eq("newsletter-issue"), eq("Issue " + tag), vars.capture());
         assertEquals(List.of("First paragraph here.", "Second <b>paragraph</b>."), vars.getValue().get("paragraphs"));
         assertTrue(((String) vars.getValue().get("unsubscribeUrl")).endsWith("token=" + reader.getUnsubscribeToken()));
-        verify(mailService, never()).send(eq(pendingAddress), anyString(), eq("newsletter-issue"), anyMap());
+        verify(mailService, never()).sendWritten(eq(pendingAddress), any(), eq("newsletter-issue"), anyString(), anyMap());
 
         NewsletterIssue issue = issueRepository.findAllWithSender().stream()
                 .filter(i -> i.getSubject().equals("Issue " + tag)).findFirst().orElseThrow();

@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.config.TinifyProperties;
 import com.kienhee.blog.dto.MediaUpdateRequest;
 import com.kienhee.blog.entity.Media;
@@ -81,17 +82,17 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public Media uploadMedia(MultipartFile file, String uploaderEmail, Long folderId) {
         if (!uploadRateLimiter.tryAcquire(uploaderEmail)) {
-            throw new IllegalArgumentException("Upload limit reached. Please wait a few minutes and try again.");
+            throw new BusinessException("error.media.rate_limited");
         }
         if (file == null) {
-            throw new IllegalArgumentException("Please choose a file to upload.");
+            throw new BusinessException("error.media.choose_file");
         }
 
         byte[] original;
         try {
             original = file.getBytes();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read the uploaded file.");
+            throw new BusinessException("error.media.unreadable_upload");
         }
 
         // Size / content-type whitelist / magic bytes all live in the validator chain now,
@@ -108,12 +109,12 @@ public class MediaServiceImpl implements MediaService {
         String contentType = MediaTypeCatalog.normalize(file.getContentType());
 
         User uploader = userRepository.findByEmail(uploaderEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Uploader not found."));
+                .orElseThrow(() -> new BusinessException("error.media.uploader_not_found"));
 
         MediaFolder folder = null;
         if (folderId != null) {
             folder = mediaFolderRepository.findById(folderId)
-                    .orElseThrow(() -> new IllegalArgumentException("Folder not found."));
+                    .orElseThrow(() -> new BusinessException("error.media.folder_not_found_plain"));
         }
 
         // Reserve runs in its own transaction and survives a rollback of this one, so every
@@ -155,7 +156,7 @@ public class MediaServiceImpl implements MediaService {
             storageTx.writeFile(path, original);
         } catch (StorageException e) {
             log.warn("Could not store upload {}: {}", path, e.getMessage());
-            throw new IllegalArgumentException("Could not save the uploaded file.");
+            throw new BusinessException("error.media.save_failed");
         }
 
         StorageBlob blob = storageBlobRepository.save(StorageBlob.builder()
@@ -229,32 +230,31 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public Media replaceImage(Long id, MultipartFile file, String editorEmail) {
         if (!uploadRateLimiter.tryAcquire(editorEmail)) {
-            throw new IllegalArgumentException("Upload limit reached. Please wait a few minutes and try again.");
+            throw new BusinessException("error.media.rate_limited");
         }
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Please choose an image.");
+            throw new BusinessException("error.media.choose_image");
         }
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.not_found", id));
         if (media.getStatus() != Media.Status.ACTIVE) {
-            throw new IllegalArgumentException("Restore the file from the trash before editing it.");
+            throw new BusinessException("error.media.restore_first");
         }
         if (!MediaTypeCatalog.isRasterImage(media.getContentType())) {
-            throw new IllegalArgumentException("Only JPG, PNG, WEBP and GIF images can be edited.");
+            throw new BusinessException("error.media.not_editable");
         }
 
         byte[] bytes;
         try {
             bytes = file.getBytes();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read the edited image.");
+            throw new BusinessException("error.media.unreadable_edit");
         }
         String contentType = MediaTypeCatalog.normalize(file.getContentType());
         if (!media.getContentType().equalsIgnoreCase(contentType)) {
             // Changing the format would change the file name, and with it the public URL.
-            throw new IllegalArgumentException("Replacing keeps the original format ("
-                    + MediaTypeCatalog.defaultExtension(media.getContentType()).replace(".", "").toUpperCase(Locale.ROOT)
-                    + "). Save it as a copy to change the format.");
+            throw new BusinessException("error.media.format_locked",
+                    MediaTypeCatalog.defaultExtension(media.getContentType()).replace(".", "").toUpperCase(Locale.ROOT));
         }
 
         fileValidationChain.validate(UploadValidationContext.builder()
@@ -283,7 +283,7 @@ public class MediaServiceImpl implements MediaService {
             }
         }
         if (newWidth == null) {
-            throw new IllegalArgumentException("Could not read the edited image.");
+            throw new BusinessException("error.media.unreadable_edit");
         }
 
         // The file's owner pays for its bytes, whoever edits it. Growth is reserved up front
@@ -340,7 +340,7 @@ public class MediaServiceImpl implements MediaService {
             return saved;
         } catch (StorageException e) {
             log.warn("Could not replace image {}: {}", id, e.getMessage());
-            throw new IllegalArgumentException("Could not save the edited image.");
+            throw new BusinessException("error.media.save_edit_failed");
         } finally {
             if (reservationHeld) {
                 quotaService.release(ownerId, delta);
@@ -402,7 +402,7 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public Media updateMedia(Long id, MediaUpdateRequest request) {
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.not_found", id));
 
         media.setOriginalFilename(request.getDisplayName().trim());
         media.setAltText(request.getAltText() != null && !request.getAltText().isBlank() ? request.getAltText().trim() : null);
@@ -410,7 +410,7 @@ public class MediaServiceImpl implements MediaService {
         MediaFolder folder = null;
         if (request.getFolderId() != null) {
             folder = mediaFolderRepository.findById(request.getFolderId())
-                    .orElseThrow(() -> new IllegalArgumentException("Folder not found."));
+                    .orElseThrow(() -> new BusinessException("error.media.folder_not_found_plain"));
         }
         // Moves the physical file too (free name first, compensated on rollback).
         layout.relocate(media, folder);
@@ -422,7 +422,7 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public void deleteMedia(Long id) {
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.not_found", id));
 
         if (media.getStatus() == Media.Status.TRASHED) {
             return; // already in the trash - deleting twice is a no-op, not an error
@@ -443,10 +443,10 @@ public class MediaServiceImpl implements MediaService {
      */
     private void assertNotInUse(Media media) {
         if (postRepository.existsByCoverImage(media.getUrl())) {
-            throw new IllegalArgumentException("Cannot delete: this file is used as a cover image on one or more posts.");
+            throw new BusinessException("error.media.used_as_cover");
         }
         if (userRepository.existsByAvatarUrl(media.getUrl())) {
-            throw new IllegalArgumentException("Cannot delete: this file is used as a user's profile photo.");
+            throw new BusinessException("error.media.used_as_avatar");
         }
     }
 
@@ -460,9 +460,9 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public RestoreResult restoreMedia(Long id) {
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.not_found", id));
         if (media.getStatus() != Media.Status.TRASHED) {
-            throw new IllegalArgumentException("This file is not in the trash.");
+            throw new BusinessException("error.media.not_trashed");
         }
 
         // The folder may have been purged (the FK already nulled the column) or may itself
@@ -483,7 +483,7 @@ public class MediaServiceImpl implements MediaService {
     @Transactional
     public void purgeMedia(Long id) {
         Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("error.media.not_found", id));
         if (media.getStatus() != Media.Status.TRASHED) {
             throw new IllegalArgumentException(
                     "Cannot permanently delete: move the file to the trash first.");
@@ -623,7 +623,7 @@ public class MediaServiceImpl implements MediaService {
         MediaFolder folder = null;
         if (folderId != null) {
             folder = mediaFolderRepository.findById(folderId)
-                    .orElseThrow(() -> new IllegalArgumentException("Folder not found."));
+                    .orElseThrow(() -> new BusinessException("error.media.folder_not_found_plain"));
         }
         List<Media> mediaItems = mediaRepository.findAllById(ids);
         for (Media media : mediaItems) {

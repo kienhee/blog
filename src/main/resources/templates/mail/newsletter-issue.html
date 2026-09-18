@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,8 +20,8 @@
         </tr>
         <tr>
           <td style="padding:18px 28px;border-top:1px solid #e2e0dc;font-size:12px;line-height:1.5;color:#65625d">
-            You get this because you confirmed a subscription to the <span th:text="${siteName}">Kienhee</span> newsletter.
-            <a th:href="${unsubscribeUrl}" href="#" style="color:#65625d">Unsubscribe</a>.
+            <span th:text="#{mail.issue.footer(${siteName})}">You confirmed a subscription to this newsletter.</span>
+            <a th:href="${unsubscribeUrl}" href="#" style="color:#65625d" th:text="#{mail.issue.unsubscribe}">Unsubscribe</a>.
           </td>
         </tr>
       </table>

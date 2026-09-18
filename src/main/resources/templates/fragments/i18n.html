@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  The js.* messages for this request's language, read by core/i18n.js (window.khT).
+  JSON is built and escaped in JsMessages, so it is inlined with th:utext.
+-->
+<script th:fragment="dictionary" type="application/json" id="kh-i18n" th:utext="${jsMessages}">{}</script>
+
+</body>
+</html>

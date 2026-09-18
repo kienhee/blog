@@ -23,7 +23,7 @@ $(function () {
     $('#comment-delete-form').attr('action', '/admin/comments/' + $btn.attr('data-id') + '/delete');
     if (window.khDialog) {
       window.khDialog('the comment by "' + ($btn.attr('data-name') || 'unknown') + '"', '#comment-delete-form',
-        'It moves to the trash with its replies. You can restore it from the Trash page.');
+        khT('js.comment.delete_note'));
     }
   });
 
@@ -31,7 +31,7 @@ $(function () {
     var action = $(this).attr('data-comment-bulk');
     var ids = selectedIds();
     if (!ids.length) {
-      if (window.khToast) window.khToast('Select at least one comment');
+      if (window.khToast) window.khToast(khT('js.comment.select_one'));
       return;
     }
 
@@ -45,7 +45,7 @@ $(function () {
       $form.attr('action', '/admin/comments/bulk-delete');
       if (window.khDialog) {
         window.khDialog(ids.length === 1 ? '1 selected comment' : ids.length + ' selected comments', '#comment-bulk-form',
-          'They move to the trash with their replies. You can restore them from the Trash page.');
+          khT('js.comment.delete_note_many'));
       }
       return;
     }
@@ -72,7 +72,8 @@ $(function () {
   $(document).on('click', '.btn-reply-comment', function () {
     var $btn = $(this);
     $form.attr('action', '/admin/comments/' + $btn.attr('data-id') + '/reply');
-    $('#reply-context').text('Replying to ' + ($btn.attr('data-name') || 'this comment') + ' on "' + ($btn.attr('data-post') || '') + '"');
+    $('#reply-context').text(khT('js.comment.replying_to_on',
+        $btn.attr('data-name') || khT('js.comment.this_comment'), $btn.attr('data-post') || ''));
     $text.val('');
     $modal.addClass('open');
     setTimeout(function () { $text.trigger('focus'); }, 50);
@@ -87,7 +88,7 @@ $(function () {
   $form.on('submit', function (e) {
     if (!$.trim($text.val())) {
       e.preventDefault();
-      if (window.khToast) window.khToast('Write a reply first');
+      if (window.khToast) window.khToast(khT('js.comment.reply_empty'));
       $text.trigger('focus');
     }
   });

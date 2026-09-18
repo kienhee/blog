@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/admin-master}">
 <head>
-    <title>Dashboard</title>
+    <title th:text="#{nav.admin.dashboard}">Dashboard</title>
 </head>
 <body>
 
 <div layout:fragment="breadcrumb" class="crumb">
-    <span class="dim">Dashboard</span><span style="color:var(--line)">/</span><strong>Overview</strong>
+    <span class="dim" th:text="#{nav.admin.dashboard}">Dashboard</span><span style="color:var(--line)">/</span><strong th:text="#{admin.dashboard.overview}">Overview</strong>
 </div>
 
 <!-- Every number here comes from DashboardService (the database), refreshed on each visit.
@@ -15,41 +15,41 @@
 <div layout:fragment="content"
      th:with="canPosts=${perms.contains('posts:view')}, canComments=${perms.contains('comments:view')},
               canMedia=${perms.contains('media:view')}, canCategories=${perms.contains('categories:view')}">
-    <h1 style="font-size:34px">Overview</h1>
-    <p class="dim" style="margin:4px 0 28px">Live numbers from the database. Post counts cover the last 30 days where noted.</p>
+    <h1 style="font-size:34px" th:text="#{admin.dashboard.overview}">Overview</h1>
+    <p class="dim" style="margin:4px 0 28px" th:text="#{admin.dashboard.intro}">Live numbers from the database.</p>
 
     <div class="stats">
         <div class="stat" th:if="${canPosts}">
-            <div class="kicker">Views · last 30 days</div>
+            <div class="kicker" th:text="#{admin.dashboard.views_30d}">Views · last 30 days</div>
             <div class="v" th:text="${#numbers.formatInteger(stats.viewsLast30Days, 1, 'COMMA')}">0</div>
-            <div class="d" th:text="${stats.viewsDelta() > 0} ? |+${stats.viewsDelta()} vs previous 30 days| : (${stats.viewsDelta() < 0} ? |${stats.viewsDelta()} vs previous 30 days| : 'Same as previous 30 days')">Same as previous 30 days</div>
+            <div class="d" th:text="${stats.viewsDelta() == 0} ? #{admin.dashboard.delta_same} : #{admin.dashboard.delta(${stats.viewsDelta() > 0 ? '+' + stats.viewsDelta() : stats.viewsDelta()})}">Same as previous 30 days</div>
         </div>
         <div class="stat" th:if="${canPosts}">
-            <div class="kicker">Published · last 30 days</div>
+            <div class="kicker" th:text="#{admin.dashboard.published_30d}">Published · last 30 days</div>
             <div class="v" th:text="${stats.publishedLast30Days}">0</div>
-            <div class="d" th:text="${stats.publishedDelta() > 0} ? |+${stats.publishedDelta()} vs previous 30 days| : (${stats.publishedDelta() < 0} ? |${stats.publishedDelta()} vs previous 30 days| : 'Same as previous 30 days')">Same as previous 30 days</div>
+            <div class="d" th:text="${stats.publishedDelta() == 0} ? #{admin.dashboard.delta_same} : #{admin.dashboard.delta(${stats.publishedDelta() > 0 ? '+' + stats.publishedDelta() : stats.publishedDelta()})}">Same as previous 30 days</div>
         </div>
         <div class="stat" th:if="${canPosts}">
-            <div class="kicker">Posts</div>
+            <div class="kicker" th:text="#{nav.admin.posts}">Posts</div>
             <div class="v" th:text="${stats.publishedTotal}">0</div>
-            <div class="d" th:text="|published · ${stats.drafts} drafts · ${stats.scheduled} scheduled|">published</div>
+            <div class="d" th:text="#{admin.dashboard.posts_breakdown(${stats.drafts},${stats.scheduled})}">published</div>
         </div>
         <div class="stat" th:if="${canComments}">
-            <div class="kicker">Comments</div>
+            <div class="kicker" th:text="#{nav.admin.comments}">Comments</div>
             <div class="v" th:text="${stats.commentsApproved}">0</div>
-            <div class="d"><a th:href="@{/admin/comments}" th:text="|${stats.commentsPending} awaiting moderation|">0 awaiting moderation</a></div>
+            <div class="d"><a th:href="@{/admin/comments}" th:text="#{admin.comment.awaiting(${stats.commentsPending})}">0 awaiting moderation</a></div>
         </div>
         <div class="stat" th:if="${canMedia}">
-            <div class="kicker">Media library</div>
+            <div class="kicker" th:text="#{nav.admin.media}">Media library</div>
             <div class="v" th:text="${stats.mediaFiles}">0</div>
-            <div class="d" th:text="|files · ${stats.mediaSize()}|">files</div>
+            <div class="d" th:text="#{admin.dashboard.media_files(${stats.mediaSize()})}">files</div>
         </div>
     </div>
 
     <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;margin-top:32px">
         <div th:if="${canPosts}">
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Published posts by category</p>
-            <p th:if="${stats.topCategories.isEmpty()}" class="dim" style="padding:16px 0">No published posts yet.</p>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.dashboard.by_category}">Published posts by category</p>
+            <p th:if="${stats.topCategories.isEmpty()}" class="dim" style="padding:16px 0" th:text="#{admin.dashboard.no_published}">No published posts yet.</p>
             <div class="bar-row" th:each="c : ${stats.topCategories}"
                  style="display:grid;grid-template-columns:160px minmax(0,1fr) 70px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)">
                 <span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:title="${c.name}" th:text="${c.name}">Category</span>
@@ -60,31 +60,31 @@
         </div>
 
         <div>
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Needs attention</p>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.dashboard.attention}">Needs attention</p>
             <a th:if="${perms.contains('users:view')}" th:href="@{/admin/users}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
-                <span style="font-size:14px">Accounts waiting for approval</span>
+                <span style="font-size:14px" th:text="#{admin.dashboard.accounts_pending}">Accounts waiting for approval</span>
                 <span th:style="${stats.usersPending > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.usersPending}">0</span>
             </a>
             <a th:if="${canComments}" th:href="@{/admin/comments}" class="attention-row" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
-                <span style="font-size:14px">Comments awaiting moderation</span>
+                <span style="font-size:14px" th:text="#{admin.dashboard.comments_pending}">Comments awaiting moderation</span>
                 <span style="font-size:13px;font-weight:700" th:style="${stats.commentsPending > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.commentsPending}">0</span>
             </a>
             <th:block th:if="${canPosts}">
                 <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
-                    <span style="font-size:14px">Drafts not edited for 30+ days</span>
+                    <span style="font-size:14px" th:text="#{admin.dashboard.stale_drafts}">Drafts not edited for 30+ days</span>
                     <span th:style="${stats.staleDrafts > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.staleDrafts}">0</span>
                 </a>
                 <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
-                    <span style="font-size:14px">Published posts missing an SEO title</span>
+                    <span style="font-size:14px" th:text="#{admin.dashboard.missing_seo_title}">Published posts missing an SEO title</span>
                     <span th:style="${stats.missingSeoTitle > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.missingSeoTitle}">0</span>
                 </a>
                 <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)">
-                    <span style="font-size:14px">Published posts missing a meta description</span>
+                    <span style="font-size:14px" th:text="#{admin.dashboard.missing_seo_description}">Published posts missing a meta description</span>
                     <span th:style="${stats.missingSeoDescription > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.missingSeoDescription}">0</span>
                 </a>
                 <a th:href="@{/admin/posts}" style="display:flex;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)"
-                   title="These posts are Scheduled but have no publish time, so they will not go live on their own">
-                    <span style="font-size:14px">Scheduled posts with no publish time</span>
+                   th:title="#{admin.dashboard.scheduled_no_time_hint}">
+                    <span style="font-size:14px" th:text="#{admin.dashboard.scheduled_no_time}">Scheduled posts with no publish time</span>
                     <span th:style="${stats.scheduledWithoutTime > 0} ? 'font-size:13px;font-weight:700;color:var(--accent)' : 'font-size:13px;font-weight:700;color:var(--dim)'" th:text="${stats.scheduledWithoutTime}">0</span>
                 </a>
             </th:block>
@@ -93,8 +93,8 @@
 
     <div class="dashboard-split" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;margin-top:36px">
         <div th:if="${canComments}">
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Latest comments awaiting moderation</p>
-            <p th:if="${stats.pendingComments.isEmpty()}" class="dim" style="padding:16px 0">Nothing to moderate.</p>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.dashboard.latest_pending}">Latest comments awaiting moderation</p>
+            <p th:if="${stats.pendingComments.isEmpty()}" class="dim" style="padding:16px 0" th:text="#{admin.dashboard.nothing_to_moderate}">Nothing to moderate.</p>
             <a th:each="c : ${stats.pendingComments}" th:href="@{/admin/comments}"
                style="display:flex;flex-direction:column;gap:4px;padding:14px 0;border-bottom:1px solid var(--line)">
                 <span style="display:flex;justify-content:space-between;gap:12px">
@@ -102,30 +102,30 @@
                     <span class="dim" style="font-size:12px;white-space:nowrap" th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}">2026-09-15 10:00</span>
                 </span>
                 <span class="dim" style="font-size:13px;overflow-wrap:anywhere" th:text="${#strings.abbreviate(c.content, 110)}">Comment</span>
-                <span style="font-size:12px" th:text="|on ${c.post.title}|">on Post</span>
+                <span style="font-size:12px" th:text="#{admin.dashboard.on_post(${c.post.title})}">on Post</span>
             </a>
         </div>
 
         <div th:if="${canPosts}">
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Most read · last 30 days</p>
-            <p th:if="${stats.topPosts.isEmpty()}" class="dim" style="padding:16px 0">No views recorded yet. Views are counted for real readers only (no bots, no staff).</p>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.dashboard.most_read}">Most read · last 30 days</p>
+            <p th:if="${stats.topPosts.isEmpty()}" class="dim" style="padding:16px 0" th:text="#{admin.dashboard.no_views}">No views recorded yet.</p>
             <a th:each="t : ${stats.topPosts}" th:href="@{/article/{slug}(slug=${t.slug})}" target="_blank" rel="noopener"
                style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)">
                 <strong style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${t.title}">Title</strong>
-                <span class="dim" style="font-size:13px;font-variant-numeric:tabular-nums" th:text="|${#numbers.formatInteger(t.views, 1, 'COMMA')} views|">0 views</span>
+                <span class="dim" style="font-size:13px;font-variant-numeric:tabular-nums" th:text="#{admin.dashboard.views(${#numbers.formatInteger(t.views, 1, 'COMMA')})}">0 views</span>
             </a>
         </div>
 
         <div th:if="${canPosts}">
-            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)">Recently edited posts</p>
-            <p th:if="${stats.recentPosts.isEmpty()}" class="dim" style="padding:16px 0">No posts yet.</p>
+            <p class="kicker" style="padding-bottom:12px;border-bottom:2px solid var(--rule)" th:text="#{admin.dashboard.recently_edited}">Recently edited posts</p>
+            <p th:if="${stats.recentPosts.isEmpty()}" class="dim" style="padding:16px 0" th:text="#{admin.dashboard.no_posts}">No posts yet.</p>
             <a th:each="p : ${stats.recentPosts}" th:href="@{'/admin/post/' + ${p.id} + '/edit'}"
                style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)">
                 <strong style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${p.title}">Title</strong>
                 <span class="badge"
                       th:style="${p.status.name() == 'PUBLISHED' ? 'color:#5ee38a' : (p.status.name() == 'DRAFT' ? 'color:#a0a0a0' : (p.status.name() == 'SCHEDULED' ? 'color:#ffc94d' : 'color:#7d7979'))}"
-                      th:text="${#strings.capitalize(#strings.toLowerCase(p.status.name()))}">Draft</span>
-                <span class="dim" style="font-size:12px" th:text="|${p.category.name} · edited ${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'}|">Category · edited</span>
+                      th:text="#{'enum.post.status.' + ${p.status.name()}}">Draft</span>
+                <span class="dim" style="font-size:12px" th:text="#{admin.dashboard.edited(${p.category.name},${p.updatedAt != null ? #temporals.format(p.updatedAt, 'yyyy-MM-dd HH:mm') : '—'})}">Category · edited</span>
             </a>
         </div>
     </div>

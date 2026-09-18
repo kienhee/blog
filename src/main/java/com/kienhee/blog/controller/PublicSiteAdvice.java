@@ -1,9 +1,11 @@
 package com.kienhee.blog.controller;
 
+import com.kienhee.blog.config.I18n;
 import com.kienhee.blog.entity.Post;
 import com.kienhee.blog.service.PublicBlogService;
 import com.kienhee.blog.service.SettingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -26,12 +28,26 @@ public class PublicSiteAdvice {
 
     @ModelAttribute("siteTitle")
     public String siteTitle() {
-        return settingService.get("site.title", "Kienhee");
+        return perLanguage("site.title", "Kienhee");
     }
 
     @ModelAttribute("siteDescription")
     public String siteDescription() {
-        return settingService.get("site.meta_description", "AI guides and news, written and tested by one person.");
+        return perLanguage("site.meta_description", "AI guides and news, written and tested by one person.");
+    }
+
+    /**
+     * A setting the admin may fill in per language: {@code site.title.vi} / {@code site.title.en},
+     * falling back to the plain key (what older installs hold) and then to the built-in default.
+     * {@code SettingService} is a free key/value store, so this needs no migration.
+     */
+    private String perLanguage(String key, String fallback) {
+        String language = I18n.codeOf(LocaleContextHolder.getLocale());
+        String translated = settingService.get(key + "." + language, "");
+        if (!translated.isBlank()) {
+            return translated;
+        }
+        return settingService.get(key, fallback);
     }
 
     @ModelAttribute("mainAuthorId")

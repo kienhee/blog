@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.dto.CommentForm;
 import com.kienhee.blog.entity.Comment;
 import com.kienhee.blog.entity.CommentStatus;
@@ -55,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
         if (form.getParentId() != null) {
             Comment parent = commentRepository.findById(form.getParentId())
                     .filter(p -> post.getId().equals(p.getPostId()) && p.getStatus() == CommentStatus.APPROVED)
-                    .orElseThrow(() -> new IllegalArgumentException("The comment you are replying to is no longer available."));
+                    .orElseThrow(() -> new BusinessException("error.comment.parent_gone"));
             rootId = parent.getParentId() != null ? parent.getParentId() : parent.getId();
         }
 
@@ -104,7 +105,7 @@ public class CommentServiceImpl implements CommentService {
 
     private static Collection<Long> requireIds(Collection<Long> ids) {
         if (ids == null || ids.stream().noneMatch(Objects::nonNull)) {
-            throw new IllegalArgumentException("Select at least one comment.");
+            throw new BusinessException("error.comment.select_one");
         }
         return ids.stream().filter(Objects::nonNull).distinct().toList();
     }
@@ -119,15 +120,15 @@ public class CommentServiceImpl implements CommentService {
     public Comment replyAsStaff(Long commentId, String content, String staffEmail) {
         String text = content == null ? "" : content.replace("\r\n", "\n").trim();
         if (text.isEmpty()) {
-            throw new IllegalArgumentException("Write a reply first.");
+            throw new BusinessException("error.comment.reply_empty");
         }
         if (text.length() > 2000) {
-            throw new IllegalArgumentException("Replies can be at most 2000 characters.");
+            throw new BusinessException("error.comment.reply_too_long");
         }
         Comment target = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("That comment is no longer available."));
+                .orElseThrow(() -> new BusinessException("error.comment.gone"));
         User staff = userRepository.findByEmail(staffEmail == null ? "" : staffEmail.trim().toLowerCase(Locale.ROOT))
-                .orElseThrow(() -> new IllegalArgumentException("Your account was not found."));
+                .orElseThrow(() -> new BusinessException("error.comment.account_gone"));
 
         Long rootId = target.getParentId() != null ? target.getParentId() : target.getId();
         // A reply is public, so the conversation it belongs to must be too.

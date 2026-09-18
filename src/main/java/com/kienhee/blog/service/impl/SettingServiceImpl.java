@@ -1,5 +1,6 @@
 package com.kienhee.blog.service.impl;
 
+import com.kienhee.blog.exception.BusinessException;
 import com.kienhee.blog.entity.SiteSetting;
 import com.kienhee.blog.repository.SiteSettingRepository;
 import com.kienhee.blog.service.SettingService;
@@ -61,7 +62,7 @@ public class SettingServiceImpl implements SettingService {
     @Transactional
     public int saveAll(Map<String, String> values) {
         if (values == null || values.isEmpty()) {
-            throw new IllegalArgumentException("Nothing to save.");
+            throw new BusinessException("error.setting.nothing");
         }
 
         // Validate everything before writing anything, so one bad field never leaves a half-saved form.
@@ -69,12 +70,11 @@ public class SettingServiceImpl implements SettingService {
         for (Map.Entry<String, String> entry : values.entrySet()) {
             String key = entry.getKey() != null ? entry.getKey().trim() : "";
             if (key.isEmpty() || key.length() > MAX_KEY_LENGTH || !KEY_PATTERN.matcher(key).matches()) {
-                throw new IllegalArgumentException("Invalid setting key \"" + key
-                        + "\". Use lowercase letters, digits and . _ - (for example site.title).");
+                throw new BusinessException("error.setting.bad_key", key);
             }
             String value = entry.getValue() != null ? entry.getValue().trim() : "";
             if (value.length() > MAX_VALUE_LENGTH) {
-                throw new IllegalArgumentException("The value for \"" + key + "\" is too long.");
+                throw new BusinessException("error.setting.value_long", key);
             }
             clean.put(key, value);
         }

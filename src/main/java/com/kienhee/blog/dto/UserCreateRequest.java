@@ -12,22 +12,22 @@ import lombok.*;
 @Builder
 public class UserCreateRequest {
 
-    @NotBlank(message = "Full name is required.")
-    @Size(min = 2, max = 150, message = "Full name must have at least 2 characters.")
+    @NotBlank(message = "{validation.full_name.required}")
+    @Size(min = 2, max = 150, message = "{validation.full_name.min}")
     private String fullName;
 
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Invalid email format.")
+    @NotBlank(message = "{validation.email.required}")
+    @Email(message = "{validation.email.invalid}")
     private String email;
 
-    @NotBlank(message = "Password is required.")
-    @Size(min = 6, message = "Password must have at least 6 characters.")
+    @NotBlank(message = "{validation.password.required}")
+    @Size(min = 6, message = "{validation.password.min6}")
     private String password;
 
-    @Size(max = 20, message = "Phone must not exceed 20 characters.")
+    @Size(max = 20, message = "{validation.phone.max}")
     private String phone;
 
-    @Size(max = 255, message = "Address must not exceed 255 characters.")
+    @Size(max = 255, message = "{validation.address.max}")
     private String address;
 
     private String bio;
